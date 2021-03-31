@@ -35,13 +35,13 @@ byte counter2 = 200 ;
 
 void /*ICACHE_RAM_ATTR*/ InterruptWakeUp()
 {
-      detachInterrupt( digitalPinToInterrupt (wakeUpPin) );
-      _click_on_state = 1;     
+    detachInterrupt( digitalPinToInterrupt (wakeUpPin) );
+    _click_on_state = 1;
 }
 
 void setup() {
   Serial.begin(9600); //открываем порт для связи с ПК
-  pinMode(wakeUpPin, CHANGE);
+  pinMode(wakeUpPin, INPUT_PULLUP);
     
 
   radio.begin(); //активировать модуль
@@ -64,13 +64,16 @@ void setup() {
                   , InterruptWakeUp
                   , FALLING);
 Serial.print("setup\n");
-      set_sleep_mode(SLEEP_MODE_PWR_DOWN);  
+delay(2000);
 }
 
 void loop() {
   
-  sleep_mode();
-  Serial.print("wake up\n");
+  Serial.print("sh down\n");
+        set_sleep_mode(SLEEP_MODE_PWR_DOWN);  
+        sleep_mode();
+        Serial.print("wake up!\n");
+  
   if (_click_on_state==1)
     {
       Serial.print("button is down\n");
@@ -87,6 +90,7 @@ void loop() {
         radio.write(&counter2, sizeof(counter2));  
         led_state = 0;
         delay(10); 
+             
       }
       
       _click_on_state=0;
