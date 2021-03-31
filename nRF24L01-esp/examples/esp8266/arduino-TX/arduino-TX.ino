@@ -19,7 +19,8 @@
 #include <SPI.h>          // библиотека для работы с шиной SPI
 #include "nRF24L01.h"     // библиотека радиомодуля
 #include "RF24.h"         // ещё библиотека радиомодуля
-#include <avr/sleep.h>
+//#include <avr/sleep.h>
+#include <LowPower.h>
 
 const int wakeUpPin = 2 ; // d2
 int _click_on_state = 0; //состояние кнопки
@@ -36,12 +37,15 @@ byte counter2 = 200 ;
 void /*ICACHE_RAM_ATTR*/ InterruptWakeUp()
 {
     detachInterrupt( digitalPinToInterrupt (wakeUpPin) );
+     radio.powerUp(); //начать работу
+     radio.stopListening();  //не слушаем радиоэфир, мы передатчик
+     
     _click_on_state = 1;
 }
 
 void setup() {
   Serial.begin(9600); //открываем порт для связи с ПК
-  pinMode(wakeUpPin, INPUT_PULLUP);
+  pinMode(wakeUpPin, CHANGE);
     
 
   radio.begin(); //активировать модуль
@@ -58,26 +62,24 @@ void setup() {
   //должна быть одинакова на приёмнике и передатчике!
   //при самой низкой скорости имеем самую высокую чувствительность и дальность!!
 
-  radio.powerUp(); //начать работу
-  radio.stopListening();  //не слушаем радиоэфир, мы передатчик
+     //radio.powerUp(); //начать работу
+     //radio.stopListening();  //не слушаем радиоэфир, мы передатчик
   attachInterrupt(digitalPinToInterrupt(wakeUpPin)
                   , InterruptWakeUp
                   , FALLING);
 Serial.print("setup\n");
-delay(2000);
+delay(1000);
 }
 
 void loop() {
   
-  Serial.print("sh down\n");
-        set_sleep_mode(SLEEP_MODE_PWR_DOWN);  
-        sleep_mode();
-        Serial.print("wake up!\n");
+        //Serial.print("radio sh down\n");
+
+      //  Serial.print("wake up!\n");
   
   if (_click_on_state==1)
     {
-      Serial.print("button is down\n");
-      if (led_state == 0)
+    if (led_state == 0)
       {
         Serial.print("Sent: "); Serial.println(counter1);
         radio.write(&counter1, sizeof(counter1));
@@ -90,9 +92,10 @@ void loop() {
         radio.write(&counter2, sizeof(counter2));  
         led_state = 0;
         delay(10); 
-             
-      }
-      
+      }    
+        radio.powerDown();
+        
+                 
       _click_on_state=0;
       delay(100);
       attachInterrupt(digitalPinToInterrupt(wakeUpPin)
