@@ -45,7 +45,7 @@ void /*ICACHE_RAM_ATTR*/ InterruptWakeUp()
 
 void setup() {
   Serial.begin(9600); //открываем порт для связи с ПК
-  pinMode(wakeUpPin, CHANGE);
+  pinMode(wakeUpPin, INPUT);
     
 
   radio.begin(); //активировать модуль
