@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>ESP8266 админка</title>
+	<link href="favicon.ico" rel="icon" type="image/x-icon" />
+	<script type="text/javascript" src="a.js"></script>
+	<link rel="stylesheet" type="text/css" href="style.css"/>
+</head>
+<body>
+
+<h2>Админка</h2>
+<div class="main">
+	<div class="tab">
+		<button class="tablinks" onclick="LoadState()" id="defaultOpen">Статус</button>
+		<button class="tablinks" onclick="LoadWiFiSettings()">WiFi</button>
+		<button class="tablinks" onclick="LoadSettings()">Настройки</button>
+		<button class="tablinks" onclick="openTab(event, 'service')">Сервис</button>
+	</div>
+
+	<div id="states" class="tabcontent">
+		<div id="http" class="tabcontent_block">
+			<h3>Состояние</h3>
+			<div id="req_status">Текущий статус: On</div><br>
+			<button onclick="get_state()">Включить</button>
+			<button onclick="get_state()">Выключить</button>
+			<button onclick="get_state()">Переключить</button>
+			<button onclick="get_state()">Обновить</button>
+		</div>
+		<div id="http" class="tabcontent_last">
+			<h3>Информация</h3>
+			<table border="0">
+				<tr><td align="right">Устройство:</td><td id="dev_id">...</td></tr>
+				<tr><td align="right">IP:</td><td id="local_ip">...</td></tr>
+				<tr><td align="right">SoftAP IP:</td><td id="softap_ip" name="softap_ip">...</td></tr>
+				<tr><td align="right">MAC:</td><td id="mac" name="mac">...</td></tr>
+			</table>
+		</div>
+	</div>
+	
+	<div id="wifi" class="tabcontent">
+		<div id="wifi_settings" class="tabcontent_bloc">
+			<h3>WiFi</h3>
+				<p><input id="wifi_ssid" name="wifi_ssid" type="text" size="20" required> SSID</p>
+				<p><input id="wifi_pass" name="wifi_pass" type="password" size="20" required> Пароль</p>
+				<p><button onclick="SaveWiFiSettings()">Сохранить</button><p>
+		</div>
+		<div id="wifi_net" class="tabcontent_last">
+			<h3>Доступные WiFi-сети</h3>
+			<div id="wifi_networks">...загружаем список доступных сетей WiFi...</div>
+		</div>
+	</div>
+	
+	<div id="settings" class="tabcontent">
+		<div id="dev_name" class="tabcontent_block">
+			<h3>Имя устройства</h3>
+			<p><input id="dev_id1" name="dev_id1" type="text" size="20" required></p>
+			<p><button onclick="SaveDevID()">Сохранить</button><p>
+		</div>
+		<div id="boot_state" class="tabcontent_block">
+			<h3>Состояние при загрузке</h3>
+			<p><input id="boot_state1" name="boot_state" type="radio" value="0"> Реле выключено при включении устройства</p>
+			<p><input id="boot_state2" name="boot_state" type="radio" value="1"> Реле включено при включении устройства</p>
+			<p><button onclick="SaveBootState()">Сохранить</button><p>
+		</div>
+		<div id="mqtt" class="tabcontent_block">
+			<h3>MQTT</h3>
+			<p><input id="use_mqtt" name="use_mqtt" type="checkbox">Включить MQTT</p>
+			<p><input id="mqtt_brocker" name="mqtt_brocker" type="text" size="25" required> Брокер</p>
+			<p><input id="mqtt_port" name="mqtt_port" type="text" size="25" required> Порт</p>
+			<p><input id="mqtt_user" name="mqtt_user" type="text" size="25"> Пользователь</p>
+			<p><input id="mqtt_pass" name="mqtt_pass" type="password" size="25"> Пароль</p>
+			<p><button onclick="SaveMQTT()">Сохранить</button><p>
+		</div>
+		<div id="http" class="tabcontent_last">
+			<h3>HTTP</h3>
+			<p>Отправка HTTP-запроса при включении и выключении реле</p>
+			<p><input id="use_http" name="use_http" type="checkbox">Включить HTTP</p>
+			<p><input id="http_on_request" name="http_on_request" type="url" size="25"> запрос при включении</p>
+			<p><input id="http_off_request" name="http_off_request" type="url" size="25"> запрос при выключении</p>
+			<p><button onclick="SaveHTTP()">Сохранить</button><p>
+		</div>
+	</div>	
+	
+	<div id="service" class="tabcontent">
+		<div id="http" class="tabcontent_block">
+			<h3>Обновление ПО</h3>
+			<form method='POST' action='/update' enctype='multipart/form-data'>
+				 Прошивка:<br>
+				 <input type='file' accept='.bin' name='firmware'>
+				 <input type='submit' value='Обновить прошивку'>
+			 </form>
+			 <br>
+			 <form method='POST' action='/update' enctype='multipart/form-data'>
+				 Файловая система:<br>
+				 <input type='file' accept='.bin' name='filesystem'>
+				 <input type='submit' value='Обновить файловую систему'>
+			 </form>
+			 <br>
+		</div>
+		<div id="http" class="tabcontent_last">
+			<h3>Перезагрузка</h3>
+			<p><input type="button" value="Reboot" onclick="reboot();"></p>
+		</div>
+	</div>
+
+</div>
+
+<script>
+	document.getElementById("defaultOpen").click();
+</script>
+
+</body>
+</html>
