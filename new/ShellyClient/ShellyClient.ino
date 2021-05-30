@@ -11,9 +11,11 @@ HTTPClient http;
 WiFiClient client;
 bool RealCheck = false;
 String resp;
-const char* ssid = "iPhonexc5"; //гараж
-const char* pass = "12345qAz";
+int resp_state = 0;
 int bt_state = 0;
+
+const char* ssid = "ESPap"; //гараж
+const char* pass = "123456789";
 unsigned long previousMillis = 0;
 
 #define DEBUG;
@@ -48,51 +50,50 @@ String get(String Arequest){
   String response = http.getString(); 
   
  // log(httpCode);  
-//  log(response);   
   http.end();
   //log("Free heap: " + String(ESP.getFreeHeap()));
   return response;
 }
 
 void setup() {
-  pinMode(4, OUTPUT);
-  pinMode(5, INPUT);
+  //pinMode(4, OUTPUT);
+  //digitalWrite(4, LOW);
+  //pinMode(5, INPUT);
   initlog(); 
   wifi_begin();
 
 }
 void loop(){
-  int bt = digitalRead(5);
-  if (bt != bt_state){
-     if (RealCheck)
-      {
+  int bt = 0;
+  //int bt = digitalRead(5);
+  if (bt != bt_state){ //если есть изменение состояния кнопки
+     if (!RealCheck){
+       RealCheck = true;
+       //digitalWrite(4, HIGH); //включаем
+       resp = get("http://192.168.4.1/Led1StateOn");  //говорим серверу, что лампа включилась
+     }
+     else if (RealCheck){
       RealCheck = false;
-      digitalWrite(4, LOW);
-      }
-     else
-      {
-      RealCheck = true;
-      digitalWrite(4, HIGH);
-      }
-      }
+       //digitalWrite(4, LOW); //выключаем
+       resp = get("http://192.168.4.1/Led1StateOff"); //говорим серверу, что лампа выключилась
+     }
+  }
+  bt_state = bt; //готовы снова ловить выключатель
 
-  if (RealCheck){
-    resp = get("http://172.20.10.11/MyStateOn");}
-  else{
-    resp = get("http://172.20.10.11/MyStateOff");}
-    
-  if (resp == "On"){
-      log("Get on");
-      RealCheck = true;
-      digitalWrite(4, HIGH);
-      }
-    if (resp == "Off"){
-      log("Get off");
-      RealCheck = false;
-      digitalWrite(4, LOW);
-    }
-
-  bt_state = bt;
-  delay(300);
   
+  resp = get("http://192.168.4.1/led1state"); //спрашиваем у сервера состояние
+  log(resp);
+  if (resp == "On")
+    if (!RealCheck){
+      RealCheck = true;
+      //digitalWrite(4, HIGH);
+       Serial.println("Lamp ON");
+    }
+  if (resp == "Off")
+    if (RealCheck){
+      RealCheck = false;
+      //digitalWrite(4, LOW);
+       Serial.println("Lamp OFF");
+    }
+  delay(1000);
 }
