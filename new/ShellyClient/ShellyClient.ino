@@ -11,7 +11,6 @@ HTTPClient http;
 WiFiClient client;
 bool RealCheck = false;
 String resp;
-int resp_state = 0;
 int bt_state = 0;
 
 const char* ssid = "ESPap"; //гараж
@@ -34,6 +33,7 @@ void log(String AMessage){
 
 void wifi_begin()
 {
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);  
   log("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
@@ -56,44 +56,44 @@ String get(String Arequest){
 }
 
 void setup() {
-  //pinMode(4, OUTPUT);
-  //digitalWrite(4, LOW);
-  //pinMode(5, INPUT);
+  pinMode(4, OUTPUT);
+  digitalWrite(4, LOW);
+  pinMode(5, INPUT);
   initlog(); 
   wifi_begin();
 
 }
 void loop(){
-  int bt = 0;
-  //int bt = digitalRead(5);
+  //int bt = 0;
+  int bt = digitalRead(5);
   if (bt != bt_state){ //если есть изменение состояния кнопки
      if (!RealCheck){
        RealCheck = true;
-       //digitalWrite(4, HIGH); //включаем
-       resp = get("http://192.168.4.1/Led1StateOn");  //говорим серверу, что лампа включилась
+       digitalWrite(4, HIGH); //включаем
+       resp = get("http://192.168.4.1/Device1_On");  //говорим серверу, что лампа включилась
      }
      else if (RealCheck){
       RealCheck = false;
-       //digitalWrite(4, LOW); //выключаем
-       resp = get("http://192.168.4.1/Led1StateOff"); //говорим серверу, что лампа выключилась
+       digitalWrite(4, LOW); //выключаем
+       resp = get("http://192.168.4.1/Device1_Off"); //говорим серверу, что лампа выключилась
      }
   }
   bt_state = bt; //готовы снова ловить выключатель
 
   
-  resp = get("http://192.168.4.1/led1state"); //спрашиваем у сервера состояние
+  resp = get("http://192.168.4.1/Device1_GetState"); //спрашиваем у сервера состояние
   log(resp);
   if (resp == "On")
     if (!RealCheck){
       RealCheck = true;
-      //digitalWrite(4, HIGH);
-       Serial.println("Lamp ON");
+      digitalWrite(4, HIGH);
+      Serial.println("Lamp ON");
     }
   if (resp == "Off")
     if (RealCheck){
       RealCheck = false;
-      //digitalWrite(4, LOW);
-       Serial.println("Lamp OFF");
+      digitalWrite(4, LOW);
+      Serial.println("Lamp OFF");
     }
-  delay(1000);
+  delay(100);
 }

@@ -20,36 +20,44 @@ void log(String AMessage){
   Serial.println(AMessage); 
 }
 
+bool StartAPMode() {
+  WiFi.disconnect();
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
+  WiFi.softAP(ssid, password);
+  
+  IPAddress myIP = WiFi.softAPIP();
+  log("AP IP address: " + myIP);
+  
+  return true;
+}
+
 void setup() {
   delay(1000);
   Serial.begin(115200);
   log("");
   log("Configuring access point...");
   /* You can remove the password parameter if you want the AP to be open. */
-  WiFi.mode(WIFI_AP);
-  WiFi.softAP(ssid, password);
-
-  IPAddress myIP = WiFi.softAPIP();
-  log("AP IP address: " + myIP);
-//  server.on("/", handleRoot);
-
+ 
+  StartAPMode();
+  String r = server.headerName;
+  log(server.headerName);
   server.on("/", handle_OnConnect);
   server.on("/led1on", handle_led1on);
   server.on("/led1off", handle_led1off);
   server.onNotFound(handle_NotFound);
 
-  server.on("/led1state", handle_led1state);
-  server.on("/Led1StateOn", handle_Led1StateOn);
-  server.on("/Led1StateOff", handle_Led1StateOff);
+
+  server.on("/Device1_GetState", handle_led1state);
+  server.on("/Device1_Device1_On", handle_Led1StateOn);
+  server.on("/Device1_Device1_Off", handle_Led1StateOff);
     
   server.begin();
   log("HTTP server started");
 }
 
 void loop() {
-  server.handleClient();
-  //WiFiClient client = server.available();
-  
+  server.handleClient();  
 }
 
 void handle_OnConnect() 
@@ -80,6 +88,7 @@ void handle_led1off()
 
 void handle_led1state()
 {
+  DeviceInfo = getDeviceInfo( 
   if (LED1status) {
     log("LED1 Status: ON");
     server.send(200, "text/html", "On");
@@ -113,7 +122,7 @@ void handle_NotFound()
 String SendHTML(bool led1stat)
 {
   String ptr = "<!DOCTYPE html> <html>\n";
-  ptr +="<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
+  ptr +="<head><meta http-equiv=\"Refresh\" content=\"7;URL=http://192.168.4.1/\" name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
   ptr +="<title>LED Control</title>\n";
   ptr +="<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
   ptr +="body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 50px;}\n";
@@ -134,12 +143,13 @@ String SendHTML(bool led1stat)
   else
     ptr +="<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/led1on\">ON</a>\n";
 
-/*  if(led2stat)
+  if(led2stat)
     ptr +="<p>LED2 Status: ON</p><a class=\"button button-off\" href=\"/led2off\">OFF</a>\n";
   else
     ptr +="<p>LED2 Status: OFF</p><a class=\"button button-on\" href=\"/led2on\">ON</a>\n";
-*/
+
   ptr +="</body>\n";
+  
   ptr +="</html>\n";
   return ptr;
 }
