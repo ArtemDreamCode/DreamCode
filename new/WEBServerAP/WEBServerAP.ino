@@ -2,9 +2,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
-////change from 31.05.2021 work pc////
-////change from 31.05.2021 work pc////
-
+////change from 31.05.2021 14:00 work pc////
 
 String ssid = "ESPap";
 String password = "123456789";
