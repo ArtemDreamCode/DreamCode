@@ -91,17 +91,6 @@ void handle_led1off()
 
 void handle_led1state()
 {
-  String message = ""'
-
-  if (server.arg("id")=="")
-  { //параметр не найден
-    message = "id Arg not found";
-  }
-  else
-  { //параметр найден
-    message = "id = ";
-    message += server.arg("id");
-  }
   if (LED1status) {
     log("LED1 Status: ON");
     server.send(200, "text/html", "On");
