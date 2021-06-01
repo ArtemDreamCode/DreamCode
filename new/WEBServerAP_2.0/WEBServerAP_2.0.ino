@@ -148,6 +148,18 @@ String check_flag(String id)
 //  return "null";
 }
 
+String change_state(String id, String state_buf);
+{
+  for (int i=0; i<lengh_max; i++)
+  {
+    if (id_base[i] == id)
+    {
+      state_base[i] = state_buf;
+      return state_base[i];
+    }
+  }
+}
+
 void handle_hardState()
 { //принимаем гет-запрос от устройства с параметром айди
   //отвечаем на него его статусом из памяти
@@ -170,10 +182,14 @@ void handle_hardChangeState()
   {
     if (server.argName(0) == "id") //первый из них "id"
       id_buf = server.arg(0);
-      check_id();
     if (server.argName(1) == "state") //второй из них "state"
-      state_buf = server.arg(1);
+      state_buf = server.arg(1); 
+      state_buf = change_state(id_buf, state_buf);
+
+      server.send(200, "text/html", state_buf);
   }
+
+  
   if (LED1status)
   {
     log("LED1 Status: ON");
