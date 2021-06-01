@@ -148,7 +148,7 @@ String check_flag(String id)
 //  return "null";
 }
 
-String change_state(String id, String state_buf);
+String change_state(String id, String state_buf)
 {
   for (int i=0; i<lengh_max; i++)
   {

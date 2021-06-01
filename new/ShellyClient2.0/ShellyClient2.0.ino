@@ -94,6 +94,7 @@ void loop(){
 
   
   message = "http://192.168.4.1/state?id=" + id;
+  log(message);
   resp = get(message); //спрашиваем у сервера состояние
   log(resp);
   if (resp == "On")
@@ -108,5 +109,7 @@ void loop(){
       digitalWrite(4, LOW);
       Serial.println("Lamp OFF");
     }
-  delay(100);
+  delay(500);
+
+  log(id);
 }
