@@ -13,8 +13,8 @@ bool LED1status = false;
 //массив хранения уникальных ключей и их состояний
 int const lengh_max = 10;
 
-String id_base[lengh_max] = {"shally"}; //идентификаторы устройств
-String state_base[lengh_max] = {"Off"};  //состояния устройств
+String id_base[lengh_max]; //идентификаторы устройств
+String state_base[lengh_max];  //состояния устройств
 
 String cur_id = "shally";
 
@@ -58,9 +58,9 @@ void setup() {
 
 
   server.on("/new", handle_new);
-  server.on("/hard", handle_hard);
-  server.on("/hardstate", handle_hardState);
-    
+  server.on("/state", handle_hardState);
+  server.on("/changestate", handle_hardChangeState);
+
   server.begin();
   log("HTTP server started");
 }
@@ -97,29 +97,42 @@ void handle_led1off()
 
 String generate_id()
 {
-  String resp = "shally";
+  String resp;
   char cur_id[6];
   for (int i=0; i<6; i++)
   {
     cur_id[i] = random(65, 90);
-    resp = cur_id;
   }
+  cur_id[6] = '\n';
+  resp = cur_id;
   return resp;
 }
 
 void handle_new()
 {
+  
+  log("handle_new: ");
   for (int i=0; i<lengh_max;i++)
   {
-    if (id_base[i] == "shally") //ищем свободную ячейку массива
+    Serial.print(id_base[i]); Serial.print(state_base[i]);
+  }
+
+  for (int i=0; i<lengh_max;i++)
+  {
+    if (id_base[i] == "") //ищем свободную ячейку массива
     {
-      String abcd = generate_id; //генерим айди и сохраняем в базу
-      id_base[i] = abcd;
+      id_base[i] = generate_id(); //генерим айди и сохраняем в базу
       state_base[i] = "Off"; //меняем флаг соотв этому айди
       server.send(200, "text/html", id_base[i]); //отправляем айди его устройству
       break;
     }
   }
+  
+  for (int i=0; i<lengh_max;i++)
+  {
+    Serial.print(id_base[i]); Serial.print(state_base[i] + "\n");
+  }
+
 }
 
 String check_flag(String id)
@@ -129,47 +142,49 @@ String check_flag(String id)
     if (id_base[i] == id)
     {
       return state_base[i];
+      break;
     }
   }
+//  return "null";
 }
 
-void handle_hard()
+void handle_hardState()
 { //принимаем гет-запрос от устройства с параметром айди
   //отвечаем на него его статусом из памяти
-  String message = "";
   if (server.args() == 1) //если аргумент один
   {
     if (server.argName(0) == "id") //и этот аргумент "id"
     {
       String id_param = server.arg(0); //смотрим значение этого аргумента - от кого пришел запрос
+      Serial.print("  " + id_param + "\n");
       server.send(200, "text/html", check_flag(id_param)); //отправляем устройству его статус
     }
   }
 }
 
-void handle_hardState()
+void handle_hardChangeState()
 {
-  String message = "";
-
-  if (server.arg("id")=="")
-  { //параметр не найден
-    message = "id Arg not found";
+  String id_buf;
+  String state_buf;
+  if (server.args() == 2) //если аргумента два
+  {
+    if (server.argName(0) == "id") //первый из них "id"
+      id_buf = server.arg(0);
+      check_id();
+    if (server.argName(1) == "state") //второй из них "state"
+      state_buf = server.arg(1);
   }
-  else
-  { //параметр найден
-    message = "id = ";
-    message += server.arg("id");
-  }
-  if (LED1status) {
+  if (LED1status)
+  {
     log("LED1 Status: ON");
     server.send(200, "text/html", "On");
   }
-  else{
+  else
+  {
     log("LED1 Status: Off");
     server.send(200, "text/html", "Off"); 
-    } 
+  } 
 }
-
 
 void handle_NotFound()
 {

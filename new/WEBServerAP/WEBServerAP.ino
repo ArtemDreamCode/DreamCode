@@ -2,7 +2,6 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
-////change from 31.05.2021 14:05 work pc////
 
 String ssid = "ESPap";
 String password = "123456789";
@@ -30,7 +29,7 @@ bool StartAPMode() {
   WiFi.softAP(ssid, password);
   
   IPAddress myIP = WiFi.softAPIP();
-  log("AP IP address: " + myIP);
+//  log("AP IP address: " + myIP);
   
   return true;
 }
@@ -145,10 +144,10 @@ String SendHTML(bool led1stat)
   else
     ptr +="<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/led1on\">ON</a>\n";
 
-  if(led2stat)
-    ptr +="<p>LED2 Status: ON</p><a class=\"button button-off\" href=\"/led2off\">OFF</a>\n";
-  else
-    ptr +="<p>LED2 Status: OFF</p><a class=\"button button-on\" href=\"/led2on\">ON</a>\n";
+//  if(led2stat)
+//    ptr +="<p>LED2 Status: ON</p><a class=\"button button-off\" href=\"/led2off\">OFF</a>\n";
+//  else
+//    ptr +="<p>LED2 Status: OFF</p><a class=\"button button-on\" href=\"/led2on\">ON</a>\n";
 
   ptr +="</body>\n";
   
