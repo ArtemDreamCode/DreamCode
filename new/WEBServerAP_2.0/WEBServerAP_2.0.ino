@@ -84,10 +84,12 @@ void handle_butclick() //нажатие на кнопку в форме
       if (server.argName(1) == "state") //второй из них "state"
       {
         id_buf = server.arg(0);
-        log(id_buf);
         state_buf = server.arg(1); 
-        log(state_buf);
         change_state(id_buf, state_buf);
+        for (int i=0; i<lengh_max;i++)
+        {
+          Serial.print(id_base[i] + " " + state_base[i] + "\n");
+        }
         server.send(200, "text/html", SendHTML()); 
       }
     }
@@ -97,12 +99,12 @@ void handle_butclick() //нажатие на кнопку в форме
 String generate_id()
 {
   String resp;
-  char cur_id[6];
+  char cur_id[7];
   for (int i=0; i<6; i++)
   {
     cur_id[i] = random(65, 90);
   }
-  cur_id[6] = '\n';
+  cur_id[6] = '\0';
   resp = cur_id;
   return resp;
 }
@@ -144,10 +146,8 @@ String check_flag(String id)
 //String
 void change_state(String id, String state)
 {
-  Serial.print(state);
   for (int i=0; i<lengh_max; i++)
   {
-    Serial.print(id_base[i]);
     if (id_base[i] == id)
     {
       state_base[i] = state;
