@@ -38,7 +38,6 @@ bool StartAPMode() {
   WiFi.softAP(ssid, password);
   
   IPAddress myIP = WiFi.softAPIP();
-  //log("AP IP address: " + myIP);
   
   return true;
 }
@@ -52,8 +51,7 @@ void setup() {
  
   StartAPMode();
   server.on("/", handle_OnConnect);
-  server.on("/led1on", handle_led1on);
-  server.on("/led1off", handle_led1off);
+  server.on("/butclick", handle_butclick);
   server.onNotFound(handle_NotFound);
 
 
@@ -71,28 +69,29 @@ void loop() {
 
 void handle_OnConnect() 
 { 
-  if(LED1status)
-   log("Lamp Status: ON");
-  else
-   log("Lamp Status: OFF");
-
-
-  log("");
-  server.send(200, "text/html", SendHTML(LED1status)); 
+  server.send(200, "text/html", SendHTML()); 
 }
 
-void handle_led1on() 
+void handle_butclick() //нажатие на кнопку в форме
 {
-  LED1status = true;
-  log("LED1 Status: ON ");
-  server.send(200, "text/html", SendHTML(LED1status)); 
-}
-
-void handle_led1off() 
-{
-  LED1status = false;
-  log("LED1 Status: OFF ");
-  server.send(200, "text/html", SendHTML(LED1status)); 
+  Serial.println("handle_butclick");
+  String id_buf;
+  String state_buf;
+  if (server.args() == 2) //если аргумента два
+  {
+    if (server.argName(0) == "id") //первый из них "id"
+    {
+      if (server.argName(1) == "state") //второй из них "state"
+      {
+        id_buf = server.arg(0);
+        log(id_buf);
+        state_buf = server.arg(1); 
+        log(state_buf);
+        change_state(id_buf, state_buf);
+        server.send(200, "text/html", SendHTML()); 
+      }
+    }
+  }
 }
 
 String generate_id()
@@ -109,14 +108,7 @@ String generate_id()
 }
 
 void handle_new()
-{
-  
-  log("handle_new: ");
-  for (int i=0; i<lengh_max;i++)
-  {
-    Serial.print(id_base[i]); Serial.print(state_base[i]);
-  }
-
+{ 
   for (int i=0; i<lengh_max;i++)
   {
     if (id_base[i] == "") //ищем свободную ячейку массива
@@ -130,7 +122,7 @@ void handle_new()
   
   for (int i=0; i<lengh_max;i++)
   {
-    Serial.print(id_base[i]); Serial.print(state_base[i] + "\n");
+    Serial.print(id_base[i] + " " + state_base[i] + "\n");
   }
 
 }
@@ -148,14 +140,18 @@ String check_flag(String id)
 //  return "null";
 }
 
-String change_state(String id, String state_buf)
+
+//String
+void change_state(String id, String state)
 {
+  Serial.print(state);
   for (int i=0; i<lengh_max; i++)
   {
+    Serial.print(id_base[i]);
     if (id_base[i] == id)
     {
-      state_base[i] = state_buf;
-      return state_base[i];
+      state_base[i] = state;
+      //return state_base[i];
     }
   }
 }
@@ -183,23 +179,12 @@ void handle_hardChangeState()
     if (server.argName(0) == "id") //первый из них "id"
       id_buf = server.arg(0);
     if (server.argName(1) == "state") //второй из них "state"
+    {
       state_buf = server.arg(1); 
-      state_buf = change_state(id_buf, state_buf);
-
-      server.send(200, "text/html", state_buf);
+      change_state(id_buf, state_buf);
+      server.send(200, "text/html", check_flag(id_buf));
+    }
   }
-
-  
-  if (LED1status)
-  {
-    log("LED1 Status: ON");
-    server.send(200, "text/html", "On");
-  }
-  else
-  {
-    log("LED1 Status: Off");
-    server.send(200, "text/html", "Off"); 
-  } 
 }
 
 void handle_NotFound()
@@ -207,7 +192,7 @@ void handle_NotFound()
   server.send(404, "text/plain", "Not found");
 }
 
-String SendHTML(bool led1stat)
+String SendHTML()
 {
   String ptr = "<!DOCTYPE html> <html>\n";
   ptr +="<head><meta http-equiv=\"Refresh\" content=\"7;URL=http://192.168.4.1/\" name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
@@ -225,7 +210,25 @@ String SendHTML(bool led1stat)
   ptr +="<body>\n";
   ptr +="<h1>ESP8266 Web Server</h1>\n";
   ptr +="<h3>Using Access Point(AP) Mode</h3>\n";
-  
+
+  for (int i=0; i<lengh_max; i++)
+  {
+    if (id_base[i] != "")
+    {
+      if (state_base[i] == "On")
+      {
+        ptr +="<p>LED1 Status: ON</p><a class=\"button button-off\" href=\"/butclick"; 
+        ptr +="?id="+id_base[i]+"&state=Off\">OFF</a>\n";
+      }
+      if (state_base[i] == "Off")
+      {
+        ptr +="<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/butclick";
+        ptr +="?id="+id_base[i]+"&state=On\">ON</a>\n";
+      }
+    }
+  }
+
+/* 
   if(led1stat)
     ptr +="<p>LED1 Status: ON</p><a class=\"button button-off\" href=\"/led1off\">OFF</a>\n";
   else
