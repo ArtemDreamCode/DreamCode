@@ -79,12 +79,14 @@ void loop(){
   if (bt != bt_state){ //если есть изменение состояния кнопки
      if (!RealCheck){
        RealCheck = true;
+       state = "On";
        digitalWrite(4, HIGH); //включаем
        message = "http://192.168.4.1/changestate?id=" + id + "&state=" + state;
        resp = get(message);  //говорим серверу, что лампа включилась
      }
      else if (RealCheck){
       RealCheck = false;
+      state = "Off";
        digitalWrite(4, LOW); //выключаем
        message = "http://192.168.4.1/changestate?id=" + id + "&state=" + state;
        resp = get(message); //говорим серверу, что лампа выключилась
@@ -100,12 +102,14 @@ void loop(){
   if (resp == "On")
     if (!RealCheck){
       RealCheck = true;
+      state = "On";
       digitalWrite(4, HIGH);
       Serial.println("Lamp ON");
     }
   if (resp == "Off")
     if (RealCheck){
       RealCheck = false;
+      state = "Off";
       digitalWrite(4, LOW);
       Serial.println("Lamp OFF");
     }

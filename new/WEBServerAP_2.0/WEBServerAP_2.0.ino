@@ -7,8 +7,6 @@
 String ssid = "ESPap";
 String password = "123456789";
 
-bool LED1status = false;
-
 
 //массив хранения уникальных ключей и их состояний
 int const lengh_max = 10;
