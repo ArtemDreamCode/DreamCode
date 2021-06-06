@@ -67,8 +67,9 @@ void setup() {
   wifi_begin();
   server.begin();
 
-  server.on("/led1on", handle_led1on);
-  server.on("/led1off", handle_led1off);
+  server.on("/Bton", handle_Bton);
+  server.on("/Btoff", handle_Btoff);
+  server.on("/ChangeState", handle_ChangeState);
   
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
@@ -83,68 +84,55 @@ void setup() {
   //иначе считываем айди из епрома
 }
 
-void handle_led1on()
+void handle_Bton()
 {
    RealCheck = true;
-   state = "On";
    digitalWrite(4, HIGH); //включаем
    Serial.println("on");
-   server.send(200, "text/html", "On");   
+   server.send(200, "text/html", SendHTML());   
 }
 
-void handle_led1off()
+void handle_Btoff()
 {
    RealCheck = false;
-   state = "Off";
    digitalWrite(4, LOW); //выключаем
    Serial.println("off");
-   server.send(200, "text/html", "Off"); 
+   server.send(200, "text/html", SendHTML()); 
 }
 
+void handle_ChangeState(){
+   Serial.println("ChangeState");
+   if (RealCheck) {
+      server.send(200, "text/html", "On"); }
+   else {
+      server.send(200, "text/html", "Off"); }      
+}
+
+String SendHTML()
+{
+  String ptr = "<!DOCTYPE html> <html>\n";
+  ptr +="<head>";
+  ptr +="<meta http-equiv=\"refresh\" content=\"1;http://192.168.4.1\" />";
+  //<meta http-equiv="refresh" content="0;https://yutex.ru/index.html">
+  ptr +="</head>\n";  
+  ptr +="</html>\n";
+  return ptr;
+}
 
 void loop(){
-  //int bt = 0;
   int bt = digitalRead(5);
   if (bt != bt_state){ //если есть изменение состояния кнопки
      if (!RealCheck){
        RealCheck = true;
-       state = "On";
        digitalWrite(4, HIGH); //включаем
-       //message = "http://192.168.4.1/changestate?id=" + id + "&state=" + state;
-       //resp = get(message);  //говорим серверу, что лампа включилась
      }
      else if (RealCheck){
       RealCheck = false;
-      state = "Off";
        digitalWrite(4, LOW); //выключаем
-       //message = "http://192.168.4.1/changestate?id=" + id + "&state=" + state;
-       //resp = get(message); //говорим серверу, что лампа выключилась
      }
   }
   bt_state = bt; //готовы снова ловить выключатель
 
-  
-  //message = "http://192.168.4.1/state?id=" + id;
-  //log(message);
-  //resp = get(message); //спрашиваем у сервера состояние
-  //log(resp);
-  if (resp == "On")
-    if (!RealCheck){
-      RealCheck = true;
-      state = "On";
-      digitalWrite(4, HIGH);
-      Serial.println("Lamp ON");
-      server.send(200, "text/html", "On"); 
-    }
-  if (resp == "Off")
-    if (RealCheck){
-      RealCheck = false;
-      state = "Off";
-      digitalWrite(4, LOW);
-      Serial.println("Lamp OFF");
-      server.send(200, "text/html", "Off"); 
-    }
-  delay(500);
-
-  log(id);
+ server.handleClient();  
+delay(500);
 }

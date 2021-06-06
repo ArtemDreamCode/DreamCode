@@ -6,7 +6,7 @@
 
 String ssid = "ESPap";
 String password = "123456789";
-
+int ACountButtons = 0;
 
 //массив хранения уникальных ключей и их состояний
 int const lengh_max = 10;
@@ -32,7 +32,7 @@ void log(String AMessage){
 bool StartAPMode() {
   WiFi.disconnect();
   WiFi.mode(WIFI_AP);
-  WiFi.softAPConfig(IPAddress(192, 154, 19, 38), IPAddress(192, 154, 19, 38), IPAddress(255, 255, 255, 0));
+  WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
   WiFi.softAP(ssid, password);
   
   IPAddress myIP = WiFi.softAPIP();
@@ -56,7 +56,8 @@ void setup() {
   server.on("/new", handle_new);
   server.on("/state", handle_hardState);
   server.on("/changestate", handle_hardChangeState);
-
+  server.on("/Data", handle_DataController);
+  
   server.begin();
   log("HTTP server started");
 }
@@ -92,6 +93,23 @@ void handle_butclick() //нажатие на кнопку в форме
       }
     }
   }
+}
+
+void handle_DataController(){
+ Serial.println("handle_butclick");
+  String id_buf;
+  String state_buf;
+  if (server.args() == 1) //если аргумента два
+  {
+    if (server.argName(0) == "Count")
+    {
+
+        ACountButtons = server.arg(0).toInt();
+        log(ACountButtons);
+        server.send(200, "text/html", SendHTML()); 
+   
+    }
+  }  
 }
 
 String generate_id()
@@ -193,7 +211,7 @@ void handle_NotFound()
 String SendHTML()
 {
   String ptr = "<!DOCTYPE html> <html>\n";
-  ptr +="<head><meta http-equiv=\"Refresh\" content=\"7;URL=http://192.168.4.1/\" name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
+  ptr +="<head><meta http-equiv=\"Refresh\" content=\"5;URL=http://192.168.4.1/\" name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";
   ptr +="<title>LED Control</title>\n";
   ptr +="<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
   ptr +="body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 50px;}\n";
@@ -209,22 +227,17 @@ String SendHTML()
   ptr +="<h1>ESP8266 Web Server</h1>\n";
   ptr +="<h3>Using Access Point(AP) Mode</h3>\n";
 
-  for (int i=0; i<lengh_max; i++)
+  for (int i=0; i< ACountButtons; i++)
   {
-    if (id_base[i] != "")
-    {
-      if (state_base[i] == "On")
-      {
-        ptr +="<p>LED1 Status: ON</p><a class=\"button button-off\" href=\"/butclick"; 
+
+        ptr +="<p>LED1 Status: ON</p><a class=\"button button-off\"href=http://192.168.4.100/Bton"; <button id="btnId" type="button">Hide/Show</button>
         ptr +="?id="+id_base[i]+"&state=Off\">OFF</a>\n";
-      }
-      if (state_base[i] == "Off")
-      {
-        ptr +="<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/butclick";
-        ptr +="?id="+id_base[i]+"&state=On\">ON</a>\n";
-      }
+
+     //   ptr +="<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/butclick";
+     //   ptr +="?id="+id_base[i]+"&state=On\">ON</a>\n";
+   
     }
-  }
+ 
 
 /* 
   if(led1stat)
