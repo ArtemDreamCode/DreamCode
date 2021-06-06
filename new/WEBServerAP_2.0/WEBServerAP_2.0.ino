@@ -32,7 +32,7 @@ void log(String AMessage){
 bool StartAPMode() {
   WiFi.disconnect();
   WiFi.mode(WIFI_AP);
-  WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
+  WiFi.softAPConfig(IPAddress(192, 154, 19, 38), IPAddress(192, 154, 19, 38), IPAddress(255, 255, 255, 0));
   WiFi.softAP(ssid, password);
   
   IPAddress myIP = WiFi.softAPIP();
