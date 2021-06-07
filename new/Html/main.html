@@ -1,0 +1,53 @@
+<!DOCTYPE html https://html5css.ru/css/css3_buttons.php>
+<html>
+<head>
+<style>
+.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+.buttonScroll {border-radius: 4px;}
+.buttonWidth {width: 250px;}
+</style>
+</head>
+<body>
+
+<h2>Home controll</h2>
+  <input type='button' class="button buttonScroll buttonWidth" value='On' onClick="change_on()" id='id_on'>
+  <input type='button' class="button buttonScroll buttonWidth" value='Off' onClick="change_off()" id='id_off'>
+</body>
+<script>
+
+function change_on(){
+   document.getElementById('id_on').onclick=function(){
+		 var x = new XMLHttpRequest();
+		x.open("GET", "http://192.168.0.40/relay/0?turn=on", true);
+		x.onload = function (){
+			alert( x.responseText);
+		}
+		x.send(null);
+   }
+     return false;
+  }
+  
+function change_off(){
+   document.getElementById('id_off').onclick=function(){
+		 var x = new XMLHttpRequest();
+		x.open("GET", "http://192.168.0.40/relay/0?turn=off", true);
+		x.onload = function (){
+			alert( x.responseText);
+		}
+		x.send(null);
+   }
+     return false;
+  }  
+</script>
+</html>

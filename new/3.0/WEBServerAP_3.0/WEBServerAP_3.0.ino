@@ -118,7 +118,7 @@ void client_status() {
         address = IPaddress->addr;
         
         cur_ip = address.toString();
-        id_base[i-1] = cur_ip;
+        //id_base[i-1] = cur_ip;
         
         Serial.print("client= ");
         Serial.print(i);
@@ -126,7 +126,7 @@ void client_status() {
         Serial.print((address));
         Serial.print(" with mac adress is = ");
         Serial.print(stat_info->bssid[0],HEX);
-        cur_id[0] = stat_info->bssid[0]
+        cur_id[0] = stat_info->bssid[0];
         Serial.print(stat_info->bssid[1],HEX);
         Serial.print(stat_info->bssid[2],HEX);
         Serial.print(stat_info->bssid[3],HEX);
