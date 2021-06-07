@@ -230,26 +230,13 @@ String SendHTML()
   for (int i=0; i< ACountButtons; i++)
   {
 
-        ptr +="<p>LED1 Status: ON</p><a class=\"button button-off\"href=http://192.168.4.100/Bton"; <button id="btnId" type="button">Hide/Show</button>
-        ptr +="?id="+id_base[i]+"&state=Off\">OFF</a>\n";
-
-     //   ptr +="<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/butclick";
-     //   ptr +="?id="+id_base[i]+"&state=On\">ON</a>\n";
-   
-    }
+    ptr +="<p>LED1 Status: ON</p><a class=\"button button-off\"href=http://192.168.4.100/Bton"; <button id="btnId" type="button">Hide/Show</button>
+    ptr +="?id="+id_base[i]+"&state=Off\">OFF</a>\n";
+  
+  //   ptr +="<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/butclick";
+  //   ptr +="?id="+id_base[i]+"&state=On\">ON</a>\n";
  
-
-/* 
-  if(led1stat)
-    ptr +="<p>LED1 Status: ON</p><a class=\"button button-off\" href=\"/led1off\">OFF</a>\n";
-  else
-    ptr +="<p>LED1 Status: OFF</p><a class=\"button button-on\" href=\"/led1on\">ON</a>\n";
-/*
-  if(led2stat)
-    ptr +="<p>LED2 Status: ON</p><a class=\"button button-off\" href=\"/led2off\">OFF</a>\n";
-  else
-    ptr +="<p>LED2 Status: OFF</p><a class=\"button button-on\" href=\"/led2on\">ON</a>\n";
-*/
+  }
   ptr +="</body>\n";
   
   ptr +="</html>\n";
