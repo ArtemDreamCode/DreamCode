@@ -97,14 +97,34 @@ void loop() {
   delay(1000);
 }
 
+String checkMacFromIp(String ip)
+{
+  int i=0;
+  return mac_base[i];
+}
+
+String checkIpFromMac(String mac)
+{
+  int i=0;
+  return ip_base[i];
+}
+
+String checkStateFromMac(String mac)
+{
+  int i=0;
+  return state_base[i];
+}
+
+
+
 void client_status() {
     unsigned char number_client;
     struct station_info *stat_info;
     struct ip_addr *IPaddress;
-    
-    String cur_mac;
-    String cur_ip;
-    char cur_id[7];
+
+    String mac;
+    String ip;
+    char cur_mac[7];
     
     IPAddress address;
     int i=1;
@@ -117,29 +137,93 @@ void client_status() {
         ipv4_addr *IPaddress = &stat_info->ip;
         address = IPaddress->addr;
         
-        cur_ip = address.toString();
-        //id_base[i-1] = cur_ip;
-        
         Serial.print("client= ");
         Serial.print(i);
         Serial.print(" ip adress is = ");
         Serial.print((address));
         Serial.print(" with mac adress is = ");
         Serial.print(stat_info->bssid[0],HEX);
-        cur_id[0] = stat_info->bssid[0];
         Serial.print(stat_info->bssid[1],HEX);
         Serial.print(stat_info->bssid[2],HEX);
         Serial.print(stat_info->bssid[3],HEX);
         Serial.print(stat_info->bssid[4],HEX);
         Serial.print(stat_info->bssid[5],HEX);
+        
+        cur_mac[0] = stat_info->bssid[0];
+        cur_mac[1] = stat_info->bssid[1];
+        cur_mac[2] = stat_info->bssid[2];
+        cur_mac[3] = stat_info->bssid[3];
+        cur_mac[4] = stat_info->bssid[4];
+        cur_mac[5] = stat_info->bssid[5];
+        cur_mac[6] = '\0';
+
+        ip = address.toString();
+        mac = cur_mac;
+        
+        Serial.print(mac);
         stat_info = STAILQ_NEXT(stat_info, next);
         i++;
         Serial.println();
     }
     wifi_softap_free_station_info();
 }
-
 String SendHTML()
+{
+  String ptr =  "<!DOCTYPE html https://html5css.ru/css/css3_buttons.php>\n";
+  ptr +=  "<html>\n";
+  ptr +=  "<head>\n";
+  ptr +=  "<style>\n";
+  ptr +=  ".button {\n";
+  ptr +=  "  background-color: #4CAF50;\n";
+  ptr +=  "  border: none;\n";
+  ptr +=  "  color: white;\n";
+  ptr +=  "  padding: 15px 32px;\n";
+  ptr +=  "  text-align: center;\n";
+  ptr +=  "  text-decoration: none;\n";
+  ptr +=  "  display: inline-block;\n";
+  ptr +=  "  font-size: 16px;\n";
+  ptr +=  "  margin: 4px 2px;\n";
+  ptr +=  "  cursor: pointer;\n";
+  ptr +=  "}\n";
+  ptr +=  ".buttonScroll {border-radius: 4px;}\n";
+  ptr +=  ".buttonWidth {width: 250px;}\n";
+  ptr +=  "</style>\n";
+  ptr +=  "</head>\n";
+  ptr +=  "<body>\n";
+  
+  ptr +=  "<h2>Home controll</h2>\n";
+  ptr +=  "<input type='button' class=\"button buttonScroll buttonWidth\" value='On' onClick=\"change_on()\" id='id_on'>\n";
+  ptr +=  "<input type='button' class=\"button buttonScroll buttonWidth\" value='Off' onClick=\"change_off()\" id='id_off'>\n";
+  ptr +=  "</body>\n";
+  ptr +=  "<script>\n";
+  ptr +=  "function change_on(){\n";
+  ptr +=  "   document.getElementById('id_on').onclick=function(){\n";
+  ptr +=  "     var x = new XMLHttpRequest();\n";
+  ptr +=  "    x.open(\"GET\", \"http://" + ip_base[0] +"/relay?turn=on\", true);\n";
+  ptr +=  "    x.onload = function (){\n";
+  ptr +=  "      alert( x.responseText);\n";
+  ptr +=  "    }\n";
+  ptr +=  "    x.send(null);\n";
+  ptr +=  "   }\n";
+  ptr +=  "     return false;\n";
+  ptr +=  "  }\n";
+  ptr +=  "\n";  
+  ptr +=  "function change_off(){\n";
+  ptr +=  "   document.getElementById('id_off').onclick=function(){\n";
+  ptr +=  "     var x = new XMLHttpRequest();\n";
+  ptr +=  "    x.open(\"GET\", \"http://" + ip_base[0] +"/relay?turn=off\", true);\n";
+  ptr +=  "    x.onload = function (){\n";
+  ptr +=  "      alert( x.responseText);\n";
+  ptr +=  "    }\n";
+  ptr +=  "    x.send(null);\n";
+  ptr +=  "   }\n";
+  ptr +=  "     return false;\n";
+  ptr +=  "  }\n";
+  ptr +=  "</script>\n";
+  ptr +=  "</html>\n";
+}
+
+String SendHTML123()
 {
   String ptr = "<!DOCTYPE html> <html>\n";
   ptr +=  "<head>\n";
