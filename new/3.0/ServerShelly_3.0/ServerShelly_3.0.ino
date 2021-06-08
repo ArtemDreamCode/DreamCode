@@ -14,11 +14,11 @@ int bt_state = 0;
 String MacAdr;
 
 
-const char* ssid = "R_302";
-const char* pass = "ProtProtom";
+//const char* ssid = "R_302";
+//const char* pass = "ProtProtom";
 
-//const char* ssid = "ESPap";
-//const char* pass = "123456789";
+const char* ssid = "ESPap";
+const char* pass = "123456789";
 
 
 void wifi_begin(){
