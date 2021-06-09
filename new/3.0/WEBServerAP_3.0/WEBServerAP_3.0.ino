@@ -80,17 +80,6 @@ void setup() {
   vector.setStorage(storage_array);
 }
 
-void pingClients(){
-   for ( IPAddress element : vector)
-  {
-    String r = "http://" + element.toString() + "/state";
-    Serial << r<< endl;;
-    String req = get(r);
-
-    Serial << "pingClients: Elem: " + element.toString() + ";Response: " + req << endl;
-    delay(1000);
-  }
-}
 
 bool IsElemInCollect(IPAddress AElem){
  bool f = false;
@@ -121,7 +110,7 @@ void ControllIpToCollect(IPAddress IPAddr){
   if ((IsElemInCollect(IPAddr)) || (req.length() == 0)){ // если отвалилось Shelly
       DeleteElemInCollect(IPAddr);
   }
-  if ((!IsElemInCollect(IPAddr) || (req.length() > 0)) {  // если Shelly добавилось новое
+  if ((!IsElemInCollect(IPAddr)) || (req.length() > 0)) {  // если Shelly добавилось новое
       AddElemInCollect(IPAddr);
       }
 
@@ -133,7 +122,6 @@ void loop() {
   delay(1000);
   client_status();
   delay(1000);
-//  pingClients();
 }
 
 String checkMacFromIp(String ip)
@@ -241,26 +229,22 @@ String SendHTML()
     ptr +=  "</body>\n";
     ptr +=  "<script>\n";
     ptr +=  "function change_on_"+String(Index)+"(){\n";
-    ptr +=  "   document.getElementById('id_on').onclick=function(){\n";
     ptr +=  "     var x = new XMLHttpRequest();\n";
     ptr +=  "    x.open(\"GET\", \"http://" + element.toString() +"/relay?turn=on\", true);\n";
     ptr +=  "    x.onload = function (){\n";
     ptr +=  "      alert( x.responseText);\n";
     ptr +=  "    }\n";
     ptr +=  "    x.send(null);\n";
-    ptr +=  "   }\n";
     ptr +=  "     return false;\n";
     ptr +=  "  }\n";
     ptr +=  "\n";  
     ptr +=  "function change_off_"+String(Index)+"(){\n";
-    ptr +=  "   document.getElementById('id_off').onclick=function(){\n";
     ptr +=  "     var x = new XMLHttpRequest();\n";
     ptr +=  "    x.open(\"GET\", \"http://" + element.toString() +"/relay?turn=off\", true);\n";
     ptr +=  "    x.onload = function (){\n";
     ptr +=  "      alert( x.responseText);\n";
     ptr +=  "    }\n";
     ptr +=  "    x.send(null);\n";
-    ptr +=  "   }\n";
     ptr +=  "     return false;\n";
     ptr +=  "  }\n";
     ptr +=  "</script>\n";

@@ -27,26 +27,22 @@
 <script>
 
 function change_on(){
-   document.getElementById('id_on').onclick=function(){
 		 var x = new XMLHttpRequest();
 		x.open("GET", "http://192.168.0.40/relay/0?turn=on", true);
 		x.onload = function (){
 			alert( x.responseText);
 		}
 		x.send(null);
-   }
      return false;
   }
   
 function change_off(){
-   document.getElementById('id_off').onclick=function(){
 		 var x = new XMLHttpRequest();
 		x.open("GET", "http://192.168.0.40/relay/0?turn=off", true);
 		x.onload = function (){
 			alert( x.responseText);
 		}
 		x.send(null);
-   }
      return false;
   }  
 </script>
