@@ -1,0 +1,139 @@
+//   http://192.168.8.55/light/0?turn=on&brightness=64
+//   http://192.168.8.55/light/0?white=87
+
+#include "CTBot.h"
+#include "ESP8266WiFi.h"
+#include "ESP8266HTTPClient.h"
+
+
+class TKeyBoardsCollect 
+{
+  private:
+  TBMessage msg;
+  CTBot myBot;
+  public:
+    TKeyBoardsCollect();
+    void StartKB();
+    void DetailKB();
+    void DoGet(String cUrl); 
+    void InitBot();
+    int    GetLastMessageId();
+    String GetLastMessage(); 
+};
+
+
+TKeyBoardsCollect KeyBoardsCollect;
+const String IP = "http://192.168.0.15"; 
+const char* ssid = "TP-LINK_120";
+const char* pass =  "123qweQqq233";
+//const char* ssid = "Legobar";
+//const char* pass = "Raspberry";
+const String token = "830921018:AAF03MKEpAXTmeZ6ywbVqw7gydBmf8Ea1Qw";  
+
+TKeyBoardsCollect::TKeyBoardsCollect(){
+  //
+};
+
+int TKeyBoardsCollect::GetLastMessageId(){
+   
+   int mesid = 0;
+   if (myBot.getNewMessage(msg)) {
+     mesid = msg.sender.id;
+   }
+   return mesid;
+ }
+ 
+String TKeyBoardsCollect::GetLastMessage(){
+   String res = "";
+   if (myBot.getNewMessage(msg)) {
+    if (msg.messageType == CTBotMessageText){    
+      res = msg.text;  
+    }     
+   }
+   //Serial.println("GetLastMessage" + res);
+   return res;
+ }
+ 
+void TKeyBoardsCollect::DoGet(String cUrl){
+  HTTPClient http;     
+  http.begin(cUrl);
+  http.GET();
+  http.end();
+  delay(200);   
+} 
+void TKeyBoardsCollect::InitBot(){
+  myBot.wifiConnect(ssid, pass);
+  myBot.setTelegramToken(token);
+  if (myBot.testConnection())
+    Serial.println("\ntestConnection OK");
+  else
+    Serial.println("\ntestConnection NOK");
+};
+
+void TKeyBoardsCollect::StartKB(){
+  CTBotReplyKeyboard myKbd;
+  int mesid = GetLastMessageId();
+ // myKbd.addRow();
+  myKbd.addButton("Лампа 1");
+  myKbd.addButton("Лампа 2");  
+  myKbd.enableResize();  
+  myBot.sendMessage(mesid, "Ok", myKbd);
+ Serial.println("mesid" + mesid);
+}
+//---------------------------------------------------------
+void TKeyBoardsCollect::DetailKB(){
+  CTBotReplyKeyboard myKbd;
+  int mesid = GetLastMessageId();
+ // myKbd.addRow();
+  myKbd.addButton("Включить");
+  myKbd.addButton("Выключить");  
+  myKbd.addButton("Яркость");  
+  myKbd.addButton("Тепло");  
+  myKbd.addButton("Назад");  
+  myKbd.enableResize();   
+  myBot.sendMessage(mesid, "Ok", myKbd); 
+}
+
+void setup() {
+  
+  Serial.begin(115200);
+  Serial.println("Starting TelegramBot...");
+  WiFi.begin(ssid, pass);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting..");
+  } 
+  Serial.println("Connected to WiFi Network"); 
+
+  KeyBoardsCollect.InitBot();  
+  KeyBoardsCollect.StartKB();
+}
+int GetStatus(){
+  HTTPClient http;  
+  http.begin(IP + "/status");
+  http.GET();
+  String AResponse = http.getString();
+  Serial.println(AResponse);
+  http.end();
+  return 0;
+}
+
+void loop() {
+ // GetStatus();
+  String mess = KeyBoardsCollect.GetLastMessage(); 
+  if (mess.equalsIgnoreCase("Лампа 1") || mess.equalsIgnoreCase("Лампа 2")) 
+   {
+    KeyBoardsCollect.DetailKB();
+   //KeyBoardsCollect.DoGet(IP + "/light/0?turn=on");  
+   // KeyBoard("Off", msg.sender.id);
+    }
+                
+  if (mess.equalsIgnoreCase("Назад")) 
+  {
+    KeyBoardsCollect.StartKB();
+    //KeyBoardsCollect.DoGet(IP + "/light/0?turn=off");
+    // KeyBoard("On", msg.sender.id);
+  }        
+
+
+}// void loop
