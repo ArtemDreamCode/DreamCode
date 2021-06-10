@@ -1,9 +1,16 @@
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <WiFiServer.h>
+#include <WiFiUdp.h>
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
 #include <Streaming.h>
 #include <Vector.h>
+#include <ESP8266mDNS.h>
+
 
 int const lengh_max = 10;
 typedef Vector<IPAddress> Elements;
@@ -24,6 +31,9 @@ ESP8266WebServer server(80);
 
 HTTPClient http;
 WiFiClient client;
+
+MDNSResponder mdns;
+
 
 String get(String Arequest){
   http.begin(client, Arequest); 
@@ -78,6 +88,13 @@ void setup() {
   server.begin();
   log("HTTP server started");
   vector.setStorage(storage_array);
+
+  if (mdns.begin("esp8266-01", WiFi.localIP()))
+  [
+  Serial.println("MDNS responder started");
+  
+  MDNS.addService("http", "tcp", 80);
+  }
 }
 
 

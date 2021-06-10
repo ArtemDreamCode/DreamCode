@@ -1,13 +1,14 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-extern "C" {
-  #include<user_interface.h>
-}
-/* configuration  wifi */
+#include <ESP8266mDNS.h>
+
 String ssid = "ESPap";
 String password = "123456789";
 
 ESP8266WebServer server(80);
+
+MDNSResponder mdns;
+
 void handleRoot() {
     server.send(200, "text/html", "<h1>You are connected</h1>");
     String addy = server.client().remoteIP().toString();
@@ -25,12 +26,19 @@ void setup() {
     server.on("/", handleRoot);
     server.begin();
     Serial.println("HTTP server started");
+
+  if (mdns.begin("", WiFi.localIP()))
+  {
+    Serial.println("MDNS responder started");
+    MDNS.addService("http", "tcp", 80);
+  }
+
 }
 void loop() {
     server.handleClient();
-    delay(5000);
+    delay(1000);
     client_status();
-    delay(4000);
+    delay(1000);
 }
 void client_status() {
     unsigned char number_client;
