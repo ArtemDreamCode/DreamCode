@@ -1,15 +1,10 @@
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <WiFiServer.h>
-#include <WiFiUdp.h>
-
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
 #include <Streaming.h>
 #include <Vector.h>
-#include <ESP8266mDNS.h>
+#include <ArduinoJson.h>
 
 
 int const lengh_max = 10;
@@ -31,9 +26,9 @@ ESP8266WebServer server(80);
 
 HTTPClient http;
 WiFiClient client;
+DynamicJsonBuffer jsonBuffer; 
 
-MDNSResponder mdns;
-
+String SendHTML();
 
 String get(String Arequest){
   http.begin(client, Arequest); 
@@ -88,13 +83,6 @@ void setup() {
   server.begin();
   log("HTTP server started");
   vector.setStorage(storage_array);
-
-  if (mdns.begin("esp8266-01", WiFi.localIP()))
-  [
-  Serial.println("MDNS responder started");
-  
-  MDNS.addService("http", "tcp", 80);
-  }
 }
 
 
@@ -102,42 +90,61 @@ bool IsElemInCollect(IPAddress AElem){
  bool f = false;
    for (IPAddress element : vector)
     {
-       f = (element.toString() == AElem.toString() );    
+       f = (element.toString() == AElem.toString() );   
+       if (f) {break;} 
     } 
   return f;
 }
 
 void DeleteElemInCollect(IPAddress AElem){
-   for (IPAddress element : vector)
-    {
-       if (element.toString() == AElem.toString() ){
-         vector.pop_back();   
-       }
-    } 
+   for(int i = vector.size() - 1; i>=0; i--){
+     if (vector[i]== AElem){
+       vector.remove(i);
+       break;   
+     }
+   }
 }
 
 void AddElemInCollect(IPAddress AElem){
   vector.push_back(AElem);
 }
 
-void ControllIpToCollect(IPAddress IPAddr){  
+void ControllIpToCollect(IPAddress IPAddr){ 
+  bool IsValidDevice = true;
   String r = "http://" + IPAddr.toString() + "/state";
+   Serial << "r: " << r << endl;
   String req = get(r);
+  Serial.println(req);
+  JsonObject& root = jsonBuffer.parseObject(req);
+  /*if (!root.success()) {
+      IsValidDevice = false;
+      Serial.println("Parsing failed!");
+      return;
+    }*/
 
-  if ((IsElemInCollect(IPAddr)) || (req.length() == 0)){ // если отвалилось Shelly
+   String RespFromShelly = "";
+   RespFromShelly = root["class"].as<char*>();
+   
+   Serial.println("Response:");
+    Serial.println(RespFromShelly);
+
+  if ((IsElemInCollect(IPAddr)) && (!IsValidDevice)){ // если отвалилось Shelly
       DeleteElemInCollect(IPAddr);
   }
-  if ((!IsElemInCollect(IPAddr)) || (req.length() > 0)) {  // если Shelly добавилось новое
+  if ((!IsElemInCollect(IPAddr)) && (RespFromShelly == "Shelly")) {  // если Shelly добавилось новое
       AddElemInCollect(IPAddr);
       }
 
-  Serial << "AddIpToCollect: vector.size " << vector.size() << endl;
 }
 
 void loop() {
   server.handleClient();  
   delay(1000);
   client_status();
+     Serial << "====================================================" << endl;
+       Serial << "AddIpToCollect: vector.size " << vector.size() << endl;
+        Serial << "====================================================" << endl;
+           Serial << "===================================================="<< endl;
   delay(1000);
 }
 

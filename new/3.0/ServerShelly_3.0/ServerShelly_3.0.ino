@@ -4,6 +4,7 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPUpdateServer.h>
 #include <ESP8266HTTPClient.h>
+#include <ArduinoJson.h>
 
 ESP8266WebServer server(80);
 
@@ -12,8 +13,7 @@ WiFiClient client;
 bool RealCheck = false;
 int bt_state = 0;
 String MacAdr;
-
-
+String ClassDevice = "Shelly";
 //const char* ssid = "R_302";
 //const char* pass = "ProtProtom";
 
@@ -28,23 +28,31 @@ void wifi_begin(){
     delay(900);
   }
   MacAdr = WiFi.macAddress(); //8C:AA:B5:7B:13:73
-  MacAdr = deleteColon(MacAdr); //убираем из мак-адреса символы двоеточия
 }
 
-String deleteColon(String str){ //убираем из мак-адреса символы двоеточия
-  char buf[13];
-  int j=0;
-  for (int i=0; i<str.length(); i++){
-    if (str[i] != ':'){
-      buf[j] = str[i];
-      j++;
-    }
+void handleNotFound() {
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
-  buf[12] = '\0';
-  str = buf;
-  return str;
+  server.send(404, "text/plain", message);
 }
 
+void restServerRouting() {
+    server.on("/", HTTP_GET, []() {
+        server.send(200, F("text/html"),
+            F("Welcome to the REST Shelly Server"));
+    });
+    server.on(("/relay"), HTTP_GET, handle_ChangeState); // get from user
+    server.on(("/state"), HTTP_GET, handle_GetState); // get from AP
+}
 void setup()
 {
   //Serial.begin(115200);
@@ -53,24 +61,53 @@ void setup()
   pinMode(5, INPUT);
   wifi_begin();
 
-  server.on("/relay", handle_ChangeState);
-  server.on("/state", handle_GetState);
-  
+  restServerRouting();
+  server.onNotFound(handleNotFound);
   server.begin();
 }
 
 void handle_GetState(){ //запрос о состоянии от клиента
   String resp;
-  if (RealCheck == true)
-  {
-    resp = "1"+ MacAdr;
-    server.send(200, "text/html", resp);
-  }
-  if (RealCheck == false)
-  {
-    resp = "0"+ MacAdr;
-    server.send(200, "text/html", resp);
-  }
+  String st;
+   String response = "{"; 
+   if (RealCheck == true){
+     st = "On";
+   }
+   else{
+     st = "off";
+   }
+   response+= "\"state\": \""+st+"\"";
+   response+= ",\"ip\": \""+WiFi.localIP().toString()+"\"";
+   response+= ",\"class\": \""+ClassDevice+"\""; 
+   response+= ",\"mac\": \""+MacAdr+"\"";   
+   response+= ",\"gw\": \""+WiFi.gatewayIP().toString()+"\"";
+   response+= ",\"nm\": \""+WiFi.subnetMask().toString()+"\"";
+   response+= ",\"signalStrengh\": \""+String(WiFi.RSSI())+"\"";
+   response+= ",\"chipId\": \""+String(ESP.getChipId())+"\"";
+   response+= ",\"flashChipId\": \""+String(ESP.getFlashChipId())+"\"";
+   response+= ",\"flashChipSize\": \""+String(ESP.getFlashChipSize())+"\"";
+   response+= ",\"flashChipRealSize\": \""+String(ESP.getFlashChipRealSize())+"\"";
+   response+= ",\"freeHeap\": \""+String(ESP.getFreeHeap())+"\"";
+   response+="}";
+  
+   server.send(200, "text/html", response);
+
+/*   
+    if (server.arg("signalStrength")== "true"){
+        response+= ",\"signalStrengh\": \""+String(WiFi.RSSI())+"\"";
+    }
+ 
+    if (server.arg("chipInfo")== "true"){
+        response+= ",\"chipId\": \""+String(ESP.getChipId())+"\"";
+        response+= ",\"flashChipId\": \""+String(ESP.getFlashChipId())+"\"";
+        response+= ",\"flashChipSize\": \""+String(ESP.getFlashChipSize())+"\"";
+        response+= ",\"flashChipRealSize\": \""+String(ESP.getFlashChipRealSize())+"\"";
+    }
+    if (server.arg("freeHeap")== "true"){
+        response+= ",\"freeHeap\": \""+String(ESP.getFreeHeap())+"\"";
+    }
+    response+="}";
+    */
 }
 
 void handle_ChangeState()
@@ -92,7 +129,21 @@ void handle_ChangeState()
       digitalWrite(4, LOW); //выключаем
       //выключить лампочку
     }
+
+    
   }
+  String response = "{"; 
+  String st;
+  if (RealCheck == true){
+    st = "On";
+   }
+   else{
+     st = "off";
+   }
+   response+= "\"state\": \""+st+"\"";
+   response+="}";
+  
+   server.send(200, "text/html", response);
 }
 
 void loop()
