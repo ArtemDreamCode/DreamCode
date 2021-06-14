@@ -1,10 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <FS.h>
-#include <ESP8266mDNS.h>
-#include <ESP8266HTTPUpdateServer.h>
 #include <ESP8266HTTPClient.h>
-#include <ArduinoJson.h>
 
 ESP8266WebServer server(80);
 

@@ -4,18 +4,17 @@
 #include <ESP8266HTTPClient.h>
 #include <Streaming.h>
 #include <Vector.h>
-#include <ArduinoJson.h>
-
 
 int const lengh_max = 10;
 typedef Vector<IPAddress> Elements;
+ HTTPClient http; // stack
+ 
 IPAddress storage_array[lengh_max];
-Elements vector(storage_array);
+Elements ButtonsCollect(storage_array);
 
 String ssid = "ESPap";
 String password = "123456789";
 int ACountButtons = 0;
-  String l;
 //массив хранения ip адресов и их состояний
 
 String ip_base[lengh_max]; //текущие ip дареса устройств
@@ -24,19 +23,18 @@ String mac_base[lengh_max];  // мак-адреса устройств
 
 ESP8266WebServer server(80);
 
-HTTPClient http;
-WiFiClient client;
-DynamicJsonBuffer jsonBuffer; 
+//DynamicJsonBuffer jsonBuffer; 
 
 String SendHTML();
 
 String get(String Arequest){
+ // http.setTimeout(2000);
+  WiFiClient client; 
   http.begin(client, Arequest); 
-//  log(Arequest);
+  log("Real request : " + Arequest);
   int httpCode = http.GET();  
   String response = http.getString(); 
-  
- // log(httpCode);  
+   
   http.end();
   //log("Free heap: " + String(ESP.getFreeHeap()));
   return response;
@@ -50,7 +48,7 @@ bool StartAPMode() {
   WiFi.disconnect();
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
-  WiFi.softAP(ssid, password);
+  WiFi.softAP(ssid, password, , );
   
   IPAddress myIP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
@@ -82,13 +80,13 @@ void setup() {
   
   server.begin();
   log("HTTP server started");
-  vector.setStorage(storage_array);
+  ButtonsCollect.setStorage(storage_array);
 }
 
 
 bool IsElemInCollect(IPAddress AElem){
  bool f = false;
-   for (IPAddress element : vector)
+   for (IPAddress element : ButtonsCollect)
     {
        f = (element.toString() == AElem.toString() );   
        if (f) {break;} 
@@ -97,43 +95,45 @@ bool IsElemInCollect(IPAddress AElem){
 }
 
 void DeleteElemInCollect(IPAddress AElem){
-   for(int i = vector.size() - 1; i>=0; i--){
-     if (vector[i]== AElem){
-       vector.remove(i);
+   for(int i = ButtonsCollect.size() - 1; i>=0; i--){
+     if (ButtonsCollect[i]== AElem){
+       ButtonsCollect.remove(i);
        break;   
      }
    }
 }
 
 void AddElemInCollect(IPAddress AElem){
-  vector.push_back(AElem);
+  ButtonsCollect.push_back(AElem);
+}
+
+int GetClassName(String AJsonText){
+  int res = -1;
+  res = AJsonText.lastIndexOf("Shelly");
+  return res;
 }
 
 void ControllIpToCollect(IPAddress IPAddr){ 
-  bool IsValidDevice = true;
-  String r = "http://" + IPAddr.toString() + "/state";
-   Serial << "r: " << r << endl;
-  String req = get(r);
-  Serial.println(req);
-  JsonObject& root = jsonBuffer.parseObject(req);
-  /*if (!root.success()) {
-      IsValidDevice = false;
-      Serial.println("Parsing failed!");
-      return;
-    }*/
-
-   String RespFromShelly = "";
-   RespFromShelly = root["class"].as<char*>();
-   
-   Serial.println("Response:");
-    Serial.println(RespFromShelly);
-
-  if ((IsElemInCollect(IPAddr)) && (!IsValidDevice)){ // если отвалилось Shelly
-      DeleteElemInCollect(IPAddr);
-  }
-  if ((!IsElemInCollect(IPAddr)) && (RespFromShelly == "Shelly")) {  // если Shelly добавилось новое
-      AddElemInCollect(IPAddr);
-      }
+    String r = "http://" + IPAddr.toString() + "/state";
+    int k = -1;
+   // k = r.lastIndexOf("192.168.");
+   // if (k == -1) {continue;}
+    
+    Serial << "r: " << r << endl;
+    String req = get(r);
+    Serial.println(req);
+  
+     int IsShelly = GetClassName(req);
+  
+     Serial.println("Response:");
+     Serial.println(IsShelly);
+  
+    if ((IsElemInCollect(IPAddr)) && (IsShelly == -1)){ // если отвалилось Shelly
+        DeleteElemInCollect(IPAddr);
+    }
+    if ((!IsElemInCollect(IPAddr)) && (IsShelly > -1)) {  // если Shelly добавилось новое
+        AddElemInCollect(IPAddr);
+        }
 
 }
 
@@ -142,7 +142,7 @@ void loop() {
   delay(1000);
   client_status();
      Serial << "====================================================" << endl;
-       Serial << "AddIpToCollect: vector.size " << vector.size() << endl;
+       Serial << "AddIpToCollect: vector.size " << ButtonsCollect.size() << endl;
         Serial << "====================================================" << endl;
            Serial << "===================================================="<< endl;
   delay(1000);
@@ -178,14 +178,14 @@ void client_status() {
     IPAddress address;
     int i=0;
     number_client= wifi_softap_get_station_num();
-    stat_info = wifi_softap_get_station_info();
- //   Serial.print(" Total connected_client are = ");
- //   Serial.println(number_client);
+    stat_info = wifi_softap_get_station_info();;
     while (stat_info != NULL) {
         ipv4_addr *IPaddress = &stat_info->ip;
         address = IPaddress->addr;
-        ControllIpToCollect(address);
-                
+          Serial.println("=============Real address ====================");
+          Serial.println(address.toString());
+          Serial.println("==============================================");
+          ControllIpToCollect(address);        
       /*  Serial.print("client= ");
         Serial.print(i + 1);
         Serial.print(" ip adress is = ");
@@ -243,7 +243,7 @@ String SendHTML()
   ptr +=  "<body>\n";
   
   ptr +=  "<h2>Home controll</h2>\n";
-   for (IPAddress element : vector)
+   for (IPAddress element : ButtonsCollect)
   {
     Index++; 
       
