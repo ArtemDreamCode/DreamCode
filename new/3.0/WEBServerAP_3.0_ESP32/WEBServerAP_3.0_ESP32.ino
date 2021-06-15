@@ -51,12 +51,13 @@ void log(String AMessage){
 
 bool StartAPMode() {
   WiFi.disconnect();
-   cfgAP.max_connection = 10;
-  wifi_softap_set_config (& cfgAP);
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
   WiFi.softAP(ssid, password);
   IPAddress myIP = WiFi.softAPIP();
+
+
+ 
   Serial.print("AP IP address: ");
   Serial.println(myIP);
   return true;
@@ -183,7 +184,7 @@ void client_status() {
     IPAddress address;
     int i=0;
     number_client= wifi_softap_get_station_num();
-    stat_info = wifi_softap_get_station_info();;
+    stat_info = wifi_softap_get_station_info();
     while (stat_info != NULL) {
         ipv4_addr *IPaddress = &stat_info->ip;
         address = IPaddress->addr;
