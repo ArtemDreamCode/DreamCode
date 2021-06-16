@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+
+	<section id="app">
+		<div v-for="device in devices">
+			{{ device }} <button v-if="device.pinged" @click="relay({ip: device.ip, turn: 'on'})">on</button> <button v-if="device.pinged" @click="relay({ip: device.ip, turn: 'off'})">off</button>
+		</div>
+	</section>
+
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+	<script type="text/javascript">
+		let app = new Vue({
+		  el: '#app',
+		  data: {
+		    devices: new Map()
+		  },
+		  methods: {
+		  	relay(data) {
+		  		socket.emit("relay", data)
+		  	}
+		  }
+		})
+		const socket = io("ws://127.0.0.1:3000", { transports: ["websocket"] });
+		socket.on("devices", devices => {
+			app.devices = devices
+			console.log("devices", devices)
+		})
+	</script>
+</body>
+</html>

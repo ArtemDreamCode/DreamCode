@@ -26,6 +26,27 @@
 </body>
 <script>
 
+if (!window.performance) {
+  console.log("Perfomance not supported");
+}
+if (performance.navigation.type == 1) {
+  console.log( "Страница перезагружена" );
+  DoGet("http://192.168.4.101/state")
+} 
+//else {
+//console.log( "Страница не перезагружена");
+//}
+
+function DoGet(AValue as string){
+		 var x = new XMLHt tpRequest();
+		x.open("GET", AValue, true);
+		x.onload = function (){
+			alert( x.responseText);
+		}
+		x.send(null);
+     return false;
+  }
+
 function change_on(){
 		 var x = new XMLHttpRequest();
 		x.open("GET", "http://192.168.0.40/relay/0?turn=on", true);
