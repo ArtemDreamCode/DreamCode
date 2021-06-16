@@ -5,7 +5,7 @@ let globalSocket
 // process.on('uncaughtException', function (err) {
 //     // console.log(err);
 // }); 
-const io = require("socket.io")(3000)
+const io = require("socket.io")(3000)//3000
 
   fs.readFile('./index.html', (err, html) => {
   	if (err) {
@@ -15,7 +15,7 @@ const io = require("socket.io")(3000)
 	 	res.writeHead(200, { 'Content-Type': 'text/html' });
 		res.write(html)
 		res.end()
-	}).listen(3001)
+	}).listen(3001)// 3001
   })
 
 io.on('connection', socket => {
@@ -24,45 +24,50 @@ io.on('connection', socket => {
 		let turnResult = await relayRequest(data.ip, data.turn)
 		console.log('turn result', turnResult)
 	})
-	console.log("new socket conn", socket)
+	//console.log("new socket conn", socket)
 })
 let dictionary = new Map(),
 	getDevices = async () => {
-		return await findLocalDevices()
+		return await findLocalDevices('172.20.10.0/24')
 	},
 	checkRequest = async (ip, responseText) => {
 		return new Promise((resolve, reject) => {
 			try {
 				const req = http.get({hostname: ip}, res => {
-					console.log(`statusCode: ${res.statusCode}`)
+					//console.log(`statusCode: ${res.statusCode}`)
 					res.on("data", function(chunk) {
-					    console.log("BODY: " + chunk);
+					    console.log("BODY: " + chunk, chunk.indexOf(responseText), responseText );
 					    if (chunk.indexOf(responseText) >= 0) {
 							resolve(true)
+							return true;
 					    } else {
+							console.log("not equal")
 					    	reject(false)
+					    	return false;
 					    }
 					});
 				}).on('error', function(e) {
 				  // console.log("Got error: " + e.message);
 				});
 			} catch (e) {
-				// console.log("err", e)
+				 console.log("err", e)
 			}
-	    	reject(false)
+	    	//reject(false)
 		})
 	},
 	relayRequest = async (ip, turn) => {
+		console.log(ip, turn);
 		return new Promise((resolve, reject) => {
 			try {
-				const req = http.get({hostname: `${ip}/relay?turn=${turn}`}, res => {
-					console.log(`statusCode: ${res.statusCode}`)
+				
+				//const url =  `http://${ip}/relay?turn=${turn}`;
+				const url = 'http://'+ ip +'/relay?turn='+ turn;
+				console.log('Sending url ', url);
+				const req = http.get(url, (res) => {
+				//const req = http.get({hostname: `http://${ip}`, path:`/relay/?turn=${turn}`}, res => {
 					res.on("data", function(chunk) {
 					    console.log("BODY: " + chunk);
-					    if (chunk.indexOf(responseText) >= 0) {
-							resolve(true)
-					    }
-					});
+		    });
 				}).on('error', function(e) {
 				  console.log("Got error: " + e.message);
 				});
@@ -80,10 +85,7 @@ let dictionary = new Map(),
 				dictionary.set(device.ip, device)
 			}
 		})
-		console.log("updated dictionary", dictionary)
-		console.log("check for zombies ...", dictionary.size)
 		dictionary.forEach(record => {
-			console.log(record)
 			if (!devices.find(device => device.ip == record.ip)) {
 				dictionary.delete(record.ip)
 				console.log(`zombie found: ${record.ip}`)
@@ -92,22 +94,28 @@ let dictionary = new Map(),
 			}
 		})
 		console.log("zombies cleared")
-		devices.forEach(async device => {
+		dictionary.forEach(async device => {
 			let checkResult = false
 			device.pinged = false
 			try {
 				checkResult = await checkRequest(device.ip, "Shelly")
+				console.log("checkResult " + checkResult)
 				if (checkResult) {
 					device.pinged = true
 				} else {
 					device.pinged = false
 				}
-			} catch (e) {
+				console.log("device.pinged" + device.pinged)
+				//globalSocket.emit
+				//globalSocket.emit
+				globalSocket.emit("devices", Array.from(dictionary.values()))
+			} catch (e) { 
+				console.log(e)
 				device.pinged = false
 			}
-			console.log(checkResult)
+			//console.log(checkResult)
 		})
 		if (globalSocket) {
-			globalSocket.emit("devices", devices)
+			globalSocket.emit("devices", Array.from(dictionary.values()))
 		}
-	}, 1000)
+	}, 3000)// refr page

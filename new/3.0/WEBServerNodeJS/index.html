@@ -3,6 +3,22 @@
 <head>
 	<title></title>
 </head>
+<style>
+  .button{
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+.buttonScroll {border-radius: 4px;}
+.buttonWidth {width: 250px;}
+</style>
 <body>
 
 	<section id="app">
@@ -25,10 +41,9 @@
 		  	}
 		  }
 		})
-		const socket = io("ws://127.0.0.1:3000", { transports: ["websocket"] });
+		const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });
 		socket.on("devices", devices => {
 			app.devices = devices
-			console.log("devices", devices)
 		})
 	</script>
 </body>
