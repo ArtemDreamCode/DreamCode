@@ -1,5 +1,6 @@
 const findLocalDevices = require('local-devices')
 const http = require('http')
+const path = require('path')
 const fs = require('fs')
 let globalSocket
 // process.on('uncaughtException', function (err) {
@@ -7,36 +8,37 @@ let globalSocket
 // }); 
 const io = require("socket.io")(3000)//3000
 
-  fs.readFile('./index.html', (err, html) => {
-  	if (err) {
-        throw err; 
-    }  
-	http.createServer((req, res) => {
-	 	res.writeHead(200, { 'Content-Type': 'text/html' });
-		res.write(html)
-		res.end()
-	}).listen(3001)// 3001
-  })
-
-io.on('connection', socket => {
-	globalSocket = socket
-	socket.on("relay", async data => {
-		let turnResult = await relayRequest(data.ip, data.turn)
-		console.log('turn result', turnResult)
+http.createServer((req, res) => {
+	let filePath = '.' + req.url;
+	    if (filePath == './')
+	        filePath = './index.html';
+	fs.readFile(filePath, function (err,data) {
+	    let extname = path.extname(filePath);
+	    let contentType = 'text/html';
+	    switch (extname) {
+	        case '.js':
+	            contentType = 'text/javascript';
+	            break;
+	    }
+	    console.log(contentType)
+	 	res.writeHead(200);
+		res.end(data)
 	})
-	//console.log("new socket conn", socket)
-})
+}).listen(3001)// 3001
+
+
 let dictionary = new Map(),
 	getDevices = async () => {
-		return await findLocalDevices('172.20.10.0/24')
+		//return await findLocalDevices('172.20.10.0/24')
+		return await findLocalDevices('192.168.0.1/24')
 	},
 	checkRequest = async (ip, responseText) => {
 		return new Promise((resolve, reject) => {
 			try {
-				const req = http.get({hostname: ip}, res => {
+				const req = http.get('http://' + ip + '/state', res => {
 					//console.log(`statusCode: ${res.statusCode}`)
 					res.on("data", function(chunk) {
-					    console.log("BODY: " + chunk, chunk.indexOf(responseText), responseText );
+					    //console.log("BODY: " + chunk, chunk.indexOf(responseText), responseText );
 					    if (chunk.indexOf(responseText) >= 0) {
 							resolve(true)
 							return true;
@@ -66,7 +68,7 @@ let dictionary = new Map(),
 				const req = http.get(url, (res) => {
 				//const req = http.get({hostname: `http://${ip}`, path:`/relay/?turn=${turn}`}, res => {
 					res.on("data", function(chunk) {
-					    console.log("BODY: " + chunk);
+					    //console.log("BODY: " + chunk);
 		    });
 				}).on('error', function(e) {
 				  console.log("Got error: " + e.message);
@@ -79,8 +81,15 @@ let dictionary = new Map(),
 	},
 	checkDevisecInterval = setInterval(async () => {
 		console.log("start fetching new devices ...")
-		let devices = await getDevices()
-		devices.forEach(device => {
+		let devices = []
+		try{
+			devices = await getDevices()
+		}
+		catch (e){
+			console.log("err in fetch devices", e)
+			return false;
+		}
+		  devices.forEach(device => {
 			if (!dictionary.has(device.ip)) {
 				dictionary.set(device.ip, device)
 			}
@@ -96,7 +105,6 @@ let dictionary = new Map(),
 		console.log("zombies cleared")
 		dictionary.forEach(async device => {
 			let checkResult = false
-			device.pinged = false
 			try {
 				checkResult = await checkRequest(device.ip, "Shelly")
 				console.log("checkResult " + checkResult)
@@ -105,17 +113,29 @@ let dictionary = new Map(),
 				} else {
 					device.pinged = false
 				}
+				
 				console.log("device.pinged" + device.pinged)
-				//globalSocket.emit
-				//globalSocket.emit
-				globalSocket.emit("devices", Array.from(dictionary.values()))
+                
 			} catch (e) { 
 				console.log(e)
-				device.pinged = false
+				 //device.pinged = false
 			}
-			//console.log(checkResult)
+			console.log(device.ip,checkResult)
 		})
-		if (globalSocket) {
-			globalSocket.emit("devices", Array.from(dictionary.values()))
-		}
-	}, 3000)// refr page
+		//io.sockets.emit("devices", Array.from(dictionary.values()));
+		
+		// if (globalSocket) {
+		// 	globalSocket.emit("devices", Array.from(dictionary.values()))
+		// }
+	}, 5000)// refr page
+	
+io.on('connection', socket => {
+	globalSocket = socket
+	socket.on("relay", async data => {
+		let turnResult = await relayRequest(data.ip, data.turn)
+		console.log('turn result', turnResult)
+	})
+	socket.on("deviceReq", (response) => {
+		response(Array.from(dictionary.values()))
+	})
+})

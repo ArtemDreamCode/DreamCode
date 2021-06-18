@@ -14,8 +14,16 @@ String ClassDevice = "Shelly";
 //const char* ssid = "R_302";
 //const char* pass = "ProtProtom";
 
-const char* ssid = "iPhonexc5";
-const char* pass = "12345qAz";
+
+const char* ssid = "TP-LINK_120";
+const char* pass = "160193ya";
+
+
+//const char* ssid = "iPhonexc5";
+//const char* pass = "12345qAz";
+
+//const char* ssid = "iPhonezx";
+//const char* pass = "123456789";
 
 //const char* ssid = "ESPap";
 //const char* pass = "123456789";
@@ -24,8 +32,13 @@ void wifi_begin(){
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);  
   while (WiFi.status() != WL_CONNECTED) {
-    delay(900);
+    digitalWrite(2, HIGH);  
+    Serial.println("connecting to wifi");
+    delay(450);
   }
+  Serial.println(WiFi.localIP());
+  digitalWrite(2, LOW); 
+  Serial.println("connected"); 
   MacAdr = WiFi.macAddress(); //8C:AA:B5:7B:13:73
 }
 
@@ -45,6 +58,7 @@ void handleNotFound() {
 }
 
 void restServerRouting() {
+  
     server.on("/", HTTP_GET, []() {
         server.send(200, F("text/html"),
             F("Welcome to the REST Shelly Server"));
@@ -54,6 +68,9 @@ void restServerRouting() {
 }
 void setup()
 {
+  Serial.begin(115200);
+  pinMode(2, OUTPUT);
+  digitalWrite(2, LOW); 
   //Serial.begin(115200);
   pinMode(4, OUTPUT);
   digitalWrite(4, LOW);

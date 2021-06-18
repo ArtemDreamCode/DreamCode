@@ -3,37 +3,32 @@
 <head>
 	<title></title>
 </head>
-<style>
-  .button{
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-}
-.buttonScroll {border-radius: 4px;}
-.buttonWidth {width: 250px;}
-</style>
 <body>
 
 	<section id="app">
 		<div v-for="device in devices">
-			{{ device }} <button v-if="device.pinged" @click="relay({ip: device.ip, turn: 'on'})">on</button> <button v-if="device.pinged" @click="relay({ip: device.ip, turn: 'off'})">off</button>
+			{{ device.ip }} {{ device.pinged }} <button v-if="device.pinged" @click="relay({ip: device.ip, turn: 'on'})">on</button> <button v-if="device.pinged" @click="relay({ip: device.ip, turn: 'off'})">off</button>
 		</div>
 	</section>
 
-	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+	<script src="vue.js"></script>
+	<script type="text/javascript" src="socket.io.js"></script>
 	<script type="text/javascript">
+		//const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });
+		const socket = io("ws://192.168.0.106:3000", { transports: ["websocket"] });
+		socket.on("devices", devices => {
+			//console.log(devices)
+			//app.devices = devices
+		})
 		let app = new Vue({
 		  el: '#app',
 		  data: {
 		    devices: new Map()
+		  },
+		  mounted: function () {
+		  	socket.emit("deviceReq", (devs) => {
+				app.devices = devs
+		  	})
 		  },
 		  methods: {
 		  	relay(data) {
@@ -41,10 +36,9 @@
 		  	}
 		  }
 		})
-		const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });
-		socket.on("devices", devices => {
-			app.devices = devices
-		})
+		// const socket = io("ws://127.0.0.1:3000", { transports: ["websocket"] });
+		//const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });
+		
 	</script>
 </body>
 </html>
