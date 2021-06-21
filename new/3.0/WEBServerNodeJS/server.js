@@ -29,17 +29,15 @@ http.createServer((req, res) => {
 
 let dictionary = new Map(),
 	getDevices = async () => {
-		//return await findLocalDevices('172.20.10.0/24')
-		return await findLocalDevices('192.168.0.1/24')
+		return await findLocalDevices('172.20.10.0/24')
+		//return await findLocalDevices('192.168.0.1/24')
 	},
 	checkRequest = async (ip, responseText) => {
 		return new Promise((resolve, reject) => {
 			try {
 				const req = http.get('http://' + ip + '/state', res => {
 					//console.log(`statusCode: ${res.statusCode}`)
-					req.on('timeout', () => {
-						reject(false) 
-					});
+					
 					res.on("data", function(chunk) {
 					    //console.log("BODY: " + chunk, chunk.indexOf(responseText), responseText );
 					    if (chunk.indexOf(responseText) >= 0) {
@@ -53,8 +51,15 @@ let dictionary = new Map(),
 					});
 				}).on('error', function(e) {
 					resolve(false)
-				  // console.log("Got error: " + e.message);
-				});
+				   console.log("Got error: " + e.message);
+				}).on('socket', function (socket) {
+    socket.setTimeout(1000);  
+    socket.on('timeout', function() {
+		console.log("Check timeout, socket abort");
+        req.abort();
+    });
+});
+				
 			} catch (e) {
 				 console.log("err", e)
 			}
