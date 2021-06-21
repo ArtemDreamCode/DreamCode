@@ -10,12 +10,16 @@
 			{{ device.ip }} {{ device.pinged }} <button v-if="device.pinged" @click="relay({ip: device.ip, turn: 'on'})">on</button> <button v-if="device.pinged" @click="relay({ip: device.ip, turn: 'off'})">off</button>
 		</div>
 	</section>
-
+	<script>
+	setTimeout(function(){
+		location.reload();
+	}, 20000);
+	</script>
 	<script src="vue.js"></script>
 	<script type="text/javascript" src="socket.io.js"></script>
 	<script type="text/javascript">
 		//const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });
-		const socket = io("ws://192.168.0.106:3000", { transports: ["websocket"] });
+		const socket = io("ws://192.168.0.115:3000", { transports: ["websocket"] });
 		socket.on("devices", devices => {
 			//console.log(devices)
 			//app.devices = devices

@@ -44,11 +44,12 @@ let dictionary = new Map(),
 							return true;
 					    } else {
 							console.log("not equal")
-					    	reject(false)
+					    	resolve(false)
 					    	return false;
 					    }
 					});
 				}).on('error', function(e) {
+					resolve(false)
 				  // console.log("Got error: " + e.message);
 				});
 			} catch (e) {
