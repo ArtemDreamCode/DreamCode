@@ -37,6 +37,9 @@ let dictionary = new Map(),
 			try {
 				const req = http.get('http://' + ip + '/state', res => {
 					//console.log(`statusCode: ${res.statusCode}`)
+					req.on('timeout', () => {
+						reject(false) 
+					});
 					res.on("data", function(chunk) {
 					    //console.log("BODY: " + chunk, chunk.indexOf(responseText), responseText );
 					    if (chunk.indexOf(responseText) >= 0) {
