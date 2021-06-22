@@ -13,14 +13,14 @@
 	<script>
 	setTimeout(function(){
 		location.reload();
-	}, 20000);
+	}, 1500);
 	</script>
 	<script src="vue.js"></script>
 	<script type="text/javascript" src="socket.io.js"></script>
 	<script type="text/javascript">
 		//const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });
 		//const socket = io("ws://192.168.0.102:3000", { transports: ["websocket"] });
-		const socket = io("ws://localhost:3000", { transports: ["websocket"] });
+		const socket = io("ws://DESKTOP-DLMHF7N.local:3000", { transports: ["websocket"] });
 		socket.on("devices", devices => {
 			//console.log(devices)
 			//app.devices = devices
