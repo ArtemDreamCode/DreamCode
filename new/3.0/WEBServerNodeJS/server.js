@@ -32,15 +32,22 @@ let dictionary = new Map(),
 		return await findLocalDevices('172.20.10.0/24')
 		//return await findLocalDevices('192.168.0.1/24')
 	},
-	checkRequest = async (ip, responseText) => {
+	checkRequest = async (ip, responseText, result) => {
 		return new Promise((resolve, reject) => {
 			try {
+				result.value = []
 				const req = http.get('http://' + ip + '/state', res => {
 					//console.log(`statusCode: ${res.statusCode}`)
 					
 					res.on("data", function(chunk) {
 					    //console.log("BODY: " + chunk, chunk.indexOf(responseText), responseText );
 					    if (chunk.indexOf(responseText) >= 0) {
+							if (chunk.indexOf("off") >= 0) {
+							   result.value = false
+							}
+							if (chunk.indexOf("On") >= 0) {
+							   result.value = true
+							}
 							resolve(true)
 							return true;
 					    } else {
@@ -114,28 +121,26 @@ let dictionary = new Map(),
 		console.log("zombies cleared")
 		dictionary.forEach(async device => {
 			let checkResult = false
+			var ison = []
 			try {
-				checkResult = await checkRequest(device.ip, "Shelly")
-				console.log("checkResult " + checkResult)
+				checkResult = await checkRequest(device.ip, "Shelly", ison)
+				//console.log("checkResult " + checkResult)
 				if (checkResult) {
 					device.pinged = true
+					device.state = ison.value
 				} else {
 					device.pinged = false
 				}
 				
-				console.log("device.pinged" + device.pinged)
-                
-			} catch (e) { 
+			//	console.log("device.pinged" + device.pinged)
+ 			} catch (e) { 
 				console.log(e)
 				 //device.pinged = false
 			}
-			console.log(device.ip,checkResult)
+		//	console.log(device.ip, checkResult, device.state )
+		console.log(dictionary)
+		io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
 		})
-		//io.sockets.emit("devices", Array.from(dictionary.values()));
-		
-		// if (globalSocket) {
-		// 	globalSocket.emit("devices", Array.from(dictionary.values()))
-		// }
 	}, 5000)// refr page
 	
 io.on('connection', socket => {

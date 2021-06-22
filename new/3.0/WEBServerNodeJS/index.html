@@ -7,25 +7,34 @@
 
 	<section id="app">
 		<div v-for="device in devices">
-			{{ device.ip }} {{ device.pinged }} <button v-if="device.pinged" @click="relay({ip: device.ip, turn: 'on'})">on</button> <button v-if="device.pinged" @click="relay({ip: device.ip, turn: 'off'})">off</button>
+			<div v-if = "device.pinged">
+               <button v-on:click="relay({ip: device.ip, turn: device.state ? 'off': 'on'})">{{ device.state ? 'off': 'on' }} </button>					
+            </div>
 		</div>
 	</section>
 	<script>
-	setTimeout(function(){
-		location.reload();
-	}, 1500);
+		
+
 	</script>
 	<script src="vue.js"></script>
 	<script type="text/javascript" src="socket.io.js"></script>
 	<script type="text/javascript">
-		//const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });
+		
+		const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });
 		//const socket = io("ws://192.168.0.102:3000", { transports: ["websocket"] });
-		const socket = io("ws://DESKTOP-DLMHF7N.local:3000", { transports: ["websocket"] });
+		//const socket = io("ws://raspberrypi:3000", { transports: ["websocket"] });	
 		socket.on("devices", devices => {
 			//console.log(devices)
-			//app.devices = devices
+			app.devices = devices
 		})
-		let app = new Vue({
+		let app = new Vue({				 socket.on("devices", devices)
+				  => {
+				app.devices = devices
+				//console.log("devices", devices)
+				
+	
+		  		
+			})
 		  el: '#app',
 		  data: {
 		    devices: new Map()
@@ -37,13 +46,11 @@
 		  },
 		  methods: {
 		  	relay(data) {
-		  		socket.emit("relay", data)
+		  		socket.emit("relay", (data))// send data  				  		
+		  		
 		  	}
 		  }
 		})
-		// const socket = io("ws://127.0.0.1:3000", { transports: ["websocket"] });
-		//const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });
-		
 	</script>
 </body>
 </html>
