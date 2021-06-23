@@ -29,8 +29,8 @@ http.createServer((req, res) => {
 
 let dictionary = new Map(),
 	getDevices = async () => {
-		//return await findLocalDevices('172.20.10.0/24')
-		return await findLocalDevices('192.168.0.1/24')
+		return await findLocalDevices('172.20.10.0/24')
+	//	return await findLocalDevices('192.168.0.1/24')
 	},
 	checkRequest = async (ip, responseText, result) => {
 		return new Promise((resolve, reject) => {
@@ -45,7 +45,7 @@ let dictionary = new Map(),
 							if (chunk.indexOf("off") >= 0) {
 							   result.value = false
 							}
-							if (chunk.indexOf("On") >= 0) {
+							if (chunk.indexOf("on") >= 0) {
 							   result.value = true
 							}
 							resolve(true)
@@ -60,7 +60,7 @@ let dictionary = new Map(),
 					resolve(false)
 				   console.log("Got error: " + e.message);
 				}).on('socket', function (socket) {
-    socket.setTimeout(1000);  
+    socket.setTimeout(5000);  
     socket.on('timeout', function() {
 		console.log("Check timeout, socket abort");
         req.abort();
