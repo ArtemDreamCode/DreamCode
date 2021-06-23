@@ -29,8 +29,8 @@ http.createServer((req, res) => {
 
 let dictionary = new Map(),
 	getDevices = async () => {
-		return await findLocalDevices('172.20.10.0/24')
-		//return await findLocalDevices('192.168.0.1/24')
+		//return await findLocalDevices('172.20.10.0/24')
+		return await findLocalDevices('192.168.0.1/24')
 	},
 	checkRequest = async (ip, responseText, result) => {
 		return new Promise((resolve, reject) => {
