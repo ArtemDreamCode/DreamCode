@@ -36,18 +36,18 @@ let dictionary = new Map(),
 		return new Promise((resolve, reject) => {
 			try {
 				result.value = []
-				const req = http.get('http://' + ip + '/state', res => {
-					//console.log(`statusCode: ${res.statusCode}`)
-					
+				const req = http.get('http://' + ip + '/state', res => {					
 					res.on("data", function(chunk) {
-					    //console.log("BODY: " + chunk, chunk.indexOf(responseText), responseText );
-					    if (chunk.indexOf(responseText) >= 0) {
-							if (chunk.indexOf("off") >= 0) {
-							   result.value = false
-							}
-							if (chunk.indexOf("on") >= 0) {
-							   result.value = true
-							}
+						  var jsonData = chunk; 
+						  console.log("jsonData: " + jsonData);
+						  var jsonParsed = JSON.parse(jsonData);
+						  console.log("jsonParsed.state.state: " + jsonParsed.state);
+						  console.log("jsonParsed.state.class: " + jsonParsed.class);
+						  console.log("jsonParsed.state.name: " + jsonParsed.name);
+					    if (jsonParsed.class == responseText) {					
+						  result.state = jsonParsed.state							   				
+                          result.class = jsonParsed.class
+                          result.name = jsonParsed.name 
 							resolve(true)
 							return true;
 					    } else {
@@ -121,13 +121,15 @@ let dictionary = new Map(),
 		console.log("zombies cleared")
 		dictionary.forEach(async device => {
 			let checkResult = false
-			var ison = []
+			var DeviceState = []
 			try {
-				checkResult = await checkRequest(device.ip, "Shelly", ison)
+				checkResult = await checkRequest(device.ip, "Shelly", DeviceState)
 				//console.log("checkResult " + checkResult)
 				if (checkResult) {
 					device.pinged = true
-					device.state = ison.value
+					device.state = DeviceState.state
+					device.name = DeviceState.name
+					device.class = DeviceState.class				
 				} else {
 					device.pinged = false
 				}

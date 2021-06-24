@@ -1,22 +1,11 @@
 <!DOCTYPE html>
 <html>
-<style>
-   .btn{
-	  background-color: #FFFF00;
-	  border: none;
-	  color: black;
-	  padding: 15px 32px;
-	  text-align: center;
-	  text-decoration: none;
-	  display: inline-block;
-	  font-size: 16px;
-	  margin: 4px 2px;
-	  cursor: pointer;
-}
-
-.btn_on {background-color: #555555;} /* black */
-.btn_off {background-color: #e7e7e7; color: black;} /* gray */ 
-
+<style scoped>
+  #btn{
+        color: #CC00CC;
+        width: 150;
+        height: 50;
+    }
 </style>
 <head>
 	<title>Home light control</title>
@@ -26,13 +15,9 @@
 	<section id="app">
 		<div v-for="device in devices">
 			<div v-if = "device.pinged">
-				<div v-if = "device.state === 'on'">
-				   <button class = "btn btn_off" v-on:click="relay({ip: device.ip, turn: 'off'})">{{ device.name }}</button>
-				 </div>
-				 <div v-else>
-				   <button class = "btn btn_on" v-on:click="relay({ip: device.ip, turn: 'on'})"> {{ device.name }}</button>
-				 </div>
-			 </div>
+             <!--  <button v-on:click="relay({ip: device.ip, turn: device.state ? 'off': 'on'})">{{ device.state ? 'off': 'on' }} </button> -->
+			   <input id="btn" type="button" v-on:click=click="relay({ip: device.ip, turn: device.state ? 'off': 'on'})" value="{{ device.state ? 'off': 'on' }}">					
+            </div>
 		</div>
 	</section>
 	<script>
@@ -65,7 +50,7 @@
 		  methods: {
 		  	relay(data) {
 		  		socket.emit("relay", (data))// send data  				  		
-		  		console.log("data" + data.turn)
+		  		
 		  	}
 		  }
 		})

@@ -2,6 +2,11 @@
 #include <ESP8266WebServer.h>
 #include <FS.h>
 #include <ESP8266HTTPClient.h>
+#include <EEPROM.h>
+#include "UnitFlash.h"
+
+#define EEPROM_NameAddr 0
+#define EEPROM_StateAddr 1
 
 ESP8266WebServer server(80);
 
@@ -10,8 +15,8 @@ WiFiClient client;
 bool RealCheck = false;
 int bt_state = 0;
 String MacAdr;
-String DeviceFrendlyName = "New Robotic Device";
 String ClassDevice = "Shelly";
+String DeviceFrendlyName = "New Robotic Device";
 //const char* ssid = "R_302";
 //const char* pass = "ProtProtom";
 
@@ -77,8 +82,11 @@ void setup()
   pinMode(4, OUTPUT);
   digitalWrite(4, LOW);
   pinMode(5, INPUT);
+  EEPROM.begin(16);
+//  DeviceFrendlyName = readEEPROM();
+  RealCheck = GetFlashState();
+  Serial.println(RealCheck);
   wifi_begin();
-
   restServerRouting();
   server.onNotFound(handleNotFound);
   server.begin();
@@ -146,10 +154,9 @@ void handle_ChangeState()
       RealCheck = false;
       digitalWrite(4, LOW); //выключаем
       //выключить лампочку
-    }
-
-    
+    }    
   }
+  SetFlashState(RealCheck);
   String response = "{"; 
   String st;
   if (RealCheck == true){
@@ -160,16 +167,34 @@ void handle_ChangeState()
    }
    response+= "\"state\": \""+st+"\"";
    response+="}";
-  
+   SetFlashState(RealCheck);
    server.send(200, "text/html", response);
 }
 
+/*void writeEEPROM(String str) {
+   const char *buf = str.c_str();
+   EEPROM.put(AddrName, strlen(buf));
+   for (int i=0; i<16; i++) {
+       EEPROM.put(AddrName+1+i, buf[i]);
+   }
+   EEPROM.commit();
+}
+
+String readEEPROM() {
+    char buf[16];
+    uint16_t size = EEPROM.get(AddrName);
+    for (int i=0; i<size; i++) {
+      char buf[16] = EEPROM.get(AddrName+1+i);
+    }
+    return String(buf);
+}
+*/
 void handle_ChangeFrendlyName(){
   String nm;
   if ((server.args() == 1) && (server.argName(0) == "name")) {
     nm = server.arg(0);
     DeviceFrendlyName = nm;
-    
+    //writeEEPROM(EEPROM_NameAddr, DeviceFrendlyName);
     }
    String response = "{"; 
    response+= "\"name\": \""+DeviceFrendlyName+"\"";
@@ -195,6 +220,7 @@ void loop()
      }
   }
   bt_state = bt; //готовы снова ловить выключатель
+  SetFlashState(RealCheck);
   server.handleClient();  
   Serial.println("DeviceFrendlyName: " + DeviceFrendlyName);
   delay(200);
