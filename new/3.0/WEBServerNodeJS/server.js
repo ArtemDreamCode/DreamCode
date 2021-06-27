@@ -2,7 +2,10 @@ const findLocalDevices = require('local-devices')
 const http = require('http')
 const path = require('path')
 const fs = require('fs')
+const Device_GUID = 'dDf5FFShellysde';
+
 let globalSocket
+ var jsonData
 // process.on('uncaughtException', function (err) {
 //     // console.log(err);
 // }); 
@@ -29,38 +32,69 @@ http.createServer((req, res) => {
 
 let dictionary = new Map(),
 	getDevices = async () => {
-		return await findLocalDevices('172.20.10.0/24')
-	//	return await findLocalDevices('192.168.0.1/24')
+	//	return await findLocalDevices('172.20.10.0/24')
+		return await findLocalDevices('192.168.0.1/24')
 	},
 	checkRequest = async (ip, responseText, result) => {
 		return new Promise((resolve, reject) => {
 			try {
 				result.value = []
-				const req = http.get('http://' + ip + '/state', res => {					
-					res.on("data", function(chunk) {
-						  var jsonData = chunk; 
-						  console.log("jsonData: " + jsonData);
-						  var jsonParsed = JSON.parse(jsonData);
+				console.log("input before get ip " + ip)
+				const req = http.get('http://' + ip + '/state', res => {
+                    var body = "";					
+					res.on("data", function(chunk) {			
+					    body += chunk;})
+					
+					res.on('end', function(){
+
+////////////////////////////
+
+        if (res.statusCode == 200) { 
+            try {
+                if (body != '') {
+                    console.log("http://" + ip + "/state   :=>jsdata :  " + body);
+                    var jsonParsed = JSON.parse(body)
+                   	if (body.indexOf(Device_GUID) >= 0) {
+						  var jsonParsed = JSON.parse(body)
 						  console.log("jsonParsed.state.state: " + jsonParsed.state);
 						  console.log("jsonParsed.state.class: " + jsonParsed.class);
 						  console.log("jsonParsed.state.name: " + jsonParsed.name);
-					    if (jsonParsed.class == responseText) {					
-						  result.state = jsonParsed.state							   				
-                          result.class = jsonParsed.class
-                          result.name = jsonParsed.name 
-							resolve(true)
-							return true;
+					      if (jsonParsed.class == responseText) {					
+							  result.state = jsonParsed.state							   				
+							  result.class = jsonParsed.class
+							  result.name = jsonParsed.name
+							  result.device_guid = jsonParsed.device_guid	
+							  resolve(true)
+							  return true;
 					    } else {
 							console.log("not equal")
 					    	resolve(false)
 					    	return false;
 					    }
-					});
-				}).on('error', function(e) {
+						}else{
+						resolve(false)
+						return false;}	
+                } else {
+                    console.log('Body is empty');
+					resolve(false)
+					return false;
+                }
+            } catch (err) {
+                console.log(err);
+				resolve(false)
+		    	return false;
+            }
+        } else {
+            console.log('Status code: ' + res.statusCode);
+		    resolve(false)
+			return false;
+        }
+     });
+  }).on('error', function(e) {
 					resolve(false)
 				   console.log("Got error: " + e.message);
 				}).on('socket', function (socket) {
-    socket.setTimeout(5000);  
+    socket.setTimeout(1000);  
     socket.on('timeout', function() {
 		console.log("Check timeout, socket abort");
         req.abort();
@@ -105,10 +139,14 @@ let dictionary = new Map(),
 			console.log("err in fetch devices", e)
 			return false;
 		}
+			             
 		  devices.forEach(device => {
+			//  console.log("black " + device.ip)
 			if (!dictionary.has(device.ip)) {
-				dictionary.set(device.ip, device)
-			}
+			//	if (IPMask.test(device.ip)){
+			//		console.log("white ip " + device.ip)
+				  dictionary.set(device.ip, device)}
+			//}
 		})
 		dictionary.forEach(record => {
 			if (!devices.find(device => device.ip == record.ip)) {
@@ -143,7 +181,7 @@ let dictionary = new Map(),
 		console.log(dictionary)
 		io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
 		})
-	}, 5000)// refr page
+	}, 2000)// время ответа сервера
 	
 io.on('connection', socket => {
 	globalSocket = socket
