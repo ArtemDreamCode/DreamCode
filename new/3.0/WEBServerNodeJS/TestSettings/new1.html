@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<style>
+   .btn{
+	  background-color: #FFFF00;
+	  border: none;
+	  color: black;
+	  padding: 15px 32px;
+	  text-align: center;
+	  text-decoration: none;
+	  display: inline-block;
+	  font-size: 16px;
+	  margin: 4px 2px;
+	  cursor: pointer;
+}
+
+.btn_set{
+	background-color: #808080;
+}
+.btn_on {background-color: #555555;} 
+.btn_off {background-color: #e7e7e7; color: black;} 
+
+</style>
+<head>
+	<title>Home light control</title>
+</head>
+<body>
+    <h1>Home light control</h1>
+	<section id="app">
+		<div>
+			<button class = "btn btn_on" v-on:click="SetClick({ip: '192.168.4.113', state: 'on'})">settigs</button>
+			<div v-if = "change_flag === 'off' ">
+				<input type="text" name="newName" placeholder="New name.." onBlur="SetName({ip: '192.168.4.113', name: this.value})">  <!--   to do SetName   -->
+			</div>
+			<div v-else>
+				<input hidden type="text" name="newName" placeholder="New name.." onBlur="SetName({ip: '192.168.4.113', name: this.value})">  <!--   to do SetName   -->
+			</div>
+		</div>
+	</section>
+	<script src="vue.js"></script>
+	<script type="text/javascript" src="socket.io.js"></script>
+	<script type="text/javascript">
+
+		//var change_flag = "on";
+		//console.log(change_flag);
+
+		
+		let app = new Vue({
+		  el: '#app',
+		  data: {
+			change_flag: "off"
+		  },
+		  methods: {
+		  	SetClick: function(data) {
+		  		change_flag = "on";
+				console.log("ip " + data.ip);
+				console.log(change_flag);
+		  	},
+			SetName: function(data) {
+				console.log("ip " + data.ip)
+				console.log("name " + data.name)
+				var Elem="Ip: " + data.ip +
+					"\nNewName: " + data.name;
+				alert(Elem);
+				change_flag = "off";
+				console.log(change_flag);
+			}	
+		  }
+		})
+	</script>
+</body>
+</html>
