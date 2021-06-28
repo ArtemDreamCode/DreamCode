@@ -1,38 +1,66 @@
 <!DOCTYPE html>
 <html>
 <style>
-   .btn{
-	  background-color: #FFFF00;
-	  border: none;
-	  color: black;
-	  padding: 15px 32px;
-	  text-align: center;
-	  text-decoration: none;
-	  display: inline-block;
-	  font-size: 16px;
-	  margin: 4px 2px;
-	  cursor: pointer;
+.btn {
+  display: inline-block;
+  padding: 15px 25px;
+  font-size: 24px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #fff;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+    margin: 8px 2px;
+}
+
+.btn:active {
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
 }
 
 .btn_on {background-color: #555555;} /* black */
 .btn_off {background-color: #e7e7e7; color: black;} /* gray */ 
 
+.btn_name{
+background-image: url('SetBut.jpg');
+padding-left : 32px;
+padding-top : 10px;
+padding-bottom : 10px;
+background-repeat : no-repeat;
+}
+.btn_set{
+background-image: url('SetBut.jpg');
+padding-left : 32px;
+padding-top : 10px;
+padding-bottom : 10px;
+background-repeat : no-repeat;
+}
+
+
 </style>
 <head>
 	<title>Home light control</title>
+	<meta charset="UTF-8" />
 </head>
 <body>
     <h1>Home light control</h1>
 	<section id="app">
 		<div v-for="device in devices">
 			<div v-if = "device.pinged">
-				<button class = "btn btn_on" v-on:click="ChangeName({ip: device.ip, name: '12345'})">change name</button>
-				<button class = "btn btn_on" v-on:click="ChangeState({ip: device.ip})">change state</button>
+				<!-- <button class = "btn btn_on" v-on:click="ChangeState({ip: device.ip})">change state</button> -->
 				<div v-if = "device.state === 'on'">
-				   <button class = "btn btn_off" v-on:click="relay({ip: device.ip, turn: 'off'})">{{ device.name }}</button>
+				   <button class = "btn btn_off" v-on:click="relay({ip: device.ip, turn: 'off'})">{{ device.name }}</button>				   
+				   	<img style="margin: -10px 20px" src="newname.png" v-on:click="ChangeName({ip: device.ip, name: device.name})"> 
+				<img style="margin: -10px 20px" src="SetBut.jpg" v-on:click="info({ip: device.ip, name: device.name, state: device.state})">					
 				 </div>
 				 <div v-else>
-				   <button class = "btn btn_on" v-on:click="relay({ip: device.ip, turn: 'on'})"> {{ device.name }}</button>
+				   <button class = "btn btn_on" v-on:click="relay({ip: device.ip, turn: 'on'})"> {{ device.name }}</button >
+				   	<img style="margin: -10px 20px" src="newname.png" v-on:click="ChangeName({ip: device.ip, name: device.name})"> 
+				<img style="margin: -10px 20px" src="SetBut.jpg" v-on:click="info({ip: device.ip, name: device.name, state: device.state})"> 
 				 </div>
 			 </div>
 		</div>
@@ -70,15 +98,35 @@
 		  		console.log("data" + data.turn)
 		  	},
 			ChangeName(data) {
-		  		socket.emit("ChangeName", (data))// send data  				  		
-		  		console.log("set name ok")
+			  var nm = prompt("Укажите имя устройства", data.name)				
+				if (nm != null) {
+				  data.name = nm
+		  		  socket.emit("ChangeName", (data))// send data  				  		
+		  		  console.log("set name ok")
+				  }
 		  	},
 			ChangeState(data){
-		  		socket.emit("ChangeState", (data))// send data  				  		
+		  		socket.emit("ChangeState", (data))// send 				  		
 		  		console.log("change state ok")
 		  	}
-		  }
-		})
+			,
+			info(data){
+			var st 
+			if(data.state === "on"){ 
+			  st = "Выключено"
+			}
+			else{
+			  st = "Включено"			
+			}
+			    alert("Информация об устройстве\n  ip: " + data.ip 
+					+ "\n  Имя: " + data.name 
+					+ "\n  Состояние: " + st);
+		  		//socket.emit("ChangeState", (data))// send 				  		
+		  		console.log("change state ok")
+				
+		  	}
+		}
+	})
 		
 	</script>
 </body>
