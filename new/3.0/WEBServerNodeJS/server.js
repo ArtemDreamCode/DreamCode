@@ -29,8 +29,8 @@ http.createServer((req, res) => {
 
 let dictionary = new Map(),
 	getDevices = async () => {
-		return await findLocalDevices('172.20.10.0/24')
-	//	return await findLocalDevices('192.168.0.1/24')
+	//	return await findLocalDevices('172.20.10.0/24')
+		return await findLocalDevices('192.168.0.1/24')
 	},
 	checkRequest = async (ip, responseText, result) => {
 		return new Promise((resolve, reject) => {
@@ -38,6 +38,7 @@ let dictionary = new Map(),
 				result.value = []
 				const req = http.get('http://' + ip + '/state', res => {					
 					res.on("data", function(chunk) {
+						if (chunk.indexOf(responseText) >= 0){
 						  var jsonData = chunk; 
 						  console.log("jsonData: " + jsonData);
 						  var jsonParsed = JSON.parse(jsonData);
@@ -55,7 +56,7 @@ let dictionary = new Map(),
 					    	resolve(false)
 					    	return false;
 					    }
-					});
+						}});
 				}).on('error', function(e) {
 					resolve(false)
 				   console.log(ip + "  Got error: " + e.message);
