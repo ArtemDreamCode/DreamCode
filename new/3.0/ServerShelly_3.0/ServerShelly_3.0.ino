@@ -17,18 +17,16 @@ int bt_state = 0;
 String MacAdr;
 String ClassDevice = "Shelly";
 String DeviceFrendlyName = "New Robotic Device";
-String Device_GUID = "dDf5FFShellysde";
-
 //const char* ssid = "R_302";
 //const char* pass = "ProtProtom";
 
 
-const char* ssid = "TP-LINK_120";
-const char* pass = "160193ya";
+//const char* ssid = "TP-LINK_120";
+//const char* pass = "160193ya";
 
 
-//const char* ssid = "iPhonexc5";
-//const char* pass = "12345qAz";
+const char* ssid = "iPhonexc5";
+const char* pass = "12345qAz";
 
 //const char* ssid = "iPhonezx";
 //const char* pass = "123456789";
@@ -86,7 +84,7 @@ void setup()
   pinMode(5, INPUT);
   EEPROM.begin(16);
 //  DeviceFrendlyName = readEEPROM();
-  //RealCheck = GetFlashState();
+  RealCheck = GetFlashState();
   Serial.println(RealCheck);
   wifi_begin();
   restServerRouting();
@@ -104,8 +102,7 @@ void handle_GetState(){ //запрос о состоянии от клиента
    else{
      st = "off";
    }
-   response+= "\"device_guid\": \""+Device_GUID+"\"";
-   response+= ",\"state\": \""+st+"\"";
+   response+= "\"state\": \""+st+"\"";
    response+= ",\"ip\": \""+WiFi.localIP().toString()+"\"";
    response+= ",\"class\": \""+ClassDevice+"\""; 
    response+= ",\"name\": \""+DeviceFrendlyName+"\""; 
@@ -159,7 +156,7 @@ void handle_ChangeState()
       //выключить лампочку
     }    
   }
-  //SetFlashState(RealCheck);
+  SetFlashState(RealCheck);
   String response = "{"; 
   String st;
   if (RealCheck == true){
@@ -170,7 +167,7 @@ void handle_ChangeState()
    }
    response+= "\"state\": \""+st+"\"";
    response+="}";
-  // SetFlashState(RealCheck);
+   SetFlashState(RealCheck);
    server.send(200, "text/html", response);
 }
 
@@ -223,7 +220,7 @@ void loop()
      }
   }
   bt_state = bt; //готовы снова ловить выключатель
- // SetFlashState(RealCheck);
+  SetFlashState(RealCheck);
   server.handleClient();  
   Serial.println("DeviceFrendlyName: " + DeviceFrendlyName);
   delay(200);
