@@ -10,7 +10,6 @@ int value;
 int addrState = 10;
 int addrName = 20;
 
-int incomingByte = 0;
 String incomingString = "";
 
 void eeprom_write_name(String str)
@@ -19,7 +18,7 @@ void eeprom_write_name(String str)
   strcpy(cstr, str.c_str()); //переводим string в char[]
   EEPROM.begin(40);
   EEPROM.write(addrName, str.length()+1); //записываем сначала длину строки-имени
-  for (int i=1; i<=(str.length() + 1); i++)
+  for (int i=0; i<=(str.length() + 1); i++)
   {
     EEPROM.write(addrName+1+i, cstr[i]);  //записываем последовательно каждый символ имени
   }
