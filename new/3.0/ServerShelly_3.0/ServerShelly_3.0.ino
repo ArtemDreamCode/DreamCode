@@ -5,8 +5,6 @@
 #include <EEPROM.h>
 #include "UnitFlash.h"
 
-#define EEPROM_NameAddr 0
-#define EEPROM_StateAddr 1
 
 ESP8266WebServer server(80);
 
@@ -82,12 +80,12 @@ void setup()
   pinMode(4, OUTPUT);
   digitalWrite(4, LOW);
   pinMode(5, INPUT);
-  EEPROM.begin(16);
-//  DeviceFrendlyName = readEEPROM();
-  RealCheck = GetFlashState();
+  DeviceFrendlyName = eeprom_read_name();
+  RealCheck = eeprom_read_state();
   Serial.println(RealCheck);
   wifi_begin();
   restServerRouting();
+  
   server.onNotFound(handleNotFound);
   server.begin();
 }
@@ -118,23 +116,6 @@ void handle_GetState(){ //запрос о состоянии от клиента
    response+="}";
   
    server.send(200, "text/html", response);
-
-/*   
-    if (server.arg("signalStrength")== "true"){
-        response+= ",\"signalStrengh\": \""+String(WiFi.RSSI())+"\"";
-    }
- 
-    if (server.arg("chipInfo")== "true"){
-        response+= ",\"chipId\": \""+String(ESP.getChipId())+"\"";
-        response+= ",\"flashChipId\": \""+String(ESP.getFlashChipId())+"\"";
-        response+= ",\"flashChipSize\": \""+String(ESP.getFlashChipSize())+"\"";
-        response+= ",\"flashChipRealSize\": \""+String(ESP.getFlashChipRealSize())+"\"";
-    }
-    if (server.arg("freeHeap")== "true"){
-        response+= ",\"freeHeap\": \""+String(ESP.getFreeHeap())+"\"";
-    }
-    response+="}";
-    */
 }
 void handle_ChangeState()
 {
@@ -154,9 +135,10 @@ void handle_ChangeState()
       RealCheck = false;
       digitalWrite(4, LOW); //выключаем
       //выключить лампочку
-    }    
+    }
+    eeprom_write_state(RealCheck);
   }
-  SetFlashState(RealCheck);
+  
   String response = "{"; 
   String st;
   if (RealCheck == true){
@@ -167,34 +149,15 @@ void handle_ChangeState()
    }
    response+= "\"state\": \""+st+"\"";
    response+="}";
-   SetFlashState(RealCheck);
    server.send(200, "text/html", response);
 }
 
-/*void writeEEPROM(String str) {
-   const char *buf = str.c_str();
-   EEPROM.put(AddrName, strlen(buf));
-   for (int i=0; i<16; i++) {
-       EEPROM.put(AddrName+1+i, buf[i]);
-   }
-   EEPROM.commit();
-}
-
-String readEEPROM() {
-    char buf[16];
-    uint16_t size = EEPROM.get(AddrName);
-    for (int i=0; i<size; i++) {
-      char buf[16] = EEPROM.get(AddrName+1+i);
-    }
-    return String(buf);
-}
-*/
 void handle_ChangeFrendlyName(){
   String nm;
   if ((server.args() == 1) && (server.argName(0) == "name")) {
     nm = server.arg(0);
     DeviceFrendlyName = nm;
-    //writeEEPROM(EEPROM_NameAddr, DeviceFrendlyName);
+    eeprom_write_name(DeviceFrendlyName);
     }
    String response = "{"; 
    response+= "\"name\": \""+DeviceFrendlyName+"\"";
@@ -218,9 +181,9 @@ void loop()
        RealCheck = false;
        digitalWrite(4, LOW); //выключаем
      }
+     eeprom_write_state(RealCheck);
   }
   bt_state = bt; //готовы снова ловить выключатель
-  SetFlashState(RealCheck);
   server.handleClient();  
   Serial.println("DeviceFrendlyName: " + DeviceFrendlyName);
   delay(200);
