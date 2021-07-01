@@ -9,7 +9,7 @@
 ESP8266WebServer server(80);
 
 WiFiClient client;  
-
+String Device_GUID = "dDf5FFShellysde";
 bool RealCheck = false;
 int bt_state = 0;
 String MacAdr;
@@ -19,12 +19,12 @@ String DeviceFrendlyName = "New Robotic Device";
 //const char* pass = "ProtProtom";
 
 
-const char* ssid = "TP-LINK_120";
-const char* pass = "160193ya";
+//const char* ssid = "TP-LINK_120";
+//const char* pass = "160193ya";
 
 
-//const char* ssid = "iPhonexc5";
-//const char* pass = "12345qAz";
+const char* ssid = "iPhonexc5";
+const char* pass = "12345qAz";
 
 //const char* ssid = "iPhonezx";
 //const char* pass = "123456789";
@@ -100,7 +100,8 @@ void handle_GetState(){ //запрос о состоянии от клиента
    else{
      st = "off";
    }
-   response+= "\"state\": \""+st+"\"";
+   response+= "\"device_guid\": \""+Device_GUID+"\"";
+   response+= ",\"state\": \""+st+"\"";
    response+= ",\"ip\": \""+WiFi.localIP().toString()+"\"";
    response+= ",\"class\": \""+ClassDevice+"\""; 
    response+= ",\"name\": \""+DeviceFrendlyName+"\""; 
