@@ -32,6 +32,25 @@ const char* pass = "12345qAz";
 //const char* ssid = "ESPap";
 //const char* pass = "123456789";
 
+void DoCheckButtonState(){
+  int bt = digitalRead(5);
+  if (bt != bt_state)
+  { //если есть изменение состояния кнопки
+     if (!RealCheck)
+     {
+       RealCheck = true;
+       digitalWrite(4, HIGH); //включаем
+     }
+     else if (RealCheck)
+     {
+       RealCheck = false;
+       digitalWrite(4, LOW); //выключаем
+     }
+     eeprom_write_state(RealCheck);
+  }
+  bt_state = bt; //готовы снова ловить выключатель  
+}
+
 void wifi_begin(){
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);  
@@ -39,6 +58,7 @@ void wifi_begin(){
     digitalWrite(2, HIGH);  
     Serial.println("connecting to wifi");
     delay(450);
+    DoCheckButtonState();
   }
   Serial.println(WiFi.localIP());
   digitalWrite(2, LOW); 
@@ -169,22 +189,7 @@ void handle_ChangeFrendlyName(){
 
 void loop()
 {
-  int bt = digitalRead(5);
-  if (bt != bt_state)
-  { //если есть изменение состояния кнопки
-     if (!RealCheck)
-     {
-       RealCheck = true;
-       digitalWrite(4, HIGH); //включаем
-     }
-     else if (RealCheck)
-     {
-       RealCheck = false;
-       digitalWrite(4, LOW); //выключаем
-     }
-     eeprom_write_state(RealCheck);
-  }
-  bt_state = bt; //готовы снова ловить выключатель
+  DoCheckButtonState();
   server.handleClient();  
   Serial.println("DeviceFrendlyName: " + DeviceFrendlyName);
   delay(200);
