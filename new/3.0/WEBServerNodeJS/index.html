@@ -53,16 +53,20 @@ background-repeat : no-repeat;
 			<div v-if = "device.pinged">
 				<!-- <button class = "btn btn_on" v-on:click="ChangeState({ip: device.ip})">change state</button> -->
 				<div v-if = "device.state === 'on'">
-				   <button class = "btn btn_off" v-on:click="relay({ip: device.ip, turn: 'off'})">{{ device.name }}</button>				   
-				   	<img style="margin: -10px 20px" src="newname.png" v-on:click="ChangeName({ip: device.ip, name: device.name})"> 
-				<img style="margin: -10px 20px" src="SetBut.jpg" v-on:click="info({ip: device.ip, name: device.name, state: device.state})">					
+	
+
+						   <button class = "btn btn_off" v-on:click="relay({ip: device.ip, turn: 'off', state: device.fictionState})">{{ device.name }}</button>				   
+									<img style="margin: -10px 20px" src="newname.png" v-on:click="ChangeName({ip: device.ip, name: device.name})"> 
+								<img style="margin: -10px 20px" src="SetBut.jpg" v-on:click="info({ip: device.ip, name: device.name, state: device.state})">																													
+					</div>
+					 <div v-else>
+					
+						<button class = "btn btn_on" v-on:click="relay({ip: device.ip, turn: 'on', state: device.fictionState})">{{ device.name }}</button>
+							<img style="margin: -10px 20px" src="newname.png" v-on:click="ChangeName({ip: device.ip, name: device.name})"> 
+						<img style="margin: -10px 20px" src="SetBut.jpg" v-on:click="info({ip: device.ip, name: device.name, state: device.state})">			
+					</div>
+
 				 </div>
-				 <div v-else>
-				   <button class = "btn btn_on" v-on:click="relay({ip: device.ip, turn: 'on'})"> {{ device.name }}</button >
-				   	<img style="margin: -10px 20px" src="newname.png" v-on:click="ChangeName({ip: device.ip, name: device.name})"> 
-				<img style="margin: -10px 20px" src="SetBut.jpg" v-on:click="info({ip: device.ip, name: device.name, state: device.state})"> 
-				 </div>
-			 </div>
 		</div>
 	</section>
 	<script>
@@ -74,29 +78,39 @@ background-repeat : no-repeat;
 	<script type="text/javascript">
 	
 	//	const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });		
-		const socket = io("ws://172.20.10.11:3000", { transports: ["websocket"] });
-		//const socket = io("ws://192.168.0.101:3000", { transports: ["websocket"] });
-		//const socket = io("ws://raspberrypi:3000", { transports: ["websocket"] });	
+	//	const socket = io("ws://172.20.10.11:3000", { transports: ["websocket"] });
+		const socket = io("ws://192.168.0.103:3000", { transports: ["websocket"] });
+		//const socket = io("ws://raspberrypi:3000", { transports: ["websocket"] });
+		
+
 		socket.on("devices", devices => {
 			//console.log(devices)
+
 			app.devices = devices
+		  app.devices.forEach(device => {
+			console.log("app.devices.device.fictionState" + device.fictionState)
+			
+		   })
+			
 		})
 		
 		let app = new Vue({
 		  el: '#app',
 		  data: {
 		    devices: new Map()
+		//	console.log("devices ok")
 		  },
 		  mounted: function () {
 		  	socket.emit("deviceReq", (devs) => {
 				app.devices = devs
+
 		  	})
+			//console.log("mounted ok")
 		  },
 		  methods: {
-		  	relay(data) {
-		  		socket.emit("relay", (data))// send data  				  		
-		  		console.log("data" + data.turn)
-		  	},
+		  	relay(data) {				
+				socket.emit("relay", (data))// send data  				  		
+		  	},				
 			ChangeName(data) {
 			  var nm = prompt("Укажите имя устройства", data.name)				
 				if (nm != null) {
@@ -105,26 +119,21 @@ background-repeat : no-repeat;
 		  		  console.log("set name ok")
 				  }
 		  	},
-			ChangeState(data){
-		  		socket.emit("ChangeState", (data))// send 				  		
-		  		console.log("change state ok")
-		  	}
-			,
 			info(data){
-			var st 
-			if(data.state === "on"){ 
-			  st = "Выключено"
-			}
-			else{
-			  st = "Включено"			
-			}
-			    alert("Информация об устройстве\n  ip: " + data.ip 
-					+ "\n  Имя: " + data.name 
-					+ "\n  Состояние: " + st);
-		  		//socket.emit("ChangeState", (data))// send 				  		
-		  		console.log("change state ok")
-				
-		  	}
+				var st 
+				if(data.state === "on"){ 
+				  st = "Включено"
+				}
+				else{
+				  st = "Выключено"			
+				}
+					alert("Информация об устройстве\n  ip: " + data.ip 
+						+ "\n  Имя: " + data.name 
+						+ "\n  Состояние: " + st);
+					//socket.emit("ChangeState", (data))// send 				  		
+					console.log("change state ok")
+					
+				}
 		}
 	})
 		

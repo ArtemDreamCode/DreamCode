@@ -11,20 +11,22 @@ ESP8266WebServer server(80);
 WiFiClient client;  
 String Device_GUID = "dDf5FFShellysde";
 bool RealCheck = false;
-int bt_state = 0;
+int bt_state;
 String MacAdr;
 String ClassDevice = "Shelly";
 String DeviceFrendlyName = "New Robotic Device";
 //const char* ssid = "R_302";
 //const char* pass = "ProtProtom";
+//const char* ssid = "rostelecom_104";
+//const char* pass = "63030723";
 
 
-//const char* ssid = "TP-LINK_120";
-//const char* pass = "160193ya";
+const char* ssid = "TP-LINK_120";
+const char* pass = "160193ya";
 
 
-const char* ssid = "iPhonexc5";
-const char* pass = "12345qAz";
+//const char* ssid = "iPhonexc5";
+//const char* pass = "12345qAz";
 
 //const char* ssid = "iPhonezx";
 //const char* pass = "123456789";
@@ -48,6 +50,14 @@ void DoCheckButtonState(){
      }
      eeprom_write_state(RealCheck);
   }
+  else
+  {
+    if (RealCheck) //realcheck уже начитался из памяти 
+       digitalWrite(4, HIGH); //включаем
+    else      
+       digitalWrite(4, LOW); //выключаем
+  }
+ 
   bt_state = bt; //готовы снова ловить выключатель  
 }
 
@@ -102,6 +112,7 @@ void setup()
   pinMode(5, INPUT);
   DeviceFrendlyName = eeprom_read_name();
   RealCheck = eeprom_read_state();
+  bt_state = digitalRead(5);
   Serial.println(RealCheck);
   wifi_begin();
   restServerRouting();

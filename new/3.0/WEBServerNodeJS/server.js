@@ -30,8 +30,8 @@ http.createServer((req, res) => {
 
 let dictionary = new Map(),
 	getDevices = async () => {
-		return await findLocalDevices('172.20.10.0/24')
-	//	return await findLocalDevices('192.168.0.1/24')
+	//	return await findLocalDevices('172.20.10.0/24')
+		return await findLocalDevices('192.168.0.1/24')
 	},
   checkRequest = async (ip, responseText, result) => {
 		return new Promise((resolve, reject) => {
@@ -118,6 +118,14 @@ let dictionary = new Map(),
 					res.on("data", function(chunk) {
 					    //console.log("BODY: " + chunk);
 		    });
+			
+	       dictionary.forEach(device => {
+			if (device.ip === ip) {
+				device.state = turn
+			}
+			})
+			
+			io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
 				}).on('error', function(e) {
 				  console.log(ip + "  Got error: " + e.message);
 				});
@@ -139,6 +147,13 @@ let dictionary = new Map(),
 					res.on("data", function(chunk) {
 					    //console.log("BODY: " + chunk);
 		    });
+	        dictionary.forEach(device => {
+			if (device.ip === ip) {
+				device.name = name
+			}
+			})
+			
+			io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
 				}).on('error', function(e) {
 				  console.log(ip + "  Got error: " + e.message);
 				});
@@ -147,28 +162,7 @@ let dictionary = new Map(),
 			}
 			resolve(false)
 		})
-	}, 
-	relayChangeState = async (ip) => {
-		console.log(ip);
-		return new Promise((resolve, reject) => {
-			try {
-				
-				const url =  `http://${ip}/state`;
-				console.log('Sending url ', url);
-				const req = http.get(url, (res) => {
-				//const req = http.get({hostname: `http://${ip}`, path:`/relay/?turn=${turn}`}, res => {
-					res.on("data", function(chunk) {
-					    //console.log("BODY: " + chunk);
-		    });
-				}).on('error', function(e) {
-				  console.log(ip + "  Got error: " + e.message);
-				});
-			} catch (e) {
-				console.log(ip + "  err", e)
-			}
-			resolve(false)
-		})
-	}, 
+	},  
 	checkDevisecInterval = setInterval(async () => {
 		console.log("start fetching new devices ...")
 		let devices = []
@@ -214,24 +208,24 @@ let dictionary = new Map(),
 				 //device.pinged = false
 			}
 		//	console.log(device.ip, checkResult, device.state )
-		io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
+		io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
 		})
 		console.log(dictionary)
-	}, 2000)// refr page
+	}, 5000)// refr page
 	
 io.on('connection', socket => {
 	globalSocket = socket
+	io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
+	
 	socket.on("relay", async data => {
 		let turnResult = await relayRequest(data.ip, data.turn)
 		console.log('turn result', turnResult)
+//		response(Array.from(dictionary.values()))
 //		io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
 	})
 	socket.on("ChangeName", async data => {
 		let tResult = await relayChangeName(data.ip, data.name)
-		//console.log('setname result', data.name)
-	})
-	socket.on("ChangeState", async data => {
-		let tResult = await relayChangeState(data.ip)
+	//	response(Array.from(dictionary.values()))
 		//console.log('setname result', data.name)
 	})
 	socket.on("deviceReq", (response) => {
