@@ -211,7 +211,7 @@ let dictionary = new Map(),
 		io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
 		})
 		console.log(dictionary)
-	}, 5000)// refr page
+	}, 15000)// refr page
 	
 io.on('connection', socket => {
 	globalSocket = socket
