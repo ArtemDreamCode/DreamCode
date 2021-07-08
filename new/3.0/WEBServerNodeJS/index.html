@@ -50,7 +50,7 @@ background-repeat : no-repeat;
     <h1>Home light control</h1>
 	<section id="app">
 		<div v-for="device in devices">
-			<div v-if = "device.pinged">
+		<!--	<div v-if = "device.pinged"> -->
 				<!-- <button class = "btn btn_on" v-on:click="ChangeState({ip: device.ip})">change state</button> -->
 				<div v-if = "device.state === 'on'">
 	
@@ -66,7 +66,7 @@ background-repeat : no-repeat;
 						<img style="margin: -10px 20px" src="SetBut.jpg" v-on:click="info({ip: device.ip, name: device.name, state: device.state})">			
 					</div>
 
-				 </div>
+			<!--	 </div> -->
 		</div>
 	</section>
 	<script>
@@ -78,8 +78,8 @@ background-repeat : no-repeat;
 	<script type="text/javascript">
 	
 	//	const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });		
-	//	const socket = io("ws://172.20.10.11:3000", { transports: ["websocket"] });
-		const socket = io("ws://192.168.0.103:3000", { transports: ["websocket"] });
+		const socket = io("ws://172.20.10.13:3000", { transports: ["websocket"] });
+	//	const socket = io("ws://192.168.0.13:3000", { transports: ["websocket"] });
 		//const socket = io("ws://raspberrypi:3000", { transports: ["websocket"] });
 		
 
