@@ -11,15 +11,16 @@ var Device_GUID = "dDf5FFShellysde";
 const io = require("socket.io")(3000)//3000
 
 
-//let dictionary = new Map();
+let dictionary = new Map();
 let devices = [];
+let svrDevices = [];
 http.createServer((req, res) => {
 	
 	let filePath = '.' + req.url;
 	
 	  if(req.url === "/state"){
 		console.log("state");
-		var jsData = JSON.stringify(devices)
+		var jsData = JSON.stringify(Array.from(dictionary.values()))
         res.end(jsData);
 	  }
 	    if (filePath == './')
@@ -40,10 +41,10 @@ http.createServer((req, res) => {
 }).listen(3001)// 3001
 
 
-let dictionary = new Map(),
+//let dictionary = new Map(),
 	getDevices = async () => {
-		return await findLocalDevices('172.20.10.0/24')
-	//	return await findLocalDevices('192.168.0.1/24')
+	//	return await findLocalDevices('172.20.10.0/24')
+		return await findLocalDevices('192.168.0.1/24')
 	},
   checkRequest = async (ip, responseText, result) => {
 		return new Promise((resolve, reject) => {
@@ -186,7 +187,7 @@ let dictionary = new Map(),
 			console.log("err in fetch devices", e)
 			return false;
 		}
-		  devices.forEach(device => {
+		  devices.forEach(device => {  
 			if (!dictionary.has(device.ip)) {
 				dictionary.set(device.ip, device)
 			}
@@ -217,6 +218,7 @@ let dictionary = new Map(),
 					device.class = DeviceState.class				
 				} else {
 					device.pinged = false
+					//dictionary.delete(device.ip)
 				}
 				
 			//	console.log("device.pinged" + device.pinged)
@@ -227,6 +229,13 @@ let dictionary = new Map(),
 		//	console.log(device.ip, checkResult, device.state )
 		io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
 		})
+		
+	   //   dictionary.forEach(async device => {
+		//	if (!device.pinged) {
+		//	dictionary.delete(device.ip)}
+	//	})	
+//				io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
+
 		console.log(dictionary)
 	}, 15000)// refr page
 	
