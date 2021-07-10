@@ -21,8 +21,12 @@ String DeviceFrendlyName = "New Robotic Device";
 //const char* pass = "63030723";
 
 
-const char* ssid = "TP-LINK_120";
-const char* pass = "160193ya";
+//const char* ssid = "TP-LINK_120";
+//const char* pass = "160193ya";
+
+
+const char* ssid = "Keenetic-9462";
+const char* pass = "LCMN8S6X";
 
 
 //const char* ssid = "iPhonexc5";

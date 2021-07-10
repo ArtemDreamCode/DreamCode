@@ -5,15 +5,17 @@ const fs = require('fs')
 const url = require('url');
 let globalSocket
 var Device_GUID = "dDf5FFShellysde";
+var Device_Class = "Shelly";
+
 // process.on('uncaughtException', function (err) {
 //     // console.log(err);
 // }); 
+
 const io = require("socket.io")(3000)//3000
 
 
 let dictionary = new Map();
-let devices = [];
-let svrDevices = [];
+
 http.createServer((req, res) => {
 	
 	let filePath = '.' + req.url;
@@ -44,9 +46,10 @@ http.createServer((req, res) => {
 //let dictionary = new Map(),
 	getDevices = async () => {
 	//	return await findLocalDevices('172.20.10.0/24')
-		return await findLocalDevices('192.168.0.1/24')
+	//	return await findLocalDevices('192.168.0.1/24')
+		return await findLocalDevices('192.168.1.1/24')
 	},
-  checkRequest = async (ip, responseText, result) => {
+  checkRequest = async (ip, result) => {
 		return new Promise((resolve, reject) => {
 			try {
 				result.value = []
@@ -63,18 +66,20 @@ http.createServer((req, res) => {
         if (res.statusCode == 200) { 
             try {
                 if (body != '') {
-                    console.log("http://" + ip + "/state   :=>jsdata :  " + body);
-                    var jsonParsed = JSON.parse(body)
-                   	if (body.indexOf(Device_GUID) >= 0) {
+					if (body.indexOf(Device_GUID) >= 0) {
+                      var jsonParsed = JSON.parse(body)
 						  var jsonParsed = JSON.parse(body)
-						  console.log("jsonParsed.state.state: " + jsonParsed.state);
-						  console.log("jsonParsed.state.class: " + jsonParsed.class);
-						  console.log("jsonParsed.state.name: " + jsonParsed.name);
-					      if (jsonParsed.class == responseText) {					
+						  
+					      if (jsonParsed.class == Device_Class) {					
 							  result.state = jsonParsed.state							   				
 							  result.class = jsonParsed.class
 							  result.name = jsonParsed.name
 							  result.device_guid = jsonParsed.device_guid	
+							  console.log("result.state: " + result.state);
+						      console.log("result.class: " + result.class);
+						      console.log("result.name: " + result.name);
+						      console.log("result.device_guid: " + result.device_guid);
+						  
 							  resolve(true)
 							  return true;
 					    } else {
@@ -179,65 +184,55 @@ http.createServer((req, res) => {
   
 	checkDevisecInterval = setInterval(async () => {
 		console.log("start fetching new devices ...")
-//		let devices = []
+		let devices = []
 		try{
 			devices = await getDevices()
+			console.log("devices.length: " + devices.length);
 		}
 		catch (e){
 			console.log("err in fetch devices", e)
 			return false;
 		}
-		  devices.forEach(device => {  
-			if (!dictionary.has(device.ip)) {
-				dictionary.set(device.ip, device)
-			}
-		})
 
-		
-		dictionary.forEach(record => {
-			if (!devices.find(device => device.ip == record.ip)) {
-				dictionary.delete(record.ip)
-				console.log(`zombie found: ${record.ip}`)
-			} else {
-				console.log(`device ${record.ip} is available`)
-			}
-		})
-		console.log("zombies cleared")
-		dictionary.forEach(async device => {
-			let checkResult = false
-			var DeviceState = []
-			try {
-				checkResult = await checkRequest(device.ip, "Shelly", DeviceState)
-				
-				
-				//console.log("checkResult " + checkResult)
-				if (checkResult) {
-					device.pinged = true
-					device.state = DeviceState.state
-					device.name = DeviceState.name
-					device.class = DeviceState.class				
-				} else {
-					device.pinged = false
-					//dictionary.delete(device.ip)
+		  devices.forEach(async device => {  
+				let checkResult = false
+				var DeviceState = []
+				try {
+					checkResult = await checkRequest(device.ip, DeviceState)
+					
+					if (checkResult) {
+						console.log("device.ip is checkresult " + device.ip);
+						device.pinged = true
+						device.state = DeviceState.state
+						device.name = DeviceState.name
+						device.class = DeviceState.class
+						//if (!dictionary.has(device.ip)) { // если еще нет то добовляем
+						  // dictionary.set(device.ip, device)}
+						//if (dictionary.has(device.ip)) { // если уже есть то обновляем
+						   dictionary.set(device.ip, device)//}
+						   
+					} else {
+						if (dictionary.has(device.ip)) {
+						  dictionary.delete(device.ip)
+						}
+						//console.log("The Oldest good device is disconnecting now: " + device.ip)
+					}
+					
+				} catch (e) { 
+					console.log(e)
+					 //device.pinged = false
 				}
 				
-			//	console.log("device.pinged" + device.pinged)
- 			} catch (e) { 
-				console.log(e)
-				 //device.pinged = false
-			}
-		//	console.log(device.ip, checkResult, device.state )
-		io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
+				if (devices.size == 0) {
+				   dictionary.clear()	
+				}
+			   io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
+
+			//}
 		})
-		
-	   //   dictionary.forEach(async device => {
-		//	if (!device.pinged) {
-		//	dictionary.delete(device.ip)}
-	//	})	
-//				io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
 
 		console.log(dictionary)
-	}, 15000)// refr page
+	}, 5000)// refr page
 	
 io.on('connection', socket => {
 	globalSocket = socket
