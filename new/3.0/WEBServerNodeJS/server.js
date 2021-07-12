@@ -47,7 +47,7 @@ http.createServer((req, res) => {
 	getDevices = async () => {
 	//	return await findLocalDevices('172.20.10.0/24')
 	//	return await findLocalDevices('192.168.0.1/24')
-		return await findLocalDevices('192.168.1.1/24')
+		return await findLocalDevices('192.168.0.1/24')
 	},
   checkRequest = async (ip, result) => {
 		return new Promise((resolve, reject) => {
@@ -182,6 +182,7 @@ http.createServer((req, res) => {
 		})
 	},  
   
+  
 	checkDevisecInterval = setInterval(async () => {
 		console.log("start fetching new devices ...")
 		let devices = []
@@ -194,7 +195,17 @@ http.createServer((req, res) => {
 			return false;
 		}
 
-		  devices.forEach(async device => {  
+		
+		dictionary.forEach(async record => {
+			
+			if (!devices.find(device => device.ip == record.ip)) {
+			  dictionary.delete(record.ip)
+			console.log("dictionary.delete(record.ip)  " + record.ip)
+			}
+		}
+		)
+		
+		  devices.forEach(async device => { //dev 17, 18, 19,    dic 17, 18, 19, 20, 21  
 				let checkResult = false
 				var DeviceState = []
 				try {
@@ -206,35 +217,35 @@ http.createServer((req, res) => {
 						device.state = DeviceState.state
 						device.name = DeviceState.name
 						device.class = DeviceState.class
-						//if (!dictionary.has(device.ip)) { // если еще нет то добовляем
-						  // dictionary.set(device.ip, device)}
-						//if (dictionary.has(device.ip)) { // если уже есть то обновляем
-						   dictionary.set(device.ip, device)//}
+						dictionary.set(device.ip, device)
 						   
 					} else {
 						if (dictionary.has(device.ip)) {
 						  dictionary.delete(device.ip)
 						}
-						//console.log("The Oldest good device is disconnecting now: " + device.ip)
 					}
+
 					
 				} catch (e) { 
 					console.log(e)
+					
 					 //device.pinged = false
 				}
 				
 				if (devices.size == 0) {
 				   dictionary.clear()	
+				  console.log(" dictionary.clear()	")
 				}
-			   io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
+			//   io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
 
 			//}
 		})
-
+		    io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
 		console.log(dictionary)
 	}, 5000)// refr page
 	
-io.on('connection', socket => {
+try {
+	io.on('connection', socket => {
 	globalSocket = socket
 	io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
 	
@@ -253,3 +264,8 @@ io.on('connection', socket => {
 		response(Array.from(dictionary.values()))
 	})
 })
+}
+catch (e){
+	console.log("catch soccet io: ", e)
+	return false;
+}
