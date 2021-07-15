@@ -1,4 +1,3 @@
-const findLocalDevices = require('local-devices')
 const http = require('http')
 const path = require('path')
 const fs = require('fs')
@@ -42,13 +41,18 @@ http.createServer((req, res) => {
 	})
 }).listen(3001)// 3001
 
-
+const Arpping = require('arpping');
+const arpping = new Arpping({});
 //let dictionary = new Map(),
 	getDevices = async () => {
 	//	return await findLocalDevices('172.20.10.0/24')
 	//	return await findLocalDevices('192.168.0.1/24')
-		return await findLocalDevices('192.168.1.2/24')
-	},
+	//	return await findLocalDevices('192.168.1.2/24')
+	let devices = await arpping.discover();
+	console.log(devices)
+		return devices;
+	}
+	
   checkRequest = async (ip, result) => {
 		return new Promise((resolve, reject) => {
 			try {
@@ -253,12 +257,15 @@ http.createServer((req, res) => {
 		})
 		console.log("tmp :")
 		console.log(tmp)
-		tmp.sort();
+	//	tmp.sort();
+		const sorted = tmp.sort((a, b) => {  
+		  return a - b
+		})
 		tmp_count = 0;
 		let dictionary_buf = new Map();
 		while(dictionary.size > 0){
 			dictionary.forEach(async record => {
-				if(record.index == tmp[tmp_count]){
+				if(record.index == sorted[tmp_count]){
 					dictionary_buf.set(record.ip, record);
 					dictionary.delete(record.ip);
 					tmp_count++;
