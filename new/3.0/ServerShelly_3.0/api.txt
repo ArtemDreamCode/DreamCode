@@ -9,3 +9,6 @@ http://192.168.4.100/relay?turn=on
 
 http://192.168.4.100/set?name=value
 {"name": "value"}
+
+http://192.168.4.100/set?index=value
+{"index": "value"}

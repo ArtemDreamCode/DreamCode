@@ -55,15 +55,15 @@ background-repeat : no-repeat;
 				<div v-if = "device.state === 'on'">
 	
 
-						   <button class = "btn btn_off" v-on:click="relay({ip: device.ip, turn: 'off', state: device.fictionState})">{{ device.name }}</button>				   
+						   <button class = "btn btn_off" v-on:click="relay({ip: device.ip, turn: 'off', state: device.fictionState})"> {{device.index}} {{device.name }}</button>				   
 									<img style="margin: -10px 20px" src="newname.png" v-on:click="ChangeName({ip: device.ip, name: device.name})"> 
-								<img style="margin: -10px 20px" src="SetBut.jpg" v-on:click="info({ip: device.ip, name: device.name, state: device.state})">																													
+								<img style="margin: -10px 20px" src="SetBut.jpg" v-on:click="info({ip: device.ip, name: device.name, state: device.state, index: device.index})">																													
 					</div>
 					 <div v-else>
 					
-						<button class = "btn btn_on" v-on:click="relay({ip: device.ip, turn: 'on', state: device.fictionState})">{{ device.name }}</button>
+						<button class = "btn btn_on" v-on:click="relay({ip: device.ip, turn: 'on', state: device.fictionState})">{{device.index}} {{device.name }}</button>
 							<img style="margin: -10px 20px" src="newname.png" v-on:click="ChangeName({ip: device.ip, name: device.name})"> 
-						<img style="margin: -10px 20px" src="SetBut.jpg" v-on:click="info({ip: device.ip, name: device.name, state: device.state})">			
+						<img style="margin: -10px 20px" src="SetBut.jpg" v-on:click="info({ip: device.ip, name: device.name, state: device.state, index: device.index})">			
 					</div>
 
 				<!-- </div> -->
@@ -80,7 +80,7 @@ background-repeat : no-repeat;
 	//	const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });		
 	//	const socket = io("ws://172.20.10.13:3000", { transports: ["websocket"] });
 	//	const socket = io("ws://192.168.0.102:3000", { transports: ["websocket"] });
-		const socket = io("ws://192.168.1.79:3000", { transports: ["websocket"] });
+		const socket = io("ws://192.168.1.103:3000", { transports: ["websocket"] });
 		//const socket = io("ws://raspberrypi:3000", { transports: ["websocket"] });
 		
 
@@ -130,7 +130,9 @@ background-repeat : no-repeat;
 				}
 					alert("Информация об устройстве\n  ip: " + data.ip 
 						+ "\n  Имя: " + data.name 
-						+ "\n  Состояние: " + st);
+						+ "\n  Состояние: " + st
+						+ "\n  Индекс: " + data.index
+						);
 					//socket.emit("ChangeState", (data))// send 				  		
 					console.log("change state ok")
 					

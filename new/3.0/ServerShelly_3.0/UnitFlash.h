@@ -3,7 +3,7 @@
 
 int addrState = 10;
 int addrName = 20;
-
+int addrIndex = 15;
 
 String eeprom_read_name()
 {
@@ -54,4 +54,22 @@ void eeprom_write_state(bool state)
 
   EEPROM.commit(); //сохраняем в епром
   EEPROM.end();
+}
+
+void eeprom_write_index(int index)
+{
+  EEPROM.begin(40);
+  EEPROM.write(addrIndex, index);
+  Serial.println("EEPROM write position: " + index);
+  EEPROM.commit(); //сохраняем в епром
+  EEPROM.end(); //сохраняем в епром
+}
+
+int eeprom_read_index()
+{
+  EEPROM.begin(40); 
+  int index = EEPROM.read(addrIndex);
+  Serial.println("EEPROM read position: " + index);
+  EEPROM.end();
+  return index;
 }

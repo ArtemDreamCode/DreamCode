@@ -10,11 +10,13 @@ ESP8266WebServer server(80);
 
 WiFiClient client;  
 String Device_GUID = "dDf5FFShellysde";
+int Device_Position = 0;
 bool RealCheck = false;
 int bt_state;
 String MacAdr;
 String ClassDevice = "Shelly";
 String DeviceFrendlyName = "New Robotic Device";
+int DeviceIndex = 0;
 //const char* ssid = "R_302";
 //const char* pass = "ProtProtom";
 //const char* ssid = "rostelecom_104";
@@ -67,7 +69,8 @@ void DoCheckButtonState(){
 
 void wifi_begin(){
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, pass);  
+ // WiFi.begin(ssid, pass); 
+  WiFi.begin(ssid);  
   while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(2, HIGH);  
     Serial.println("connecting to wifi");
@@ -116,6 +119,7 @@ void setup()
   pinMode(5, INPUT);
   DeviceFrendlyName = eeprom_read_name();
   RealCheck = eeprom_read_state();
+  DeviceIndex = eeprom_read_index();
   bt_state = digitalRead(5);
   Serial.println(RealCheck);
   wifi_begin();
@@ -136,6 +140,7 @@ void handle_GetState(){ //запрос о состоянии от клиента
      st = "off";
    }
    response+= "\"device_guid\": \""+Device_GUID+"\"";
+   response+= ",\"index\": \""+String(DeviceIndex)+"\""; 
    response+= ",\"state\": \""+st+"\"";
    response+= ",\"ip\": \""+WiFi.localIP().toString()+"\"";
    response+= ",\"class\": \""+ClassDevice+"\""; 
@@ -189,18 +194,30 @@ void handle_ChangeState()
 }
 
 void handle_ChangeFrendlyName(){
-  String nm;
   if ((server.args() == 1) && (server.argName(0) == "name")) {
+    String nm;
     nm = server.arg(0);
     DeviceFrendlyName = nm;
     eeprom_write_name(DeviceFrendlyName);
-    }
-   String response = "{"; 
-   response+= "\"name\": \""+DeviceFrendlyName+"\"";
-   response+="}";
+    String response = "{"; 
+    response+= "\"name\": \""+DeviceFrendlyName+"\"";
+    response+="}";
+    server.send(200, "text/html", response);
+  }
   
-   server.send(200, "text/html", response);
+  if ((server.args() == 1) && (server.argName(0) == "index")) {
+    int index = 0;
+    index = server.arg(0).toInt();
+    DeviceIndex = index;
+    eeprom_write_index(DeviceIndex);
+    String response = "{"; 
+    response+= "\"index\": \""+String(DeviceIndex)+"\"";
+    response+="}";
+  
+    server.send(200, "text/html", response);
+  }
 }
+
 
 void loop()
 {

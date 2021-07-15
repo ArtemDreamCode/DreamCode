@@ -47,7 +47,7 @@ http.createServer((req, res) => {
 	getDevices = async () => {
 	//	return await findLocalDevices('172.20.10.0/24')
 	//	return await findLocalDevices('192.168.0.1/24')
-		return await findLocalDevices('192.168.0.1/24')
+		return await findLocalDevices('192.168.1.2/24')
 	},
   checkRequest = async (ip, result) => {
 		return new Promise((resolve, reject) => {
@@ -75,10 +75,12 @@ http.createServer((req, res) => {
 							  result.class = jsonParsed.class
 							  result.name = jsonParsed.name
 							  result.device_guid = jsonParsed.device_guid	
+							  result.index = jsonParsed.index
 							  console.log("result.state: " + result.state);
 						      console.log("result.class: " + result.class);
 						      console.log("result.name: " + result.name);
 						      console.log("result.device_guid: " + result.device_guid);
+							  console.log("result.index: " + result.index);
 						  
 							  resolve(true)
 							  return true;
@@ -217,6 +219,9 @@ http.createServer((req, res) => {
 						device.state = DeviceState.state
 						device.name = DeviceState.name
 						device.class = DeviceState.class
+						device.index = DeviceState.index
+						
+						
 						dictionary.set(device.ip, device)
 						   
 					} else {
@@ -224,14 +229,13 @@ http.createServer((req, res) => {
 						  dictionary.delete(device.ip)
 						}
 					}
-
 					
 				} catch (e) { 
 					console.log(e)
 					
 					 //device.pinged = false
 				}
-				
+
 				if (devices.size == 0) {
 				   dictionary.clear()	
 				  console.log(" dictionary.clear()	")
@@ -240,9 +244,39 @@ http.createServer((req, res) => {
 
 			//}
 		})
-		    io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
+		/////////////////////////////////////////
+		let tmp = [];
+		let tmp_count = 0;
+		dictionary.forEach(async record => {
+			tmp[tmp_count] = record.index;
+			tmp_count++;
+		})
+		console.log("tmp :")
+		console.log(tmp)
+		tmp.sort();
+		tmp_count = 0;
+		let dictionary_buf = new Map();
+		while(dictionary.size > 0){
+			dictionary.forEach(async record => {
+				if(record.index == tmp[tmp_count]){
+					dictionary_buf.set(record.ip, record);
+					dictionary.delete(record.ip);
+					tmp_count++;
+					console.log("dictionary: ")
+					console.log(dictionary)
+					console.log("dictionary_buf :")
+					console.log(dictionary_buf)
+				}
+			})
+		}
+		dictionary_buf.forEach(async record => {
+			dictionary.set(record.ip, record);
+		})
+		dictionary_buf.clear()		
+		////////////////////////////////////////
+		 io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
 		console.log(dictionary)
-	}, 5000)// refr page
+	}, 15000)// refr page
 	
 try {
 	io.on('connection', socket => {
