@@ -28,7 +28,7 @@ int DeviceIndex = 0;
 
 
 const char* ssid = "Keenetic-9462";
-const char* pass = "LCMN8S6X";
+//const char* pass = "LCMN8S6X";
 
 
 //const char* ssid = "iPhonexc5";
@@ -69,7 +69,7 @@ void DoCheckButtonState(){
 
 void wifi_begin(){
   WiFi.mode(WIFI_STA);
- // WiFi.begin(ssid, pass); 
+ // WiFi.begin(ssid); 
   WiFi.begin(ssid);  
   while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(2, HIGH);  
