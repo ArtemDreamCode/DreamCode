@@ -1,3 +1,4 @@
+const findLocalDevices = require('local-devices')
 const http = require('http')
 const path = require('path')
 const fs = require('fs')
@@ -41,23 +42,13 @@ http.createServer((req, res) => {
 	})
 }).listen(3001)// 3001
 
-const Arpping = require('arpping');
-const arpping = new Arpping({
-	debug: true
-});
-
-const getIPRange = require('get-ip-range');
 
 //let dictionary = new Map(),
 	getDevices = async () => {
 	//	return await findLocalDevices('172.20.10.0/24')
 	//	return await findLocalDevices('192.168.0.1/24')
-	//	return await findLocalDevices('192.168.1.2/24')
-   let {hosts} = await arpping.ping(getIPRange('192.168.0.2', '192.168.0.150'))
-	console.log(hosts)
-	return hosts;
-	}
-	
+		return await findLocalDevices('192.168.0.3/24')
+	},
   checkRequest = async (ip, result) => {
 		return new Promise((resolve, reject) => {
 			try {
@@ -83,13 +74,12 @@ const getIPRange = require('get-ip-range');
 							  result.state = jsonParsed.state							   				
 							  result.class = jsonParsed.class
 							  result.name = jsonParsed.name
-							  result.device_guid = jsonParsed.device_guid	
 							  result.index = jsonParsed.index
+							  result.device_guid = jsonParsed.device_guid	
 							  console.log("result.state: " + result.state);
 						      console.log("result.class: " + result.class);
 						      console.log("result.name: " + result.name);
 						      console.log("result.device_guid: " + result.device_guid);
-							  console.log("result.index: " + result.index);
 						  
 							  resolve(true)
 							  return true;
@@ -198,11 +188,8 @@ const getIPRange = require('get-ip-range');
 		console.log("start fetching new devices ...")
 		let devices = []
 		try{
-			let obDevices = await getDevices()
-			obDevices.forEach(device => {
-				devices.push({ip: device})
-			})
-			console.log("devices.length: " + devices.length, devices);
+			devices = await getDevices()
+			console.log("devices.length: " + devices.length);
 		}
 		catch (e){
 			console.log("err in fetch devices", e)
@@ -232,8 +219,6 @@ const getIPRange = require('get-ip-range');
 						device.name = DeviceState.name
 						device.class = DeviceState.class
 						device.index = DeviceState.index
-						
-						
 						dictionary.set(device.ip, device)
 						   
 					} else {
@@ -241,13 +226,14 @@ const getIPRange = require('get-ip-range');
 						  dictionary.delete(device.ip)
 						}
 					}
+
 					
 				} catch (e) { 
 					console.log(e)
 					
 					 //device.pinged = false
 				}
-
+				
 				if (devices.size == 0) {
 				   dictionary.clear()	
 				  console.log(" dictionary.clear()	")
@@ -289,9 +275,9 @@ const getIPRange = require('get-ip-range');
 		})
 		dictionary_buf.clear()		
 		////////////////////////////////////////
-		 io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
+		    io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
 		console.log(dictionary)
-	}, 10000)// refr page
+	}, 5000)// refr page
 	
 try {
 	io.on('connection', socket => {

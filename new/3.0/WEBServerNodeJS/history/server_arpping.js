@@ -1,4 +1,3 @@
-const findLocalDevices = require('local-devices')
 const http = require('http')
 const path = require('path')
 const fs = require('fs')
@@ -42,13 +41,23 @@ http.createServer((req, res) => {
 	})
 }).listen(3001)// 3001
 
+const Arpping = require('arpping');
+const arpping = new Arpping({
+	debug: true
+});
+
+const getIPRange = require('get-ip-range');
 
 //let dictionary = new Map(),
 	getDevices = async () => {
 	//	return await findLocalDevices('172.20.10.0/24')
 	//	return await findLocalDevices('192.168.0.1/24')
-		return await findLocalDevices('192.168.0.1/24')
-	},
+	//	return await findLocalDevices('192.168.1.2/24')
+   let {hosts} = await arpping.ping(getIPRange('192.168.0.2', '192.168.0.150'))
+	console.log(hosts)
+	return hosts;
+	}
+	
   checkRequest = async (ip, result) => {
 		return new Promise((resolve, reject) => {
 			try {
@@ -75,10 +84,12 @@ http.createServer((req, res) => {
 							  result.class = jsonParsed.class
 							  result.name = jsonParsed.name
 							  result.device_guid = jsonParsed.device_guid	
+							  result.index = jsonParsed.index
 							  console.log("result.state: " + result.state);
 						      console.log("result.class: " + result.class);
 						      console.log("result.name: " + result.name);
 						      console.log("result.device_guid: " + result.device_guid);
+							  console.log("result.index: " + result.index);
 						  
 							  resolve(true)
 							  return true;
@@ -187,8 +198,11 @@ http.createServer((req, res) => {
 		console.log("start fetching new devices ...")
 		let devices = []
 		try{
-			devices = await getDevices()
-			console.log("devices.length: " + devices.length);
+			let obDevices = await getDevices()
+			obDevices.forEach(device => {
+				devices.push({ip: device})
+			})
+			console.log("devices.length: " + devices.length, devices);
 		}
 		catch (e){
 			console.log("err in fetch devices", e)
@@ -217,6 +231,9 @@ http.createServer((req, res) => {
 						device.state = DeviceState.state
 						device.name = DeviceState.name
 						device.class = DeviceState.class
+						device.index = DeviceState.index
+						
+						
 						dictionary.set(device.ip, device)
 						   
 					} else {
@@ -224,14 +241,13 @@ http.createServer((req, res) => {
 						  dictionary.delete(device.ip)
 						}
 					}
-
 					
 				} catch (e) { 
 					console.log(e)
 					
 					 //device.pinged = false
 				}
-				
+
 				if (devices.size == 0) {
 				   dictionary.clear()	
 				  console.log(" dictionary.clear()	")
@@ -240,9 +256,42 @@ http.createServer((req, res) => {
 
 			//}
 		})
-		    io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
+		/////////////////////////////////////////
+		let tmp = [];
+		let tmp_count = 0;
+		dictionary.forEach(async record => {
+			tmp[tmp_count] = record.index;
+			tmp_count++;
+		})
+		console.log("tmp :")
+		console.log(tmp)
+	//	tmp.sort();
+		const sorted = tmp.sort((a, b) => {  
+		  return a - b
+		})
+		tmp_count = 0;
+		let dictionary_buf = new Map();
+		while(dictionary.size > 0){
+			dictionary.forEach(async record => {
+				if(record.index == sorted[tmp_count]){
+					dictionary_buf.set(record.ip, record);
+					dictionary.delete(record.ip);
+					tmp_count++;
+					console.log("dictionary: ")
+					console.log(dictionary)
+					console.log("dictionary_buf :")
+					console.log(dictionary_buf)
+				}
+			})
+		}
+		dictionary_buf.forEach(async record => {
+			dictionary.set(record.ip, record);
+		})
+		dictionary_buf.clear()		
+		////////////////////////////////////////
+		 io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
 		console.log(dictionary)
-	}, 5000)// refr page
+	}, 10000)// refr page
 	
 try {
 	io.on('connection', socket => {
