@@ -1,0 +1,22 @@
+{
+  "name": "testapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "arpping": "^3.0.0",
+    "electron": "^13.1.7",
+    "get-ip-range": "^2.1.1",
+    "local-devices": "^3.0.0",
+    "socket.io": "^4.1.2"
+  },
+  "dependencies": {
+    "goratchet": "^2.0.2",
+    "onsenui": "^2.11.2"
+  }
+}
