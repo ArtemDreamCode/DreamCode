@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<style>
+.btn {
+  display: inline-block;
+  padding: 15px 25px;
+  font-size: 24px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #black;
+  background: transparent;
+  border: 2px solid #black;
+  border-radius: 15px;
+  box-shadow: 0 2px #999;
+  margin: 4px 0px;
+  width: 90%
+}
+
+.btn:active {
+  box-shadow: 0 5px #666;
+}
+.button:hover {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+</style>
+<head>
+  <link rel="stylesheet" href="C:/iot/onsenUI/css/onsenui.css">
+  <link rel="stylesheet" href="C:/iot/onsenUI/css/onsen-css-components.min.css">
+  <script src="C:/iot/onsenUI/js/onsenui.min.js"></script>
+</head>
+
+<body>
+<ons-page>
+  <ons-toolbar>
+    <div class="center">Devices Controll</div>
+  </ons-toolbar>
+
+  <ons-tabbar swipeable position="auto">
+    <ons-tab page="Devices Controll" label="Devices Controll" icon="ion-md-sunny" active>
+    </ons-tab>
+	
+	<ons-tab page="Room Controll" label="Room Controll" icon="ion-ios-home" active-icon="ion-ios-home">
+    </ons-tab>
+	
+    <ons-tab page="Settings" label="Settings" icon="md-settings" active-icon="md-settings">
+    </ons-tab>
+  </ons-tabbar>
+</ons-page>
+
+<template id="Devices Controll">
+  <ons-page id="Devices Controll">
+	<ons-list>
+    <ons-list-header>Новые устройства</ons-list-header>
+    <ons-list-item expandable>New device
+      <div class="expandable-content">
+	    <div><div class="zmdi zmdi-keyboard">Name: New Device</div></div>
+ 	    <div><div class="zmdi zmdi-power"> State: Off </div> </div>		
+ 	    <div><div class="zmdi zmdi-home"> Room: Dont Changed </div> </div>		
+		<div><div class="zmdi zmdi-network-setting"> IP Adress: 192.168.0.10 </div></div>
+	    <div><div class="zmdi zmdi-network-setting"> MAC Adress: rd:35:5r:iy:7u:35:7y:4r </div></div>
+	  </div>
+    </ons-list-item>
+	<ons-list-item expandable>New device
+      <div class="expandable-content">
+	    <div><div class="zmdi zmdi-keyboard">Name: New Device</div></div>
+ 	    <div><div class="zmdi zmdi-power"> State: Off </div> </div>		
+ 	    <div><div class="zmdi zmdi-home"> Room: Dont Changed </div> </div>		
+		<div><div class="zmdi zmdi-network-setting"> IP Adress: 192.168.0.11 </div></div>
+	    <div><div class="zmdi zmdi-network-setting"> MAC Adress: rd:35:5r:iy:5u:u5:jh:4i </div></div>
+	  </div>
+    </ons-list-item>
+	
+	<ons-list-header>Подключенные устройства</ons-list-header>
+    <ons-list-item expandable>Kitchen main
+      <div class="expandable-content">
+	    <div><div class="zmdi zmdi-keyboard">Name: Kitchen main</div></div>
+ 	    <div><div class="zmdi zmdi-power"> State: Off </div> </div>		
+ 	    <div><div class="zmdi zmdi-home"> Room: Kitchen </div> </div>		
+		<div><div class="zmdi zmdi-network-setting"> IP Adress: 192.168.0.7 </div></div>
+	    <div><div class="zmdi zmdi-network-setting"> MAC Adress: r6:yh:uh:iy:yu:uj:6h:4i </div></div>
+	  </div>
+    </ons-list-item>
+	<ons-list-item expandable>Kitchen wall lamp
+      <div class="expandable-content">
+	    <div><div class="zmdi zmdi-keyboard">Name: Kitchen wall lamp</div></div>
+ 	    <div><div class="zmdi zmdi-power"> State: Off </div> </div>		
+ 	    <div><div class="zmdi zmdi-home"> Room: Kitchen </div> </div>		
+		<div><div class="zmdi zmdi-network-setting"> IP Adress: 192.168.0.7 </div></div>
+	    <div><div class="zmdi zmdi-network-setting"> MAC Adress: r6:yh:uh:iy:5u:u5:jh:4i </div></div>
+	  </div>
+    </ons-list-item>
+  </ons-list>
+  </ons-page>
+</template>
+
+<template id="Room Controll">
+  <ons-page id="Room Controll">
+  <div>
+	<ons-row>
+	<ons-col width="48%" style="margin: 1%">
+	
+	<ons-list style="background: transparent">
+    <ons-list-item expandable style="background: url('images/kitchen.jpg'); background-position:center;  background-size: cover;  min-height: 40px">
+       <div class="center">
+         <span class="list-item__title" style="background-color: white; opacity: 0.7">Kitchen</span>
+       </div>
+	   <div class="expandable-content">
+	     <div>
+	   `	<button class="btn">Main Lamp</button>
+	     </div>
+	   </div>
+	 </ons-list-item>
+	 <ons-list-item expandable style="margin-top: 2%; background: url('images/hallway.jpg'); background-position:center;  background-size: cover;  min-height: 40px">
+      <div class="center">
+        <span class="list-item__title" style="background-color: white; opacity: 0.7">Hallway</span>
+      </div>
+	  <div class="expandable-content">
+	  <div>
+	   `	<button class="btn">Main Lamp</button>
+	     </div>
+	  </div>
+     </ons-list-item>
+	 <ons-list-item expandable style="margin-top: 2%; background: url('images/bathroom.jpg'); background-position:center;  background-size: cover;  min-height: 40px">
+      <div class="center">
+        <span class="list-item__title" style="background-color: white; opacity: 0.7">Bathroom</span>
+      </div>
+	  <div class="expandable-content">
+	  <div>
+	   `	<button class="btn">Main Lamp</button>
+	     </div>
+	  </div>
+     </ons-list-item>
+	</ons-list>
+	</ons-col>
+	<ons-col width="48%" style="margin: 1%">
+	<ons-list style="background: transparent">
+    <ons-list-item expandable style="background: url('images/livingroom.jpg'); background-position:center;  background-size: cover;  min-height: 40px">
+      <div class="center">
+        <span class="list-item__title" style="background-color: white; opacity: 0.7">Living Room</span>
+      </div>
+	  <div class="expandable-content">
+	  <div>
+	   `	<button class="btn">Main Lamp</button>
+	     </div>
+	  </div>
+    </ons-list-item>
+	
+	  <ons-list-item expandable style="margin-top: 2%; background: url('images/sleeproom.jpg'); background-position:center;  background-size: cover;  min-height: 40px">
+      <div class="center">
+        <span class="list-item__title" style="background-color: white; opacity: 0.7">Sleep Room</span>
+      </div>
+	  <div class="expandable-content">
+	  <div>
+	   `	<button class="btn">Main Lamp</button>
+	     </div>
+	  </div>
+    </ons-list-item>
+	<ons-list-item expandable style="margin-top: 2%; background: url('images/childroom.jpg'); background-position:center;  background-size: cover;  min-height: 40px">
+      <div class="center">
+        <span class="list-item__title" style="background-color: white; opacity: 0.7">Child Room</span>
+      </div>
+	  <div class="expandable-content">
+	  <div>
+	   `	<button class="btn">Main Lamp</button>
+	     </div>
+	  </div>
+    </ons-list-item>
+	
+	</ons-list>
+	</ons-col>
+	</ons-row>
+	</div>
+  </ons-page>
+</template>
+
+<template id="Settings">
+  <ons-page id="Settings">
+    <p style="text-align: center;">
+      This is the setting page.
+    </p>
+  </ons-page>
+</template>
+<script type="text/javascript">
+	document.addEventListener('prechange', function(event) {
+  document.querySelector('ons-toolbar .center')
+    .innerHTML = event.tabItem.getAttribute('label');
+});
+</script>
+</body>
+</html>
