@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Home lite control</title>
+  <script src="vue.js"></script>
+  <script type="text/javascript" src="socket.io.js"></script>
+  <link rel="stylesheet" href="css/onsenui.css">
+  <link rel="stylesheet" href="css/onsen-css-components.min.css">
+  <script src="js/onsenui.min.js"></script>
+     
+ </head> 
+ 
+ <body>
+<template id="main">
+  <v-ons-page>
+    <v-ons-toolbar>
+      <div class="center">{{ title }}</div>
+    </v-ons-toolbar>
+
+    <v-ons-tabbar swipeable position="auto"
+      :tabs="tabs"
+      :visible="true"
+      :index.sync="activeIndex"
+    >
+    </v-ons-tabbar>
+  </v-ons-page>
+</template>
+
+<template id="home">
+  <v-ons-page>
+    <p style="text-align: center">
+      Welcome home.<br><br>{{ myProp }}
+    </p>
+  </v-ons-page>
+</template>
+
+<template id="news">
+  <v-ons-page>
+    <p style="text-align: center">
+      Some news here.
+    </p>
+  </v-ons-page>
+</template>
+
+<template id="settings">
+  <v-ons-page>
+    <p style="text-align: center">
+      Change the settings.
+    </p>
+  </v-ons-page>
+</template>
+
+<div id="app"></div>
+
+<script type="text/javascript">
+     let app = new Vue({
+		  el: '#app',
+		  data: {
+		    devices: new Map()
+		//	console.log("devices ok")
+		  },
+		  mounted: function () {
+		  	socket.emit("deviceReq", (devs) => {
+				app.devices = devs
+
+		  	})
+			//console.log("mounted ok")
+		  },
+		  methods: {
+		  	relay(data) {	
+				socket.emit("relay", (data))// send data  				  		
+		  	},				
+			ChangeName(data) {
+			  var nm = prompt("Укажите имя устройства", data.name)				
+				if (nm != null) {
+				  data.name = nm
+		  		  socket.emit("ChangeName", (data))// send data  				  		
+		  		  console.log("set name ok")
+				  }
+		  	},
+			info(data){
+				var st 
+				if(data.state === "on"){ 
+				  st = "Включено"
+				}
+				else{
+				  st = "Выключено"			
+				}
+					alert("Информация об устройстве\n  ip: " + data.ip 
+						+ "\n  Имя: " + data.name 
+						+ "\n  Состояние: " + st
+						+ "\n  Индекс: " + data.index
+						);
+					//socket.emit("ChangeState", (data))// send 				  		
+					console.log("change state ok")
+					
+				}
+		}
+	})
+
+</script>
+
+ </body>
