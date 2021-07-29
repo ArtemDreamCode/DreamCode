@@ -5,8 +5,10 @@
       [добавить в конец (секция All) disable_splash=1] - убирает радужную панель вначале
 
 3. sudo nano /etc/lightdm/lightdm.conf
-   убрать строку содержащую xserver-command=X и вместо нее написать xserver-command=X -nocursor уберет курсор мыши
-   sudo apt-get install unclutter
+   найти строку #[Seat:*] и раскоментировать ее - это уберет курсор мыши совсем 
+
+   {убрать строку содержащую xserver-command=X и вместо нее написать xserver-command=X -nocursor уберет курсор мыши
+   sudo apt-get install unclutter} -- скрывает если не используется
 
 4. gui hide bakcadge, pahel and delete desctop image
 
@@ -14,6 +16,9 @@
   визуальные настройки: 
   пуск -> preference -> screensaver -> disable screensaver -> reboot rasp
 
+6. Скрыть предупреждение о низком напряжении 
+	sudo nano /boot/config.txt
+	avoid_warnings=2 (=1 - пропадает только знак молнии =2 пропадает все )
 -----------------------------------------------------------------
 settings app 
 1. curl -sL https://deb.nodesource.com/setup_16.x | sudo bash -

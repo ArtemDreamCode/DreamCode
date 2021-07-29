@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <style>
+.app {
+      overflow: auto;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+}
 .Activebtn {
   display: inline-block;
   padding: 15px 25px;
@@ -25,6 +30,9 @@
   background-color: #4CAF50; /* Green */
   color: white;
 }
+::-webkit-scrollbar {
+    display: none;
+}
 </style>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -35,6 +43,7 @@
  </head> 
 
 <body>
+
  	<ons-page>
 		<ons-toolbar>
 			<div class="center">Devices Controll</div>
@@ -179,7 +188,19 @@
   <script type="text/javascript" src="socket.io.js"></script>
   <script src="js/onsenui.min.js"></script>
 <script type="text/javascript">
+window.fn = {};
 
+window.fn.open = function() {
+  var menu = document.getElementById('menu');
+  menu.open();
+};
+
+window.fn.load = function(page) {
+  var content = document.getElementById('content');
+  var menu = document.getElementById('menu');
+  content.load(page)
+    .then(menu.close.bind(menu));
+};
 window.addEventListener('load', function(){
     const socket = io("ws://192.168.0.7:3000", { transports: ["websocket"] });
 
