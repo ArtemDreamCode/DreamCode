@@ -105,6 +105,7 @@ void restServerRouting() {
             F("Welcome to the REST Shelly Server"));
     });
     server.on(("/relay"), HTTP_GET, handle_ChangeState); // get from user
+    server.on(("/reset"), HTTP_GET, handle_Reset); // get from user
     server.on(("/state"), HTTP_GET, handle_GetState); // get from AP
     server.on(("/set"), HTTP_GET, handle_ChangeFrendlyName); // change device name
 }
@@ -117,6 +118,7 @@ void setup()
   pinMode(4, OUTPUT);
   digitalWrite(4, LOW);
   pinMode(5, INPUT);
+    
   DeviceFrendlyName = eeprom_read_name();
   RealCheck = eeprom_read_state();
   DeviceIndex = eeprom_read_index();
@@ -127,6 +129,11 @@ void setup()
   
   server.onNotFound(handleNotFound);
   server.begin();
+
+  if(!is_new_device())
+  {
+      handle_Reset();
+  }
 }
 
 void handle_GetState(){ //запрос о состоянии от клиента
@@ -145,6 +152,12 @@ void handle_GetState(){ //запрос о состоянии от клиента
    response+= ",\"ip\": \""+WiFi.localIP().toString()+"\"";
    response+= ",\"class\": \""+ClassDevice+"\""; 
    response+= ",\"name\": \""+DeviceFrendlyName+"\""; 
+   char newdev = eeprom_read_state_new_device();
+   Serial.println(newdev);
+   if (newdev == 1)
+      response+= ",\"isnewdevice\": \"old\"";
+   else 
+      response+= ",\"isnewdevice\": \"new\"";
    response+= ",\"mac\": \""+MacAdr+"\"";   
    response+= ",\"gw\": \""+WiFi.gatewayIP().toString()+"\"";
    response+= ",\"nm\": \""+WiFi.subnetMask().toString()+"\"";
@@ -193,12 +206,27 @@ void handle_ChangeState()
    server.send(200, "text/html", response);
 }
 
+void handle_Reset()
+{  
+   DeviceFrendlyName = "New Robotic Device";
+   eeprom_write_state_new_device(0);   
+   eeprom_write_name(DeviceFrendlyName);
+   String response = "{"; 
+   response+= "\"name\": \""+DeviceFrendlyName+"\"";
+    response+="}";
+   server.send(200, "text/html", response);
+}
+
 void handle_ChangeFrendlyName(){
   if ((server.args() == 1) && (server.argName(0) == "name")) {
     String nm;
     nm = server.arg(0);
     DeviceFrendlyName = nm;
     eeprom_write_name(DeviceFrendlyName);
+    if (!is_new_device())
+    {
+      eeprom_write_state_new_device(1);
+    }
     String response = "{"; 
     response+= "\"name\": \""+DeviceFrendlyName+"\"";
     response+="}";
@@ -218,6 +246,14 @@ void handle_ChangeFrendlyName(){
   }
 }
 
+bool is_new_device()
+{
+  if (eeprom_read_state_new_device() == 1)
+  {
+    return true;
+  }
+  else return false;
+}
 
 void loop()
 {

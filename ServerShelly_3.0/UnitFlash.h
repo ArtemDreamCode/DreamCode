@@ -4,6 +4,26 @@
 int addrState = 10;
 int addrName = 20;
 int addrIndex = 15;
+int addrStateNewDevice = 5;
+
+char eeprom_read_state_new_device()
+{
+  
+  EEPROM.begin(40); 
+  char NewDevice = EEPROM.read(addrStateNewDevice);
+  EEPROM.end();
+  return NewDevice;
+}
+
+
+void eeprom_write_state_new_device(char i)
+{
+  EEPROM.begin(40);
+  EEPROM.write(addrStateNewDevice, i); //записываем
+  
+  EEPROM.commit(); //сохраняем в епром
+  EEPROM.end(); //сохраняем в епром
+}
 
 String eeprom_read_name()
 {
@@ -27,6 +47,7 @@ bool eeprom_read_state()
   int st = EEPROM.read(addrState);
   if (st == 1) state = true;
   EEPROM.end();
+  Serial.println("name from eeprom: " + state);
   return state;
 }
 
@@ -39,6 +60,11 @@ void eeprom_write_name(String str)
   for (int i=0; i<=(str.length() + 1); i++)
   {
     EEPROM.write(addrName+1+i, cstr[i]);  //записываем последовательно каждый символ имени
+  }
+  Serial.println("name to eeprom: ");
+  for (int i = 0; i<str.length() + 1; i++)
+  {
+    Serial.print(cstr[i]);
   }
   EEPROM.commit(); //сохраняем в епром
   EEPROM.end(); //сохраняем в епром
