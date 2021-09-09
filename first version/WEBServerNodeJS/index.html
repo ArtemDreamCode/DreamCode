@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<style>
+   .btn{
+	  background-color: #FFFF00;
+	  border: none;
+	  color: black;
+	  padding: 15px 32px;
+	  text-align: center;
+	  text-decoration: none;
+	  display: inline-block;
+	  font-size: 16px;
+	  margin: 4px 2px;
+	  cursor: pointer;
+}
+
+.btn_on {background-color: #555555;} /* black */
+.btn_off {background-color: #e7e7e7; color: black;} /* gray */ 
+
+</style>
+<head>
+	<title>Home light control</title>
+</head>
+<body>
+    <h1>Home light control</h1>
+	<section id="app">
+		<div v-for="device in devices">
+			<div v-if = "device.pinged">
+				<div v-if = "device.state === 'on'">
+				   <button class = "btn btn_off" v-on:click="relay({ip: device.ip, turn: 'off'})">{{ device.name }}</button>
+				 </div>
+				 <div v-else>
+				   <button class = "btn btn_on" v-on:click="relay({ip: device.ip, turn: 'on'})"> {{ device.name }}</button>
+				 </div>
+			 </div>
+		</div>
+	</section>
+	<script>
+		
+
+	</script>
+	<script src="vue.js"></script>
+	<script type="text/javascript" src="socket.io.js"></script>
+	<script type="text/javascript">
+	
+	//	const socket = io("ws://172.20.10.2:3000", { transports: ["websocket"] });		
+	//	const socket = io("ws://172.20.10.11:3000", { transports: ["websocket"] });
+		const socket = io("ws://192.168.0.103:3000", { transports: ["websocket"] });
+		//const socket = io("ws://raspberrypi:3000", { transports: ["websocket"] });	
+		socket.on("devices", devices => {
+			//console.log(devices)
+			app.devices = devices
+		})
+		
+		let app = new Vue({
+		  el: '#app',
+		  data: {
+		    devices: new Map()
+		  },
+		  mounted: function () {
+		  	socket.emit("deviceReq", (devs) => {
+				app.devices = devs
+		  	})
+		  },
+		  methods: {
+		  	relay(data) {
+		  		socket.emit("relay", (data))// send data  				  		
+		  		console.log("data" + data.turn)
+		  	}
+		  }
+		})
+		
+	</script>
+</body>
+</html>
