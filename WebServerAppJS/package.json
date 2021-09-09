@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "goratchet": "^2.0.2",
-    "onsenui": "^2.11.2"
+    "onsenui": "^2.11.2",
+    "parser-readline": "^1.0.2",
+    "serialport": "^9.2.1"
   }
 }

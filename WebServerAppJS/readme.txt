@@ -16,9 +16,6 @@
   визуальные настройки: 
   пуск -> preference -> screensaver -> disable screensaver -> reboot rasp
 
-6. Скрыть предупреждение о низком напряжении 
-	sudo nano /boot/config.txt
-	avoid_warnings=2 (=1 - пропадает только знак молнии =2 пропадает все )
 -----------------------------------------------------------------
 settings app 
 1. curl -sL https://deb.nodesource.com/setup_16.x | sudo bash -
