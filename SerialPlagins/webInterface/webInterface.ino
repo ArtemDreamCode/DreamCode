@@ -12,6 +12,9 @@ struct Device
    const char* state;
 };
 
+String str_input = "";
+
+
 String Plagin_GUID = "DFDDSDFDF454DFdfd";
 
 const int DEVICES_MAX_COUNT = 20;
@@ -124,7 +127,10 @@ void handle_turn(){
 }
 
 void handle_GetState(){ //запрос о состоянии от клиента
-  String response = "{";
+  String response = "input data from serv: ";
+  response += str_input;
+  response += "\n";
+  response += "{";
   response += "\"dictionary_new\":["; 
   for (int i=0; i<count_dictionary_new; i++)
   {
@@ -141,21 +147,31 @@ void handle_GetState(){ //запрос о состоянии от клиента
   server.send(200, "text/html", response);
 }
 
+String readSerialInput()
+{
+  String str_data = "";
+  while (Serial.available() > 0) {         // ПОКА есть что то на вход    
+    str_data += (char)Serial.read();        // забиваем строку принятыми данными
+    delay(2);                              // ЗАДЕРЖКА. Без неё работает некорректно!
+  }
+  return str_data;
+}
+
 void readAndParse()
 {
   if (Serial.available() > 0)
   {  //если есть доступные данные
             
       StaticJsonDocument<capacity> doc;
-      String jsstring = Serial.readString();
-    
+      String jsstring = Serial.readStringUntil('\0');
+      str_input = jsstring;
         DeserializationError error = deserializeJson(doc, jsstring);  
         if (error) {
         Serial.println("err parse: " + jsstring);
 //        Serial.println(error.f_str());
         return;
       }
-      
+      Serial.println("no err parse: " + jsstring);
       JsonArray arr = doc["dictionary_new"].as<JsonArray>();
     
       count_dictionary_new = arr.size(); //кол-во элементов массива
@@ -205,7 +221,7 @@ void readAndParse()
 
 
 void loop(){
-//  readAndParse();
+  readAndParse();
   server.handleClient();
   delay(200);
 }

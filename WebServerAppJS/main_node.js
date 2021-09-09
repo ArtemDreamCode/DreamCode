@@ -30,6 +30,8 @@ const Readline = SerialPort.parsers.Readline;
 let dictionary = new Map();
 let dictionary_new = new Map();
 let dictionary_old = new Map();
+let dictionary_new_com = new Map();
+
 
 http.createServer((req, res) => {
 	
@@ -91,18 +93,46 @@ const arpping = new Arpping({
      serialPort.on('data', function(data) {
 		console.log('serial received: ' + data);
 		if (data.indexOf("getInfo") >= 0) {
-				let myJson = {};
-				myJson.dictionary_new = Array.from(dictionary_new.values());
-				myJson.dictionary_old = Array.from(dictionary_old.values());
+				//let myJson = {};
+				//myJson.dictionary_new = Array.from(dictionary_new.values());
+				//myJson.dictionary_old = Array.from(dictionary_old.values());
+//				myJson.state = "123456789/123456789/123456789/123456789/123456789/123456789/123456789/123456789/123456789/123456789/";
 				
-			 let json = JSON.stringify(myJson);
-			  serialPort.write(json, function(err) {
-			   if (err) {
-				return console.log('Error on write: ', err.message);
-			   }
-			   console.log('message written ', json);
-			  });
+			// let json = JSON.stringify(myJson);
+			let json = "{"
+			for (let i=0;i<=9;i++){
+//			let k;
+//			if (i == 9) {
+//				k = ""
+//			}else {k = ","}
+			
+			dictionary_new.forEach(async record => {
+			   // let myJson = {};
+			//	let 
+			  //  myJson.name = record.name;
+			//	myJson.ip = record.ip;
+			//	let json = JSON.stringify(myJson);
+			 
+			    json += "\"name\": \""+record.name+"\", \"ip\": \""+record.ip+"\"";
+				serialPort.write(json, function(err) {
+				 if (err) {
+			       return console.log('Error on write: ', err.message);
+				 }
+				   console.log('message written ', json);
+				  });
+				 })
+		 
 			}
+			json += "}"
+			serialPort.write(json, function(err) {
+				 if (err) {
+			       return console.log('Error on write: ', err.message);
+				 }
+				   console.log('message written ', json);
+				  });
+			
+		}
+		
 		if (data.indexOf("ip:") >= 0) {
             console.log('message written ', data);
 		}
