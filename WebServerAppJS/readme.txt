@@ -31,3 +31,12 @@ sudo npm install --save-dev electron
 	pm2 start npm -- test
 	pm2 startup (copy link and exec)
  	pm2 save	
+
+
+
+----------------------------------------
+сперва скопировать 
+cd D:\dreamcode\Iot\WebServerAppJS\vueapp>
+       npm i
+проект npm run build
+       npm run serve

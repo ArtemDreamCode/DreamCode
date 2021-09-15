@@ -12,7 +12,12 @@ let Device_Class = "Shelly";
 
 let SerialPort = require('serialport');
 
-const io = require("socket.io")(3000)//3000
+const io = require("socket.io")(3000, {
+ cors: {
+                origins: ["*"],
+                headers: ["*"]
+        }
+})//3000
 const Readline = SerialPort.parsers.Readline;
 
 /*app.on('ready', function() {
@@ -152,7 +157,7 @@ const getIPRange = require('get-ip-range');
 	//	return await findLocalDevices('172.20.10.0/24')
 	//	return await findLocalDevices('192.168.0.1/24')
 	//	return await findLocalDevices('192.168.1.2/24')
-   let {hosts} = await arpping.ping(getIPRange('192.168.0.2', '192.168.0.20'))
+   let {hosts} = await arpping.ping(getIPRange('172.20.10.4', '172.20.10.7'))
 //	console.log(hosts)
 	return hosts;
 	}
@@ -213,7 +218,7 @@ const getIPRange = require('get-ip-range');
 					resolve(false)
 				  // console.log(ip + "  Got error: " + e.message);
 				}).on('socket', function (socket) {
-    socket.setTimeout(10000);  
+    socket.setTimeout(5000);  
     socket.on('timeout', function() {
 		//console.log(ip + "  Check timeout, socket abort");
         req.abort();
@@ -240,13 +245,8 @@ const getIPRange = require('get-ip-range');
 					    //console.log("BODY: " + chunk);
 		    });
 			
-	       dictionary.forEach(device => {
-			if (device.ip === ip) {
-				device.state = turn
-			}
-			})
 			
-			io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
+			//io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
 				}).on('error', function(e) {
 				//  console.log(ip + "  Got error: " + e.message);
 				});
@@ -275,7 +275,10 @@ const getIPRange = require('get-ip-range');
 			})
 			
 			io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
-				}).on('error', function(e) {
+			io.sockets.emit("devices_new", Array.from(dictionary_new.values())) // auto update client push click new data
+			io.sockets.emit("devices_old", Array.from(dictionary_old.values())) // auto update client push click new data
+		 			
+			}).on('error', function(e) {
 				//  console.log(ip + "  Got error: " + e.message);
 				});
 			} catch (e) {
@@ -284,20 +287,43 @@ const getIPRange = require('get-ip-range');
 			resolve(false)
 		})
 	},  
-  
+	
+	ResetDevice = async (ip) => {
+		console.log(ip);
+		return new Promise((resolve, reject) => {
+			try {
+				
+				const url =  `http://${ip}/reset`;
+				console.log('Sending url ', url);
+				const req = http.get(url, (res) => {
+				//const req = http.get({hostname: `http://${ip}`, path:`/reset, res => {
+					res.on("data", function(chunk) {
+					    //console.log("BODY: " + chunk);
+		    });
+			
+			//io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
+				}).on('error', function(e) {
+				  console.log(ip + "  Got error: " + e.message);
+				});
+			} catch (e) {
+				console.log(ip + "  err", e)
+			}
+			resolve(false)
+		})
+	},  
   
 	checkDevisecInterval = setInterval(async () => {
-	//	console.log("start fetching new devices ...")
+		console.log("start fetching new devices ...")
 		let devices = []
 		try{
 			let obDevices = await getDevices()
 			obDevices.forEach(device => {
 				devices.push({ip: device})
 			})
-			//console.log("devices.length: " + devices.length, devices);
+			console.log("devices.length: " + devices.length, devices);
 		}
 		catch (e){
-		//	console.log("err in fetch devices", e)
+			console.log("err in fetch devices", e)
 			return false;
 		}
 
@@ -306,19 +332,19 @@ const getIPRange = require('get-ip-range');
 			
 			if (!devices.find(device => device.ip == record.ip)) {
 			  dictionary.delete(record.ip)
-		//	console.log("dictionary.delete(record.ip)  " + record.ip)
+			console.log("dictionary.delete(record.ip)  " + record.ip)
 			}
 		}
 		)
 		let k = 0;
-		 devices.forEach(async device => { //dev 17, 18, 19,    dic 17, 18, 19, 20, 21  
+		 devices.forEach(async device => {  
 				let checkResult = false
 				var DeviceState = []
 				try {
 					checkResult = await checkRequest(device.ip, DeviceState)
 					
 					if (checkResult) {
-					//	console.log("device.ip is checkresult " + device.ip);
+						console.log("device.ip is checkresult " + device.ip);
 						device.pinged = true
 						device.state = DeviceState.state
 						device.name = DeviceState.name
@@ -397,7 +423,6 @@ const getIPRange = require('get-ip-range');
 		})
 		dictionary_buf.clear()		
 */		////////////////////////////////////////
-		 io.sockets.emit("devices", Array.from(dictionary.values())) // auto update client push click new data
 		 io.sockets.emit("devices_new", Array.from(dictionary_new.values())) // auto update client push click new data
 		 io.sockets.emit("devices_old", Array.from(dictionary_old.values())) // auto update client push click new data
 		 
@@ -412,32 +437,65 @@ const getIPRange = require('get-ip-range');
 		//console.log("getPortsList ", getPortsList)
 		 
 		// InitSerialPort();
-		 receivedComPortData();
+		// receivedComPortData();
 		// SerialPortWrite(json);
-		//console.log(dictionary)
+		console.log(dictionary)
 		
 	}, 5000)// refr page
-	checkComPortInterval = setInterval(async () => {
-			//	 receivedComPortData();
-			}, 100)// refr com port
 	
 try {
 	io.on('connection', socket => {
 	globalSocket = socket
-	io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
+	io.sockets.emit("devices_new", Array.from(dictionary_new.values())) // push click new data
+	io.sockets.emit("devices_old", Array.from(dictionary_old.values())) // push click new data	
 	
 	socket.on("relay", async data => {
 		let turnResult = await relayRequest(data.ip, data.turn)
-		//console.log('turn result', turnResult)
+		
+		dictionary_old.forEach(device => {
+			if (device.ip === data.ip) {
+				device.state = data.turn
+			}
+			})
+		dictionary_new.forEach(device => {
+			if (device.ip === data.ip) {
+				device.state = data.turn
+			}
+			})
+		io.sockets.emit("devices_old", Array.from(dictionary_old.values())) 
+		io.sockets.emit("devices_new", Array.from(dictionary_new.values())) 
 	})
 	socket.on("ChangeName", async data => {
 		let tResult = await relayChangeName(data.ip, data.name)
+		
+		dictionary_old.forEach(device => {
+			if (device.ip === data.ip) {
+				device.name = data.name
+			}
+			})
+		dictionary_new.forEach(device => {
+			if (device.ip === data.ip) {
+				device.name = data.name
+			}
+			})			
+		io.sockets.emit("devices_old", Array.from(dictionary_old.values())) 
+		io.sockets.emit("devices_new", Array.from(dictionary_new.values())) 
+			 					
+	})
+	
+	socket.on("reset", async data => {
+		let tResult = await ResetDevice(data.ip)
 	//	response(Array.from(dictionary.values()))
-		//console.log('setname result', data.name)
+		console.log('ResetDevice', data.ip)
+		io.sockets.emit("devices_old", Array.from(dictionary_old.values())) 
+		io.sockets.emit("devices_new", Array.from(dictionary_new.values()))
+		io.sockets.emit("CountNewDev", CountNewDev) 
 	})
-	socket.on("deviceReq", (response) => {
-		response(Array.from(dictionary.values()))
-	})
+	
+	io.sockets.emit("devices_old", Array.from(dictionary_old.values())) 
+	io.sockets.emit("devices_new", Array.from(dictionary_new.values()))
+	io.sockets.emit("CountNewDev", CountNewDev) 
+
 })
 }
 catch (e){
