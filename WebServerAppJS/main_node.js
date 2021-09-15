@@ -5,8 +5,8 @@ const path = require('path')
 const fs = require('fs')
 const url = require('url');
 let globalSocket
-let CountNewDev = 0;
 let Device_GUID = "dDf5FFShellysde";
+let Device_New_Name = "New Robotic Device";
 let Plagin_GUID = "DFDDSDFDF454DFdfd";
 let Device_Class = "Shelly";
 
@@ -366,9 +366,6 @@ const getIPRange = require('get-ip-range');
 						dictionary.set(device.ip, device);
 						CountNewDev = k; 
 					} else {
-						if (dictionary.has(device.ip)) {
-						  dictionary.delete(device.ip)
-						}
 						if (dictionary_new.has(device.ip)) {
 						  dictionary_new.delete(device.ip)
 						}
@@ -426,7 +423,6 @@ const getIPRange = require('get-ip-range');
 		 io.sockets.emit("devices_new", Array.from(dictionary_new.values())) // auto update client push click new data
 		 io.sockets.emit("devices_old", Array.from(dictionary_old.values())) // auto update client push click new data
 		 
-		 io.sockets.emit("CountNewDev", CountNewDev)
 		 
 	/*	 let myJson = {};
 			myJson.dictionary_new = Array.from(dictionary_new.values());
@@ -441,7 +437,14 @@ const getIPRange = require('get-ip-range');
 		// SerialPortWrite(json);
 		console.log(dictionary)
 		
-	}, 5000)// refr page
+	}, 15000)// refr page 
+	
+	/*
+	TO DO
+	  Сделать принудительные эммиты при отваливании устройства и при добавлении.	
+	
+	*/
+	
 	
 try {
 	io.on('connection', socket => {
@@ -476,10 +479,13 @@ try {
 		dictionary_new.forEach(device => {
 			if (device.ip === data.ip) {
 				device.name = data.name
+				device.isnewdevice = "old";
+		        dictionary_old.set(device.ip, device);
+		        dictionary_new.delete(device.ip);					
 			}
 			})			
 		io.sockets.emit("devices_old", Array.from(dictionary_old.values())) 
-		io.sockets.emit("devices_new", Array.from(dictionary_new.values())) 
+		io.sockets.emit("devices_new", Array.from(dictionary_new.values()))
 			 					
 	})
 	
@@ -487,14 +493,21 @@ try {
 		let tResult = await ResetDevice(data.ip)
 	//	response(Array.from(dictionary.values()))
 		console.log('ResetDevice', data.ip)
+		dictionary_old.forEach(device => {
+			if (device.ip === data.ip) {
+				device.name = Device_New_Name;
+				device.isnewdevice = "new";
+				dictionary_new.set(device.ip, device);
+				dictionary_old.delete(device.ip);
+			}
+		})
+		
 		io.sockets.emit("devices_old", Array.from(dictionary_old.values())) 
 		io.sockets.emit("devices_new", Array.from(dictionary_new.values()))
-		io.sockets.emit("CountNewDev", CountNewDev) 
 	})
 	
 	io.sockets.emit("devices_old", Array.from(dictionary_old.values())) 
 	io.sockets.emit("devices_new", Array.from(dictionary_new.values()))
-	io.sockets.emit("CountNewDev", CountNewDev) 
 
 })
 }

@@ -43,15 +43,13 @@ export default {
   components: {
       Table
   },
-  created() {
-		if (localStorage.devices_old) {
-			var devices = JSON.parse(localStorage.getItem("devices_old"));
-            if (devices.length == 0){
+  mounted() {
+		if (localStorage.devices_old && localStorage.devices_new) {
+			if (localStorage.devices_old.length < 3 && localStorage.devices_new.length > 3) {
+				console.log("YES")
 				window.location.href="/new-devices"
 			}
 		}
-  },
-  mounted() {
 		if (localStorage.devices_old) {
 			this.tableBody = [];
 			var devices = JSON.parse(localStorage.getItem("devices_old"));
@@ -74,12 +72,17 @@ export default {
 			localStorage.setItem("devices_old", JSON.stringify(devices))
 						
         });
-        socket.on("CountNewDev", devices => {
-			this.new_devices = devices
+        socket.on("devices_new", devices => {
+			this.new_devices = devices.length
             if (devices != 0 && this.tableBody.length == 0) {
                 window.location.href="/new-devices"
-            }
+			} else if (devices == 0 && this.new_devices != 0) {
+				window.location.href="/new-devices"	
+            } else if (devices == 0 && this.tableBody.length == 0) {
+				window.location.href="/"
+			}
 			localStorage.setItem("CountNewDev", devices)
+			localStorage.setItem("CountNewDev", devices.length)
 
         })
 	}

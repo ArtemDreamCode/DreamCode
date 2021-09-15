@@ -47,6 +47,7 @@ export default {
 		})
 		}
 	socket.on("devices_old", devices => { 
+	if (devices.length == 0) window.location.href = "/"
 		let readyArray = [];
 		this.devices = [];
 		devices.forEach((device, index, array) => {
@@ -57,6 +58,11 @@ export default {
 			} 
 		})
 		localStorage.setItem("devices_old", JSON.stringify(devices))
+	
+	})
+	socket.on("devices_new", devices => {
+		localStorage.setItem("devices_new", JSON.stringify(devices));
+		localStorage.setItem("CountNewDev", devices.length)
 	})
 	}	
 }

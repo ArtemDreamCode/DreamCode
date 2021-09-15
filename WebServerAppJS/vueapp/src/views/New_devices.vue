@@ -57,6 +57,12 @@ export default {
 		}
 		socket.on("devices_old", devices => { 
 			this.devices_old = devices;
+			if (this.tableBody.length == 0 && this.devices_old != 0) {
+				window.location.href = "/settings"
+			} else if (this.tableBody.length == 0 && this.devices_old == 0) {
+				window.location.href = "/"
+
+			}
 			localStorage.setItem("devices_old", JSON.stringify(devices));
         });
 		socket.on("devices_new", devices => { 
@@ -65,10 +71,14 @@ export default {
 			devices.forEach((device, index) => {
 				this.tableBody[index] = [device.name, device.ip, device.state];
 			})
-			if (this.tableBody.length == 0) {
-			window.location.href = "/settings"
+			if (this.tableBody.length == 0 && this.devices_old != 0) {
+				window.location.href = "/settings"
+			} else if (this.tableBody.length == 0 && this.devices_old == 0) {
+				window.location.href = "/"
+
 			}
 			localStorage.setItem("devices_new", JSON.stringify(devices))
+			localStorage.setItem("CountNewDev", devices.length)
         })
 		
   },

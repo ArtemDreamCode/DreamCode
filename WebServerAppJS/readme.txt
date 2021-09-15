@@ -36,7 +36,8 @@ sudo npm install --save-dev electron
 
 ----------------------------------------
 сперва скопировать 
-cd D:\dreamcode\Iot\WebServerAppJS\vueapp>
+cd D:\dreamcode\Iot\WebServerAppJS\vueapp
        npm i
-проект npm run build
+     node server (запускается там где лежит отдельно и отдельно интерфейс, в скомпилированном приложении запускается 1 файл под сервером или електроном Index.html)
+проект npm run build (собирает в папке vue папку dist - готовый билд, запуск возможен index.html только под electron или apache servers)
        npm run serve

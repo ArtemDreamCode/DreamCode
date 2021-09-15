@@ -4,7 +4,7 @@
             <span class = "copyright">HDC (с) 2021</span>
         </div>
         <div class="controls-button">
-            <a :href="message__update != 0 || devs != 0 ? '/settings' : '/?error=no_devs'" class="constrols__item router--settings">
+            <a :href="devs == 0  ? (message__update != 0 ? '/new-devices' : '/?error=no_devs') : '/settings'" class="constrols__item router--settings">
                 <div v-if="message__update > 0"   class="message-count">
                     <span class = "message-count__number">{{message__update}}</span>
                 </div>
@@ -68,16 +68,16 @@ export default {
 			this.devs = JSON.parse(localStorage.getItem("devices_old"));
 		}
 		if (localStorage.CountNewDev) {
-			var devices = JSON.parse(localStorage.getItem("CountNewDev"));
+			var devices = localStorage.getItem("CountNewDev");
             this.message__update = devices
 		}
 		socket.on("devices_old", devices => { 
 			this.devs = devices;
 			localStorage.setItem("devices_old", JSON.stringify(devices))
         })
-        socket.on("CountNewDev", devices => {
-            this.message__update = devices
-			localStorage.setItem("CountNewDev", devices)
+		socket.on("devices_new", devices => { 
+			this.message__update = devices.length
+			localStorage.setItem("CountNewDev", devices.length)
         })
 
     if(this.$route.query.error == "no_devs") {
