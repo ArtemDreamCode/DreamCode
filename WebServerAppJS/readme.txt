@@ -35,9 +35,18 @@ sudo npm install --save-dev electron
 
 
 ----------------------------------------
-сперва скопировать 
-cd D:\dreamcode\Iot\WebServerAppJS\vueapp
-       npm i
-     node server (запускается там где лежит отдельно и отдельно интерфейс, в скомпилированном приложении запускается 1 файл под сервером или електроном Index.html)
-проект npm run build (собирает в папке vue папку dist - готовый билд, запуск возможен index.html только под electron или apache servers)
-       npm run serve
+проект 
+       cd D:\dreamcode\Iot\WebServerAppJS
+       npm install
+(модификации package.json секция scrip заменить: 
+               "test": "concurrently --kill-others \"electron .\" \"vue-cli-service serve\"")
+       npm run serve (start морда)
+       npm run test (start electron) npm -- test
+pm2 start npm --name "testapp" -- start
+---------------------------------------------------------------
+bags
+1 имя не отчищается в окне смены имени
+2 убрать раскрашивание кнопок зеленым в самом html (приводит к багам с визуалкой)
+3 кнопки вк выкл внешний вид (куда делся, вроде бы делали)
+
+
