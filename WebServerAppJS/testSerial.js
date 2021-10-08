@@ -14,10 +14,12 @@ port.pipe(parser);
 //parser.on('data', console.log);
 parser.on('data', function (data) {
 	let str = data.toString(); //Convert to string
-    console.log(str);
+
+    console.log("from dev: ", str);
 	str = str.replace(/\r?\n|\r/g, ""); //remove '\r' from this String
     str = JSON.stringify(data); // Convert to JSON
     str = JSON.parse(data); //Then parse it
+
 
     console.log(str.name);
     console.log(str.ip);
@@ -26,4 +28,12 @@ parser.on('data', function (data) {
 
 })
 
-setInterval(function(){ port.write("Hello"); }, 3000);
+setInterval(mesWebInterface, 3000)
+
+function mesWebInterface()
+{ 
+	console.log("out to dev: ");
+	console.log("{\"name\":\"kitchen\", \"ip\":\"192.168.0.10\", \"state\":\"on\"}"); 
+	port.write("{\"name\":\"kitchen\", \"ip\":\"192.168.0.10\", \"state\":\"on\"}"); 
+ 
+}
