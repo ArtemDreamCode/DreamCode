@@ -12,7 +12,7 @@ let Device_Class = "Shelly";
 let FirstGetData = true;
 var mainWindow;
 
-///*
+/*
 const SerialPort = require('serialport');
 const parsers = SerialPort.parsers;
 
