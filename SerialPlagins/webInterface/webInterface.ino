@@ -18,8 +18,8 @@ String str_input = "";
 String Plagin_GUID = "DFDDSDFDF454DFdfd";
 
 const int DEVICES_MAX_COUNT = 20;
-Device dictionary[DEVICES_MAX_COUNT];
-int count_dictionary = 0;
+Device dictionary_new[DEVICES_MAX_COUNT];
+int count_dictionary_new = 0;
 
 ESP8266WebServer server(80);
 
@@ -131,18 +131,19 @@ void handle_GetState(){ //запрос о состоянии от клиента
   response += str_input;
   response += "\n";
   response += "{";
-  response += "\"dictionary\":["; 
-  for (int i=0; i<count_dictionary; i++)
+  response += "\"dictionary_new\":["; 
+  for (int i=0; i<count_dictionary_new; i++)
   {
     response += "{";   
-    response+= "\"name\": \""+String(dictionary[i].name)+"\"";
-    response+= ",\"ident\": \""+dictionary[i].ident+"\"";
-    response+= ",\"state\": \""+String(dictionary[i].state)+"\"";
+    response+= "\"name\": \""+String(dictionary_new[i].name)+"\"";
+    response+= ",\"ident\": \""+dictionary_new[i].ident+"\"";
+    response+= ",\"state\": \""+String(dictionary_new[i].state)+"\"";
     response+= "}"; 
-    if ((i+1)<count_dictionary)
+    if ((i+1)<count_dictionary_new)
       response+= ",";  
   }
-  response+= "]}"; 
+  response+= "],";
+  response+="\"dictionary_old\":[]}"; 
   server.send(200, "text/html", response);
 }
 
@@ -166,30 +167,39 @@ void readAndParse()
       str_input = jsstring;
         DeserializationError error = deserializeJson(doc, jsstring);  
         if (error) {
+        Serial.println("err parse: " + jsstring);
+//        Serial.println(error.f_str());
         return;
       }
-      JsonArray arr = doc["dictionary"].as<JsonArray>();
+      Serial.println("no err parse: " + jsstring);
+      JsonArray arr = doc["dictionary_new"].as<JsonArray>();
     
-      count_dictionary = arr.size(); //кол-во элементов массива
+      count_dictionary_new = arr.size(); //кол-во элементов массива
      
+        //Serial.print("ok arr.count = " + count_dictionary_new);
       
-      if (count_dictionary>DEVICES_MAX_COUNT)
-       count_dictionary = DEVICES_MAX_COUNT;
+      if (count_dictionary_new>DEVICES_MAX_COUNT)
+       count_dictionary_new = DEVICES_MAX_COUNT;
       
+
+       // Walk the JsonArray efficiently
        int i = 0;
       for (JsonObject repo : arr) {
-        dictionary[i].name = repo["name"];
+        dictionary_new[i].name = repo["name"];
+     //   dictionary_new[i].ip = repo["ip"];
+   //     dictionary_new[i].ident = ipToIdent(String(dictionary_new[i].ip));
+ //       dictionary_new[i].state = repo["state"];
         i++;
       }
 
 // responce
  String response = "{";
   response += "\"names\":["; 
-  for (int i=0; i<count_dictionary; i++){
+  for (int i=0; i<count_dictionary_new; i++){
     response += "{";   
-    response+= "\"name\": \""+String(dictionary[i].name)+"\"";
+    response+= "\"name\": \""+String(dictionary_new[i].name)+"\"";
     response+= "}"; 
-    if ((i+1)<count_dictionary)
+    if ((i+1)<count_dictionary_new)
       response+= ",";  
   }
   response+= "]}";
@@ -198,12 +208,12 @@ void readAndParse()
 
  
       
-      for (int i=0; i<count_dictionary; i++)
+      for (int i=0; i<count_dictionary_new; i++)
       {
-        Serial.println(dictionary[i].name);
-     //   Serial.println(dictionary[i].ip);
-       // Serial.println(dictionary[i].ident);
-     //   Serial.println(dictionary[i].state);
+        Serial.println(dictionary_new[i].name);
+     //   Serial.println(dictionary_new[i].ip);
+       // Serial.println(dictionary_new[i].ident);
+     //   Serial.println(dictionary_new[i].state);
        // Serial.println("______________");
       }
     }
