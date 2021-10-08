@@ -38,6 +38,17 @@ sudo npm install --save-dev electron
 проект 
        cd D:\dreamcode\Iot\WebServerAppJS
        npm install
+
+для работы электрона и серийного порта требуется:
+	1 npm install electron --save-dev
+	2 npm install serialport --save
+
+	3 установка visual studio + пакет c++
+		в линуксе компилятор встроен, должно работать и без него 
+	4 npm install --save-dev electron-rebuild
+	5 .\node_modules\.bin\electron-rebuild.cmd (windows)
+		./node_modules/.bin/electron-rebuild (linux)(требуется проверка)
+
 (модификации package.json секция scrip заменить: 
                "test": "concurrently --kill-others \"electron .\" \"vue-cli-service serve\"")
        npm run serve (start морда)
