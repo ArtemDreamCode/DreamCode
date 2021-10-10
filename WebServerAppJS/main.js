@@ -13,20 +13,20 @@ let FirstGetData = true;
 var mainWindow;
 
 ///*
-const SerialPort = require('serialport');
-const parsers = SerialPort.parsers;
+//const SerialPort = require('serialport');
+//const parsers = SerialPort.parsers;
 ///*
-const parser = new parsers.Readline({
- delimiter: '\n'
-});
+//const parser = new parsers.Readline({
+// delimiter: '\n'
+//});
 
-const port = new SerialPort('Com7', {
- baudRate: 115200
-});
+//const port = new SerialPort('Com7', {
+// baudRate: 115200
+//});
 
-port.pipe(parser);
+//port.pipe(parser);
 
-parser.on('data', console.log);
+/*parser.on('data', console.log);
 parser.on('data', function (data) {
 	let str = data.toString(); //Convert to string
     console.log("from web intrfce" + str);
@@ -194,7 +194,7 @@ const getIPRange = require('get-ip-range');
 	//	return await findLocalDevices('172.20.10.0/24')
 	//	return await findLocalDevices('192.168.0.1/24')
 	//	return await findLocalDevices('192.168.1.2/24')
-   let {hosts} = await arpping.ping(getIPRange('172.18.41.180', '172.18.41.200'))
+   let {hosts} = await arpping.ping(getIPRange('172.20.10.0', '172.20.10.20'))
 //   let {hosts} = await arpping.ping(getIPRange('192.168.0.1', '192.168.0.20'))
 //	console.log(hosts)
 	return hosts;
@@ -441,7 +441,7 @@ const getIPRange = require('get-ip-range');
 		let json = JSON.stringify(myJson);
 		console.log("send to web int: " + json)
 	///*
-		port.write(json); //отправляем по серийному порту
+	//	port.write(json); //отправляем по серийному порту
 	//*/
 		//console.log("getPortsList ", getPortsList)
 		 
