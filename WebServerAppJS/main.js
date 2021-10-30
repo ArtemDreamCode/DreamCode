@@ -194,7 +194,7 @@ const getIPRange = require('get-ip-range');
 	//	return await findLocalDevices('172.20.10.0/24')
 	//	return await findLocalDevices('192.168.0.1/24')
 	//	return await findLocalDevices('192.168.1.2/24')
-   let {hosts} = await arpping.ping(getIPRange('172.20.10.0', '172.20.10.20'))
+   let {hosts} = await arpping.ping(getIPRange('192.168.0.1', '192.168.0.30'))
 //   let {hosts} = await arpping.ping(getIPRange('192.168.0.1', '192.168.0.20'))
 //	console.log(hosts)
 	return hosts;

@@ -5,6 +5,8 @@ int addrState = 10;
 int addrName = 20;
 int addrIndex = 15;
 int addrStateNewDevice = 5;
+int addrWiFiMode = 25;
+int addrServerSSID = 30;
 
 char eeprom_read_state_new_device()
 {

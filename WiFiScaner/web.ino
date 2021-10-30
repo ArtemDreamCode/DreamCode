@@ -33,18 +33,18 @@ void handle_scan() //остановка
   /////////// сканируем точки доступа, если находим esp
   // подключаемся к ней, отправляем данные основной точки доступа
   // и говорим переподключиться в режиме станции
-  wifi_scan();
+  //wifi_scan(0);
   server.send(200, "text/html", "scan done");
+  if (wifi_scan())
+    wifi_begin(ServerSSID, ServerPASS); // connect to rasp network
 }
 
-void wifi_scan(Int iter)
+bool wifi_scan()
 {
-  if (iter == 0) return;
-  
   Serial.println("START : wifi_scan");
    // WiFi.scanNetworks will return the number of networks found
   int k = 0;
-  
+  bool isShellyFound = false;
   int n = WiFi.scanNetworks();
    
   Serial.println("Scan done");
@@ -68,19 +68,19 @@ void wifi_scan(Int iter)
       Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" Unsecured":" Secured");
       if (WiFi.SSID(i).indexOf(ShellySSID) > -1)
       {
+        isShellyFound = true;
         if (wifi_begin(WiFi.SSID(i), ShellyPASS))
         {
             String getOut = "http://192.168.4.1/reconnect?ssid="+ServerSSID+"&pass="+ServerPASS;
             Serial.println(get(getOut));
-            wifi_begin(ServerSSID, ServerPASS);
+            
         }
       }
       
       delay(10);
     }
   }
-  Serial.println("");
-  wifi_scan(iter++);
+  return isShellyFound;
 }
 
 String get(String Arequest){
