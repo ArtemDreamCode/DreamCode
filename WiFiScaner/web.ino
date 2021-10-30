@@ -36,10 +36,14 @@ void handle_scan() //остановка
   server.send(200, "text/html", "scan start");
 }
 
-void wifi_scan()
+void wifi_scan(Int iter)
 {
+  if (iter == 0) return;
+  
   Serial.println("START : wifi_scan");
    // WiFi.scanNetworks will return the number of networks found
+  int k = 0;
+  
   int n = WiFi.scanNetworks();
    
   Serial.println("Scan done");
@@ -75,6 +79,7 @@ void wifi_scan()
     }
   }
   Serial.println("");
+  wifi_scan(iter++);
 }
 
 String get(String Arequest){
