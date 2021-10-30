@@ -33,7 +33,8 @@ void handle_scan() //остановка
   /////////// сканируем точки доступа, если находим esp
   // подключаемся к ней, отправляем данные основной точки доступа
   // и говорим переподключиться в режиме станции
-  server.send(200, "text/html", "scan start");
+  wifi_scan();
+  server.send(200, "text/html", "scan done");
 }
 
 void wifi_scan(Int iter)

@@ -48,9 +48,9 @@ void setup() {
   Serial.println("WiFi Netwoek Scan Started");
 
   wifi_begin(ServerSSID, ServerPASS);
-//  restServerRouting();  
-//  server.onNotFound(handleNotFound);
-//  server.begin();
+  restServerRouting();  
+  server.onNotFound(handleNotFound);
+  server.begin();
 
 }
 
@@ -59,8 +59,7 @@ void setup() {
 //=======================================================================
 void loop() {
    Serial.println("START : wifi_scan");
- wifi_scan();
-//server.handleClient(); 
+  server.handleClient(); 
   // Wait a bit before starting New scanning again
   delay(5000);
 }
