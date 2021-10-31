@@ -71,7 +71,7 @@ bool wifi_scan()
         isShellyFound = true;
         if (wifi_begin(WiFi.SSID(i), ShellyPASS))
         {
-            String getOut = "http://192.168.4.1/reconnect?ssid="+ServerSSID+"&pass="+ServerPASS;
+            String getOut = "http://192.168.4.1/reconnect?ssid="+ServerSSID;
             Serial.println(get(getOut));
             
         }

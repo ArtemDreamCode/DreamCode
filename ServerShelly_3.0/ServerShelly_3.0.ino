@@ -23,12 +23,14 @@ int DeviceIndex = 0;
 //const char* pass = "63030723";
 
 
-String ShellySSID = "ShellyAP108";
+String ShellySSID = "";
 String ShellyPASS = "11001100";
 
 const char* ssid = "TP-LINK_120";
 const char* pass = "160193ya";
 
+String ServerSSID = "";
+String ServerPASS = "12345678";
 
 //const char* ssid = "Keenetic-9462";
 //const char* pass = "LCMN8S6X";
@@ -43,8 +45,14 @@ const char* pass = "160193ya";
 //const char* ssid = "ESPap";
 //const char* pass = "123456789";
 
+String GenerateAPName()
+{
+  String ssidname = "ShellyAP" + WiFi.macAddress();
+  return ssidname;
+}
 
-void DoCheckButtonState(){
+void DoCheckButtonState()
+{
   int bt = digitalRead(5);
   if (bt != bt_state)
   { //если есть изменение состояния кнопки
@@ -87,11 +95,23 @@ void setup()
   DeviceIndex = eeprom_read_index();
   bt_state = digitalRead(5);
   Serial.println(RealCheck);
-  wifi_begin();
   restServerRouting();
   
   server.onNotFound(handleNotFound);
   server.begin();
+  
+  if (!is_station())
+  {
+    if (set_AP_mode())
+      Serial.println("Точка доступа создана!");
+    else Serial.println("Ошибка создания точки доступа!");
+  }
+  else //режим станции, подключаемся к serverAP
+  {
+    //считываем из eeprom ssid server ap
+    ServerSSID = eeprom_read_server_ssid();
+    wifi_begin(ServerSSID, ServerPASS);
+  }
 
   if(!is_new_device())
   {
@@ -99,19 +119,19 @@ void setup()
   }
 }
 
+bool is_station()
+{
+  return (eeprom_read_state_wifi_mode() == 1);
+}
 
 bool is_new_device()
 {
-  if (eeprom_read_state_new_device() == 1)
-  {
-    return true;
-  }
-  else return false;
+  return (eeprom_read_state_new_device() == 1);
 }
 
 void loop()
 {
   DoCheckButtonState();
   server.handleClient();  
-  delay(200);
+  delay(100);
 }

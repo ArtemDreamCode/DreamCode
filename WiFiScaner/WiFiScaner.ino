@@ -22,7 +22,7 @@ ESP8266WebServer server(80);
 WiFiClient client; 
 HTTPClient http; // for depricated Get request 
 
-String ShellySSID = "ShellyAP1";
+String ShellySSID = "ShellyAP";
 String ShellyPASS = "11001100";
 
 //String HomeSSID = "LASSARD";
@@ -58,9 +58,9 @@ void setup() {
 //                        LOOP
 //=======================================================================
 void loop() {
-   Serial.println("START : wifi_scan");
+ //  Serial.println("START : wifi_scan");
   server.handleClient(); 
   // Wait a bit before starting New scanning again
-  delay(5000);
+  delay(100);
 }
 //=======================================================================

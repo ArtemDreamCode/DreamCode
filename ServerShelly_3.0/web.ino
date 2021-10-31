@@ -15,12 +15,12 @@ void handle_GetState(){ //запрос о состоянии от клиента
    response+= ",\"class\": \""+ClassDevice+"\""; 
    response+= ",\"name\": \""+DeviceFrendlyName+"\""; 
    char newdev = eeprom_read_state_new_device();
-   Serial.println(newdev);
+   //Serial.println(newdev);
    if (newdev == 1)
       response+= ",\"isnewdevice\": \"old\"";
    else 
       response+= ",\"isnewdevice\": \"new\"";
-   response+= ",\"mac\": \""+MacAdr+"\"";   
+   response+= ",\"mac\": \""+WiFi.macAddress()+"\"";   
    response+= ",\"gw\": \""+WiFi.gatewayIP().toString()+"\"";
    response+= ",\"nm\": \""+WiFi.subnetMask().toString()+"\"";
    response+= ",\"signalStrengh\": \""+String(WiFi.RSSI())+"\"";
@@ -70,13 +70,30 @@ void handle_ChangeState()
 
 void handle_Reset()
 {  
+   server.send(200, "text/html", "ok");
    DeviceFrendlyName = "New Robotic Device";
    eeprom_write_state_new_device(0);   
    eeprom_write_name(DeviceFrendlyName);
    String response = "{"; 
    response+= "\"name\": \""+DeviceFrendlyName+"\"";
     response+="}";
-   server.send(200, "text/html", response);
+}
+
+void handle_FullReset()
+{
+   server.send(200, "text/html", "ap mode");
+   delay(200);
+   DeviceFrendlyName = "New Robotic Device";
+   eeprom_write_state_new_device(0);   
+   eeprom_write_name(DeviceFrendlyName);
+   String response = "{"; 
+   response+= "\"name\": \""+DeviceFrendlyName+"\"";
+    response+="}";
+    WiFi.disconnect();
+   if (set_AP_mode())
+     Serial.println("Точка доступа создана!");
+   else Serial.println("Ошибка создания точки доступа!");
+   
 }
 
 void handle_ChangeFrendlyName(){
@@ -134,10 +151,10 @@ void restServerRouting() {
     server.on(("/state"), HTTP_GET, handle_GetState); // get from AP
     server.on(("/set"), HTTP_GET, handle_ChangeFrendlyName); // change device name
     server.on(("/reconnect"), HTTP_GET, handle_reconnect);
+    server.on(("/fullreset"), HTTP_GET, handle_FullReset);
 } 
-void wifi_begin(){
+void wifi_begin(String ssid, String pass){
   WiFi.mode(WIFI_STA);
-//  WiFi.begin(ssid); 
   WiFi.begin(ssid, pass);  
   while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(2, HIGH);  
@@ -153,33 +170,40 @@ void wifi_begin(){
 
 bool set_AP_mode()
 {
+  eeprom_write_state_wifi_mode(0);
+  ShellySSID = GenerateAPName();
   boolean result = WiFi.softAP(ShellySSID, ShellyPASS);
   return result;
 }
 
 void handle_reconnect() // подключение к точке доступа
 {
-  String state_buf;
-  Serial.println("handle_reconnect");
-  if ((server.args() == 2) && (server.argName(0) == "ssid") && (server.argName(1) == "pass"))
-  {
-    String ssid = server.arg(0);
-    String pass = server.arg(1);
-    Serial.println("ssid: " + ssid);
-    Serial.println("pass: " + pass);
-//    eeprom_write_state(RealCheck);
-    WiFi.softAPdisconnect();
-    WiFi.disconnect();
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, pass);  
-    while (WiFi.status() != WL_CONNECTED) {
-      Serial.println("connecting to wifi");
-      delay(450);
-    }
-    String ip = WiFi.localIP().toString().c_str(); 
-    Serial.println("my ip in current network: " + ip);
-  
-    delay(100);
-  }
+  Serial.println("handle_reconnect ok");
   server.send(200, "text/html", "reconnect start");
+  //if (!is_station) //только если в режиме точки доступа
+  //{
+    String state_buf;
+    Serial.println("handle_reconnect");
+    if ((server.args() == 1) && (server.argName(0) == "ssid"))
+    {
+      eeprom_write_state_wifi_mode(1);
+      String ssid = server.arg(0);
+      eeprom_write_server_ssid(ssid);
+      Serial.println("ssid: " + eeprom_read_server_ssid());
+      Serial.println("pass: " + ServerPASS);
+  //    eeprom_write_state(RealCheck);
+      WiFi.softAPdisconnect();
+      WiFi.disconnect();
+      WiFi.mode(WIFI_STA);
+      WiFi.begin(ssid, ServerPASS);  
+      while (WiFi.status() != WL_CONNECTED) {
+        Serial.println("connecting to wifi");
+        delay(450);
+      }
+      String ip = WiFi.localIP().toString().c_str(); 
+      Serial.println("my ip in current network: " + ip);
+    
+      delay(100);
+    }
+  //}
 }

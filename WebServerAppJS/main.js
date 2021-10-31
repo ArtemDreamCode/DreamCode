@@ -298,6 +298,27 @@ const getIPRange = require('get-ip-range');
 			resolve(false)
 		})
 	},
+	scan_dev = async() => {
+		return new Promise((resolve, reject) => {
+			try {
+				const url =  `http://192.168.0.18/scan`;
+				const req = http.get(url, (res) => {
+				//const req = http.get({hostname: `http://${ip}`, path:`/reset, res => {
+					res.on("data", function(chunk) {
+					    //console.log("BODY: " + chunk);
+		    });
+			
+			//io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
+				}).on('error', function(e) {
+				  console.log(ip + "  Got error scan: " + e.message);
+				});
+			} catch (e) {
+				console.log(ip + "  err", e)
+			}
+			resolve(false)
+		})		
+	},
+	
 	relayChangeName = async (ip, name) => {
 	//	console.log(ip, name);
 		return new Promise((resolve, reject) => {
@@ -481,6 +502,13 @@ try {
 		io.sockets.emit("devices_old", Array.from(dictionary_old.values())) 
 		io.sockets.emit("devices_new", Array.from(dictionary_new.values())) 
 	})
+	
+	socket.on("scan_dev", async => {
+	//	relayRequest(data.ip, data.turn)
+	    let res = scan_dev();
+		console.log("scan_dev")
+	})
+		
 	socket.on("ChangeName", async data => {
 		let tResult = await relayChangeName(data.ip, data.name)
 		
