@@ -194,8 +194,8 @@ const getIPRange = require('get-ip-range');
 	//	return await findLocalDevices('172.20.10.0/24')
 	//	return await findLocalDevices('192.168.0.1/24')
 	//	return await findLocalDevices('192.168.1.2/24')
-   let {hosts} = await arpping.ping(getIPRange('192.168.0.1', '192.168.0.30'))
-//   let {hosts} = await arpping.ping(getIPRange('192.168.0.1', '192.168.0.20'))
+//   let {hosts} = await arpping.ping(getIPRange('172.18.44.181', '172.18.44.185'))
+   let {hosts} = await arpping.ping(getIPRange('192.168.0.1', '192.168.0.20'))
 //	console.log(hosts)
 	return hosts;
 	}
@@ -274,7 +274,7 @@ const getIPRange = require('get-ip-range');
 		})
 	},
 	relayRequest = async (ip, turn) => {
-	//	console.log(ip, turn);
+		console.log(ip, turn);
 		return new Promise((resolve, reject) => {
 			try {
 				
@@ -359,12 +359,27 @@ const getIPRange = require('get-ip-range');
 				const url =  `http://${ip}/reset`;
 				console.log('Sending url ', url);
 				const req = http.get(url, (res) => {
-				//const req = http.get({hostname: `http://${ip}`, path:`/reset, res => {
 					res.on("data", function(chunk) {
-					    //console.log("BODY: " + chunk);
 		    });
-			
-			//io.sockets.emit("devices", Array.from(dictionary.values())) // push click new data
+				}).on('error', function(e) {
+				  console.log(ip + "  Got error: " + e.message);
+				});
+			} catch (e) {
+				console.log(ip + "  err", e)
+			}
+			resolve(false)
+		})
+	},  
+	FullResetDevice = async (ip) => {
+		console.log(ip);
+		return new Promise((resolve, reject) => {
+			try {
+				
+				const url =  `http://${ip}/fullreset`;
+				console.log('Sending url ', url);
+				const req = http.get(url, (res) => {
+					res.on("data", function(chunk) {
+		    });
 				}).on('error', function(e) {
 				  console.log(ip + "  Got error: " + e.message);
 				});
@@ -489,6 +504,8 @@ try {
 	socket.on("relay", async data => {
 		let turnResult = await relayRequest(data.ip, data.turn)
 		
+		//console.log(data.turn)
+		
 		dictionary_old.forEach(device => {
 			if (device.ip === data.ip) {
 				device.state = data.turn
@@ -543,6 +560,24 @@ try {
 			}
 		})
 		
+		io.sockets.emit("devices_old", Array.from(dictionary_old.values())) 
+		io.sockets.emit("devices_new", Array.from(dictionary_new.values()))
+	})
+	socket.on("fullreset", async data => {
+		let tResult = await FullResetDevice(data.ip)
+		console.log('FullResetDevice', data.ip)
+		dictionary_old.forEach(device => {
+			if (device.ip === data.ip) {
+				dictionary_old.delete(device.ip);
+			}
+			
+		})
+		dictionary_new.forEach(device => {
+			if (device.ip === data.ip) {
+				dictionary_new.delete(device.ip);
+			}
+			
+		})
 		io.sockets.emit("devices_old", Array.from(dictionary_old.values())) 
 		io.sockets.emit("devices_new", Array.from(dictionary_new.values()))
 	})
