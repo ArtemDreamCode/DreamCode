@@ -39,20 +39,19 @@ sudo npm install --save-dev electron
        cd D:\dreamcode\Iot\WebServerAppJS
        npm install
 
-для работы электрона и серийного порта требуется:
-	1 npm install electron --save-dev
-	2 npm install serialport --save
+при переносе проекта :
 
-	3 установка visual studio + пакет c++
-		в линуксе компилятор встроен, должно работать и без него 
-	4 npm install --save-dev electron-rebuild
-	5 .\node_modules\.bin\electron-rebuild.cmd (windows)
-		./node_modules/.bin/electron-rebuild (linux)(требуется проверка)
+   package.json - оставляем, node_modules не переносим !
+   после копирования ставим 
+           npm i
+           npm install -g @vue/cli
+           vue --version
 
 (модификации package.json секция scrip заменить: 
                "test": "concurrently --kill-others \"electron .\" \"vue-cli-service serve\"")
-       npm run serve (start морда)
-       npm run test (start electron) npm -- test
+       npm run front (start морда)
+       npm run back (start electron + main.js) 
+       npm test - все ()
 pm2 start npm --name "testapp" -- start
 ---------------------------------------------------------------
 bags
@@ -61,3 +60,7 @@ bags
 3 кнопки вк выкл внешний вид (куда делся, вроде бы делали)
 
 
+todo:
+ кнопки "вкл.выкл" и "фул ресет в модальном окне настройки устройств
+ доверенный адрес в роутере на сканер
+проблема: интерфейс в электроне не отдается без reload
