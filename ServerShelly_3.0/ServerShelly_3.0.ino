@@ -30,7 +30,8 @@ const char* ssid = "TP-LINK_120";
 const char* pass = "160193ya";
 
 String ServerSSID = "";
-String ServerPASS = "12345678";
+String ServerPASS = "12345678"; //MainAP //rasp
+//String ServerPASS = "PvE9zyZe"; //lassard
 
 //const char* ssid = "Keenetic-9462";
 //const char* pass = "LCMN8S6X";

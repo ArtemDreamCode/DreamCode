@@ -27,7 +27,7 @@
                             <td v-for="item in row" :key="item.id">{{item}}</td>
                             <td>
                                 <div class="edit">
-                                    <svg @click="curr_ip = $event.currentTarget.id.split(',')[1];curr_name = $event.currentTarget.id.split(',')[0];open_edit()" :id="row" width="14" height="14" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <svg @click="curr_state = $event.currentTarget.id.split(',')[2];curr_ip = $event.currentTarget.id.split(',')[1];curr_name = $event.currentTarget.id.split(',')[0];open_edit()" :id="row" width="14" height="14" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M37.1458 8.66667C37.9583 7.85416 37.9583 6.5 37.1458 5.72917L32.2708 0.854164C31.5 0.0416641 30.1458 0.0416641 29.3333 0.854164L25.5 4.66666L33.3125 12.4792L37.1458 8.66667ZM0.25 29.9375V37.75H8.0625L31.1042 14.6875L23.2917 6.875L0.25 29.9375Z" fill="black"/>
                                     </svg>
                                     <div class="edit_box" v-show="edit_display">
@@ -37,10 +37,19 @@
                                                     <path d="M12.59 0L7 5.59L1.41 0L0 1.41L5.59 7L0 12.59L1.41 14L7 8.41L12.59 14L14 12.59L8.41 7L14 1.41L12.59 0Z" fill="#2E3A59"/>
                                                 </svg>
                                             </div>
-                                            <input @click="keyboard_open" type="text" v-model="input_data" class = "form_input input" name = "device-name" :placeholder="curr_name" />
-                                            <div v-if="reset == true" @click="resetDevice" :id="row[1]" class="button button-edit">Сбросить устройство</div>
-                                            <button @click="updateDevice" :id="row[1]" class="button" type="submit">Сохранить</button>
-                                        </div>
+											<input @click="keyboard_open" type="text" v-model="input_data" class = "form_input input" name = "device-name" :placeholder="curr_name" />
+											<table width="100%"><tr>
+											<td width="50%">							
+												<div v-if="reset == true" @click="resetDevice" :id="row[1]" class="button button-edit">Сбросить устройство</div>
+												<button v-if="curr_state=='on'" @click="turnDevice" :id="row[1]" class="button button-edit device--active" type="submit">Выключить</button>
+												<button v-else @click="turnDevice" :id="row[1]" class="button button-edit" type="submit">Включить</button>																
+											</td>
+											<td  width="50%">
+												<div @click="fullResetDevice" :id="row[1]" class="button button-edit">Отключить устройтсво</div>
+												<button @click="updateDevice" :id="row[1]" class="button button-edit" type="submit">Сохранить</button>
+											</td>
+											</tr></table>
+										</div>
                                         <div v-show="keyboard_display" class="simple-keyboard"></div>
                                     </div>
                                 </div>
@@ -69,13 +78,21 @@ export default {
             edit_display: false,
             keyboard_display: false,
 			curr_ip: 0,
-			curr_name: ""
+			curr_name: "",
+			curr_state: ""
         }
     },
     methods: {
         resetDevice() {
             var device = {"ip":this.curr_ip};
             socket.emit("reset",device);
+			this.curr_ip=0;
+			this.input_data = '';
+            this.edit_display = false;
+        },
+		fullResetDevice() {
+            var device = {"ip":this.curr_ip};
+            socket.emit("fullreset",device);
 			this.curr_ip=0;
 			this.input_data = '';
             this.edit_display = false;
@@ -90,6 +107,11 @@ export default {
 			} else {
 				alert("Введите имя")
 			}
+        },
+		turnDevice() {
+			if (this.curr_state == "on") this.curr_state = "off";
+			else this.curr_state="on";
+			socket.emit("relay", {"ip":this.curr_ip, "turn": this.curr_state});
         },
         open_edit () {
 			console.log(this.curr_ip)
@@ -224,6 +246,9 @@ export default {
     background: none;
     text-align: center;
     border:2px solid var(--blue);
+}
+.device--active {
+    background: var(--light-green);
 }
 .box__close {
     display: flex;
