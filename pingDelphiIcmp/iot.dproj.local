@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.601,C:\Users\Artem\Desktop\pingDelphiIcmp\PingUnits.pas=C:\Users\Artem\Documents\Embarcadero\Studio\Projects\PingUnits.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.740,=C:\Users\Artem\Documents\Embarcadero\Studio\Projects\Unit6.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.007,=C:\Users\Artem\Documents\Embarcadero\Studio\Projects\Unit6.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.263,C:\Users\Artem\Documents\Embarcadero\Studio\Projects\PingUnits.pas=C:\Users\Artem\Documents\Embarcadero\Studio\Projects\Unit7.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.799,C:\Users\Artem\Desktop\pingDelphiIcmp\Unit6.dfm=C:\Users\Artem\Documents\Embarcadero\Studio\Projects\Unit6.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.109,C:\Users\Artem\Desktop\pingDelphiIcmp\iot.dproj=C:\Users\Artem\Desktop\pingDelphiIcmp\Project6.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.216,C:\Users\Artem\Desktop\pingDelphiIcmp\Project6.dproj=C:\Users\Artem\Documents\Embarcadero\Studio\Projects\Project6.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.449,C:\Users\Artem\Desktop\pingDelphiIcmp\Main.pas=C:\Users\Artem\Desktop\pingDelphiIcmp\Unit6.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.230,=C:\Users\Artem\Documents\Embarcadero\Studio\Projects\Unit7.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.324,=C:\Users\Artem\Documents\Embarcadero\Studio\Projects\Unit6.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.449,C:\Users\Artem\Desktop\pingDelphiIcmp\Main.dfm=C:\Users\Artem\Desktop\pingDelphiIcmp\Unit6.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.799,C:\Users\Artem\Desktop\pingDelphiIcmp\Unit6.pas=C:\Users\Artem\Documents\Embarcadero\Studio\Projects\Unit6.pas</Transaction>
+  </Transactions>
+</BorlandProject>

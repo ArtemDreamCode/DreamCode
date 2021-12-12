@@ -1,3 +1,4 @@
+bool f_process = false;
 bool wifi_begin(String ssid, String pass){
   bool f = false;
   WiFi.disconnect();  //ESP has tendency to store old SSID and PASSword and tries to connect
@@ -17,7 +18,6 @@ bool wifi_begin(String ssid, String pass){
   return false; 
 }
 
-
 void handleNotFound() {
   server.send(404, "text/plain", "not found");
 }
@@ -25,18 +25,22 @@ void handleNotFound() {
 void restServerRouting() 
 {  
     server.on("/scan", handle_scan);
+  //  server.send(200, "text/html", "scan done");
 }
 
 
-void handle_scan() //остановка
+void handle_scan() 
 {
+  if (f_process) return;
+  f_process = true; 
   /////////// сканируем точки доступа, если находим esp
   // подключаемся к ней, отправляем данные основной точки доступа
   // и говорим переподключиться в режиме станции
   //wifi_scan(0);
-  server.send(200, "text/html", "scan done");
+  
   if (wifi_scan())
     wifi_begin(ServerSSID, ServerPASS); // connect to rasp network
+  f_process = false; 
 }
 
 bool wifi_scan()

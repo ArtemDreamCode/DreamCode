@@ -15,7 +15,7 @@
 
 <script>
 import { io } from "socket.io-client";
-const socket = io("http://lycoris.su:3000/");
+const socket = io("http://localhost:3000/");
 export default {
     name: 'DevicesBox',
     props:  ['fromCount','toCount', 'devices'],
