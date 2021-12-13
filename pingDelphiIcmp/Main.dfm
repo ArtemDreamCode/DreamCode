@@ -29,4 +29,12 @@ object frMain: TfrMain
     ScrollBars = ssVertical
     TabOrder = 1
   end
+  object m_dev: TMemo
+    Left = 656
+    Top = 288
+    Width = 329
+    Height = 153
+    ScrollBars = ssVertical
+    TabOrder = 2
+  end
 end

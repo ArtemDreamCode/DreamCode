@@ -11,32 +11,50 @@ uses
   cxTextEdit, dxTileControl, dxCustomTileControl, dxTileBar, cxClasses,
   IdServerIOHandler, IdSSL, IdSSLOpenSSL,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, idGlobal, DBXJSON, System.JSON, REST.Json,
-  System.Actions, Vcl.ActnList, dxGDIPlusClasses, cxLabel, Generics.Collections;
+  System.Actions, Vcl.ActnList, dxGDIPlusClasses, cxLabel, Generics.Collections, IdAntiFreezeBase, Vcl.IdAntiFreeze;
 
 type
-  TIPList = class(TList<string>);
-  TDeviceList = class(TList<string>);
+
+  TDevice = packed record
+    Ip: string;
+    DeviceClass: string;
+    State: string;
+    Name: string;
+    GUID: string;
+    DeviceIndex: Integer;
+    IsNewDevice: Boolean;
+  end;
+
+
+  TIPList = class(TList<TDevice>);
+  TDeviceList = class(TList<TDevice>);
 
 type TPingProcess = class(TThread)
   const
     c_base_mask = '192.168.0.';
     c_min_range = 100;
     c_max_range = 107;
-    c_proc_delay = 5000;
+    c_execute_timeout = 2500;
+    c_id_connect_timeout = 1500;
     c_is_ok: array[Boolean] of string = ('Bad', 'Ok');
+    c_state = '/state';
+    c_Device_GUID = 'dDf5FFShellysde';
   strict private
     fHt: TIdHTTP;
+    fAntiFreeze: TIdAntiFreeze;
     fSsl: TIdSSLIOHandlerSocketOpenSSL;
   private
     FIPList: TIPList;
     FDeviceList: TDeviceList;
   private
     procedure DoPing;
+    procedure DoState;
+    function IsDevice(AValue: TDevice): Boolean;
   protected
     procedure Execute; override;
   public
     constructor Create(CreateSuspended: Boolean);
-    destructor  Destroy; override;
+    destructor Destroy; override;
   end;
 
 
@@ -44,6 +62,7 @@ type
   TfrMain = class(TForm)
     m: TMemo;
     m_ip: TMemo;
+    m_dev: TMemo;
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
   private
@@ -96,7 +115,7 @@ end;
 procedure TfrMain.KillProcessPing;
 begin
   FPingProcess.Terminate;
-//  FPingProcess.WaitFor;
+  FPingProcess.WaitFor;
   FreeAndNil(FPingProcess);
 end;
 
@@ -106,7 +125,9 @@ constructor TPingProcess.Create(CreateSuspended: Boolean);
 begin
   inherited Create(False);
   fHt := TIdHTTP.Create;
+  fHt.ConnectTimeout := c_id_connect_timeout;
   fSsl := TIdSSLIOHandlerSocketOpenSSL.Create;
+  fAntiFreeze := TIdAntiFreeze.Create;
   FIPList := TIPList.Create;
   FDeviceList := TDeviceList.Create;
   fSsl.IPVersion := Id_IPv6;
@@ -116,6 +137,7 @@ destructor TPingProcess.Destroy;
 begin
   fHt.Free;
   fSsl.Free;
+  fAntiFreeze.Free;
   FIPList.Free;
   FDeviceList.Free;
   inherited Destroy;
@@ -126,6 +148,7 @@ var
   f: Boolean;
   i: Integer;
   s_ip: string;
+  Device: TDevice;
 begin
   FIPList.Clear;
   for i := c_min_range to c_max_range do
@@ -139,18 +162,53 @@ begin
              end);
     if f then
     begin
-      FIPList.Add(s_ip);
+      Device.Ip := s_ip;
+      FIPList.Add(Device);
+
       Synchronize(procedure
                var
-                elem: string;
-               begin
+                el: TDevice;
+                begin
                  frMain.m_ip.Clear;
-                  for elem in FIPList do
-                    frMain.m_ip.Lines.Add(elem);
-             end);
+                  for el in FIPList do
+                    frMain.m_ip.Lines.Add(el.Ip);
+                end);
     end;
   end;
+end;
 
+procedure TPingProcess.DoState;
+var
+  elem: TDevice;
+begin
+  if FIPList.Count = 0 then
+    Exit;
+
+ // no override collect
+ { for elem in FIPList do
+    if (IsDevice(elem)) and (FDeviceList.IndexOf(elem) = - 1) then
+      FDeviceList.Add(elem);
+
+  for elem in FDeviceList do
+    if FIPList.IndexOf(elem) = - 1 then
+      FDeviceList.Remove(elem);
+  }
+
+// override collect
+  FDeviceList.Clear;
+  for elem in FIPList do
+    if IsDevice(elem) then
+      FDeviceList.Add(elem);
+
+   Synchronize(procedure
+               var
+                el: TDevice;
+                begin
+                 frMain.m_dev.Clear;
+                  for el in FDeviceList do
+                    frMain.m_dev.Lines.Add(el.Ip);
+                end);
+//      FDeviceList.Parse(elem);
 end;
 
 procedure TPingProcess.Execute;
@@ -158,8 +216,26 @@ begin
  while not Terminated do
     begin
       DoPing;
-      sleep(c_proc_delay);
+      DoState;
+      sleep(c_execute_timeout);
     end
+end;
+
+function TPingProcess.IsDevice(AValue: TDevice): Boolean;
+var
+  Json: string;
+  sResponse: string;
+  mj: TJSONObject;
+  s, r: string;
+begin
+  Result := False;
+  s := 'http://' + AValue.Ip + c_state;
+  try
+    r := fHt.Get(s);
+    Result := pos(c_Device_GUID, r) > 0;
+  except
+    on E: Exception do
+  end;
 end;
 
 end.
