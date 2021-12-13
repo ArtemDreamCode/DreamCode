@@ -11,7 +11,8 @@ uses
   cxTextEdit, dxTileControl, dxCustomTileControl, dxTileBar, cxClasses,
   IdServerIOHandler, IdSSL, IdSSLOpenSSL,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, idGlobal, DBXJSON, System.JSON, REST.Json,
-  System.Actions, Vcl.ActnList, dxGDIPlusClasses, cxLabel, Generics.Collections, IdAntiFreezeBase, Vcl.IdAntiFreeze;
+  System.Actions, Vcl.ActnList, dxGDIPlusClasses, cxLabel, Generics.Collections, IdAntiFreezeBase, Vcl.IdAntiFreeze,
+  Vcl.ComCtrls;
 
 type
 
@@ -21,8 +22,9 @@ type
     State: string;
     Name: string;
     GUID: string;
-    DeviceIndex: Integer;
-    IsNewDevice: Boolean;
+    DeviceIndex: string;
+    IsNewDevice: string;
+    function ToString: string;
   end;
 
 
@@ -49,7 +51,7 @@ type TPingProcess = class(TThread)
   private
     procedure DoPing;
     procedure DoState;
-    function IsDevice(AValue: TDevice): Boolean;
+    function CheckDevice(AValue: TDevice): Boolean;
   protected
     procedure Execute; override;
   public
@@ -60,9 +62,22 @@ type TPingProcess = class(TThread)
 
 type
   TfrMain = class(TForm)
-    m: TMemo;
+    pg: TPageControl;
+    tsmain: TTabSheet;
+    tssett: TTabSheet;
+    tscontroll: TTabSheet;
+    tstodo: TTabSheet;
+    tsdebug: TTabSheet;
     m_ip: TMemo;
     m_dev: TMemo;
+    Label1: TLabel;
+    Label3: TLabel;
+    tl_main: TdxTileControl;
+    dxTileControl1Item1: TdxTileControlItem;
+    dxTileControl1Group1: TdxTileControlGroup;
+    dxTileControl1Item2: TdxTileControlItem;
+    dxTileControl1Item3: TdxTileControlItem;
+    dxTileControl1Item4: TdxTileControlItem;
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
   private
@@ -71,8 +86,6 @@ type
     procedure DoShow; override;
     procedure RunProcessPing;
     procedure KillProcessPing;
-  public
-    { Public declarations }
   end;
 
 var
@@ -85,8 +98,16 @@ implementation
 uses PingUnits;
 
 procedure TfrMain.AfterConstruction;
+var
+  i: Integer;
 begin
   inherited;
+  Color := RGB(239, 239, 244);
+  for i := 0 to tl_main.Items.Count - 1 do
+  begin
+    tl_main.Items[i].CustomBorderColor := $00E8E3DF;
+    tl_main.Items[i].CustomBorderWidth := 2;
+  end;
 {$IFDEF DEBUG}
   ReportMemoryLeaksOnShutdown := true;
 {$ENDIF}
@@ -121,11 +142,43 @@ end;
 
 { TPingProcess }
 
+function TPingProcess.CheckDevice(AValue: TDevice): Boolean;
+var
+  mj: TJSONObject;
+  s, r: string;
+begin
+  Result := False;
+  s := 'http://' + AValue.Ip + c_state;
+  try
+    r := fHt.Get(s);
+    Result := pos(c_Device_GUID, r) > 0;
+    mj := (TJSONObject.ParseJSONValue(r) as TJSONObject);
+    try
+      if Result then
+      begin
+        AValue.DeviceClass := mj.GetValue('class').Value;
+        AValue.State :=       mj.GetValue('state').Value;
+        AValue.Name :=        mj.GetValue('name').Value;
+        AValue.GUID :=        mj.GetValue('device_guid').Value;
+        AValue.DeviceIndex := mj.GetValue('index').Value;
+        AValue.IsNewDevice := mj.GetValue('isnewdevice').Value;
+        FDeviceList.Add(AValue);
+      end;
+    finally
+      mj.Free;
+    end;
+
+  except
+    on E: Exception do
+  end;
+
+end;
+
 constructor TPingProcess.Create(CreateSuspended: Boolean);
 begin
   inherited Create(False);
   fHt := TIdHTTP.Create;
-  fHt.ConnectTimeout := c_id_connect_timeout;
+//  fHt.ConnectTimeout := c_id_connect_timeout;
   fSsl := TIdSSLIOHandlerSocketOpenSSL.Create;
   fAntiFreeze := TIdAntiFreeze.Create;
   FIPList := TIPList.Create;
@@ -157,24 +210,21 @@ begin
       Break;
     s_ip := c_base_mask + i.ToString;
     f := Ping(s_ip);
-    Synchronize(procedure begin
-             frMain.m.Lines.Add(s_ip + ':' + c_is_ok[f]);
-             end);
+
+    Synchronize(procedure
+              begin
+               frMain.m_ip.Lines.Add(s_ip + ' [' + c_is_ok[f] + ']');
+              end);
     if f then
     begin
       Device.Ip := s_ip;
       FIPList.Add(Device);
-
-      Synchronize(procedure
-               var
-                el: TDevice;
-                begin
-                 frMain.m_ip.Clear;
-                  for el in FIPList do
-                    frMain.m_ip.Lines.Add(el.Ip);
-                end);
     end;
   end;
+      Synchronize(procedure
+              begin
+               frMain.m_ip.Lines.Add('===== ' + DateTimeToStr(Now) + ' ========');
+              end);
 end;
 
 procedure TPingProcess.DoState;
@@ -184,31 +234,19 @@ begin
   if FIPList.Count = 0 then
     Exit;
 
- // no override collect
- { for elem in FIPList do
-    if (IsDevice(elem)) and (FDeviceList.IndexOf(elem) = - 1) then
-      FDeviceList.Add(elem);
-
-  for elem in FDeviceList do
-    if FIPList.IndexOf(elem) = - 1 then
-      FDeviceList.Remove(elem);
-  }
-
-// override collect
   FDeviceList.Clear;
   for elem in FIPList do
-    if IsDevice(elem) then
-      FDeviceList.Add(elem);
+    CheckDevice(elem);
 
    Synchronize(procedure
                var
                 el: TDevice;
                 begin
                  frMain.m_dev.Clear;
+                 frMain.m_dev.Lines.Add('map count: ' + FDeviceList.Count.ToString);
                   for el in FDeviceList do
-                    frMain.m_dev.Lines.Add(el.Ip);
+                    frMain.m_dev.Lines.Add(el.ToString);
                 end);
-//      FDeviceList.Parse(elem);
 end;
 
 procedure TPingProcess.Execute;
@@ -221,20 +259,24 @@ begin
     end
 end;
 
-function TPingProcess.IsDevice(AValue: TDevice): Boolean;
+{ TDevice }
+
+function TDevice.ToString: string;
 var
-  Json: string;
-  sResponse: string;
-  mj: TJSONObject;
-  s, r: string;
+  s: TStringList;
 begin
-  Result := False;
-  s := 'http://' + AValue.Ip + c_state;
+  s := TStringList.Create;
   try
-    r := fHt.Get(s);
-    Result := pos(c_Device_GUID, r) > 0;
-  except
-    on E: Exception do
+    s.Add('{ ip: ' + Ip);
+    s.Add('DeviceClass: ' + DeviceClass);
+    s.Add('State: ' + State);
+    s.Add('Name: ' + Name);
+    s.Add('GUID: ' + GUID);
+    s.Add('DeviceIndex: ' + DeviceIndex);
+    s.Add('isnewdevice: ' + isnewdevice + '}');
+    Result := s.Text;
+  finally
+    s.Free;
   end;
 end;
 
