@@ -10,5 +10,8 @@ http://192.168.4.100/relay?turn=on
 http://192.168.4.100/set?name=value
 {"name": "value"}
 
-http://172.20.10.14/fullreset
+http://192.168.4.100/reset
 ok
+
+http://172.20.10.14/fullreset
+ap mode

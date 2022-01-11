@@ -155,6 +155,7 @@ void restServerRouting() {
 } 
 void wifi_begin(String ssid, String pass){
   WiFi.mode(WIFI_STA);
+  WiFi.hostname(wifi_host_name);
   WiFi.begin(ssid, pass);  
   while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(2, HIGH);  

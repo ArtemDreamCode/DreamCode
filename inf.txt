@@ -1,0 +1,10 @@
+linux
+	1. sudo usermod -aG vboxsf user - общая папка (добавление в группу)
+	2. поставить шрифт стандартно через приложение
+ 		1. cd /home/artem/.local/share/fonts
+		2  sudo cp Veles-Bold.0.9.2.otf /usr/share/fonts
+
+
+lazarus
+	1. убрать отладочную инф из бинарника(в 4 раза уменьшается размер)
+		Project - Project options - Debugging - check true: -xs, -xg

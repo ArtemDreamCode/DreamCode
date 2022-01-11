@@ -25,18 +25,17 @@ void handleNotFound() {
 void restServerRouting() 
 {  
     server.on("/scan", handle_scan);
-  //  server.send(200, "text/html", "scan done");
 }
 
 
 void handle_scan() 
 {
   if (f_process) return;
-  f_process = true; 
+  f_process = true;
+//  server.send(200, "text/html", "scan start"); 
   /////////// сканируем точки доступа, если находим esp
   // подключаемся к ней, отправляем данные основной точки доступа
   // и говорим переподключиться в режиме станции
-  //wifi_scan(0);
   
   if (wifi_scan())
     wifi_begin(ServerSSID, ServerPASS); // connect to rasp network
@@ -50,7 +49,12 @@ bool wifi_scan()
   int k = 0;
   bool isShellyFound = false;
   int n = WiFi.scanNetworks();
-   
+  // responce 
+  String ap_list = "";
+  
+  for (int i = 0; i < n; ++i)
+    { ap_list += WiFi.SSID(i) + ';' ;}
+    server.send(200, "text/html", "scan ok, device count: " + String(n) + "; AP list: " + ap_list);   
   Serial.println("Scan done");
   
   if (n == 0)
