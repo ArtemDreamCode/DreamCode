@@ -88,7 +88,8 @@ var
 begin
   FPingedList.Clear;
  // RunCommand('/arp-scan --localnet', outArp);
-    RunCommand('/nmap -sn 192.168.0.1/24', outArp);
+    RunCommand('/nmap -sn 172.18.44.1/24', outArp);
+    // arp -a
    ip_map := TStringList.Create;
    ip_dest_map := TStringList.Create;
    ip_dest_map.Duplicates:= dupIgnore;
