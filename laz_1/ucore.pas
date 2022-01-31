@@ -30,6 +30,7 @@ type
     FAppPath: string;
     fdebuginfo: string;
 // core info
+    procedure DoPing_nmap;
     procedure DoPing;
     procedure DoState;
     procedure DoControll;
@@ -77,7 +78,7 @@ begin
   end;
 end;
 
-procedure TPingProcess.DoPing;
+procedure TPingProcess.DoPing_nmap;
 var
   i, k, l: Integer;
   s_ip, s, d, m: string;
@@ -129,6 +130,27 @@ begin
    end;
 
   synchronize(@ShowStatePinged);
+end;
+
+procedure TPingProcess.DoPing;
+var
+  i, k, l: Integer;
+  s_ip, s, d, m: string;
+  f: Boolean;
+  ip_map, ip_dest_map: TStringList;
+  outArp: AnsiString;
+
+begin
+  FPingedList.Clear;
+  RunCommand('./arp.sh', outArp);
+  try
+    FPingedList.Text:= outArp;
+
+   finally
+   end;
+
+  synchronize(@ShowStatePinged);
+
 end;
 
 procedure TPingProcess.DoState;

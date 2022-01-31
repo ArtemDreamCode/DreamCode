@@ -2,9 +2,9 @@ void handle_GetState(){ //запрос о состоянии от клиента
   String resp;
   String st;
    String response = "{"; 
-   if (RealCheck == true){
+   if (RealCheck){
      st = "on";
-   }
+   }  
    else{
      st = "off";
    }
@@ -57,7 +57,7 @@ void handle_ChangeState()
   
   String response = "{"; 
   String st;
-  if (RealCheck == true){
+  if (RealCheck){
     st = "on";
    }
    else{
