@@ -21,7 +21,7 @@ type
     c_execute_timeout = 5000;
     c_is_ok: array[Boolean] of string = ('Bad', 'Ok');
     c_state = '/state';
-    c_Device_GUID = 'dDf5FFShellysde';
+    c_Device_GUID = 'NewDev';
   private
     FChangeMainFon: string;
     FDeviceList, FNewDeviceList, FOldDeviceList: TDeviceList;
@@ -78,7 +78,7 @@ begin
   end;
 end;
 
-procedure TPingProcess.DoPing_nmap;
+procedure TPingProcess.DoPing;
 var
   i, k, l: Integer;
   s_ip, s, d, m: string;
@@ -89,7 +89,7 @@ var
 begin
   FPingedList.Clear;
  // RunCommand('/arp-scan --localnet', outArp);
-    RunCommand('/nmap -sn 172.18.44.1/24', outArp);
+    RunCommand('nmap -sn 192.168.1.1-20', outArp);
     // arp -a
    ip_map := TStringList.Create;
    ip_dest_map := TStringList.Create;
@@ -132,7 +132,7 @@ begin
   synchronize(@ShowStatePinged);
 end;
 
-procedure TPingProcess.DoPing;
+procedure TPingProcess.DoPing_nmap;
 var
   i, k, l: Integer;
   s_ip, s, d, m: string;
@@ -143,14 +143,28 @@ var
 begin
   FPingedList.Clear;
   RunCommand('./arp.sh', outArp);
+  ip_map := TStringList.Create;
+  ip_dest_map := TStringList.Create;
+  ip_dest_map.Duplicates:= dupIgnore;
   try
-    FPingedList.Text:= outArp;
+    ip_map.Text := outArp;
 
+      for i := 0 to ip_map.Count - 1 do
+      begin
+        k := Pos(c_Device_GUID, ip_map.Strings[i]);
+        if (k > 0) and (i > 0) then
+        begin
+          s := ip_map.Strings[i - 1];
+          d :=  Copy(s, Pos('ip: ',  s) + Length('ip: '), Length(s));
+          ip_dest_map.Add(d);
+        end;
+      end;
+      FPingedList.Text:= ip_dest_map.Text ;
    finally
+     ip_map.Free;
+     ip_dest_map.Free;
    end;
-
-  synchronize(@ShowStatePinged);
-
+   synchronize(@ShowStatePinged);
 end;
 
 procedure TPingProcess.DoState;
@@ -215,11 +229,10 @@ begin
   Result := False;
   addr := 'http://' + AValue + c_state;
   RunCommand('/curl ' + addr, outGet);
-  Result := pos(c_Device_GUID, outGet) > 0;
+  Result := pos(c_Device_GUID, outGet) > 0; //NewTechDev
 
     if Result then
     begin
-
       js := GetJSON(outGet);
       try
        fdebuginfo := 'end parse';

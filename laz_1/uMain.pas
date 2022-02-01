@@ -106,6 +106,7 @@ type
     procedure Arrow1Click(Sender: TObject);
     procedure BeforeDestruction; override;
     procedure FormCreate(Sender: TObject);
+    procedure Panel1Click(Sender: TObject);
     procedure Panel27Click(Sender: TObject);
     procedure Panel3MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -169,6 +170,11 @@ begin
   pgc.ShowTabs:= False;
   MainForm.BorderStyle:= bsNone;
   MainForm.Position:= poDesktopCenter;
+end;
+
+procedure TForm1.Panel1Click(Sender: TObject);
+begin
+
 end;
 
 procedure TForm1.Panel27Click(Sender: TObject);

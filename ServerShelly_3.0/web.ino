@@ -1,4 +1,5 @@
 void handle_GetState(){ //запрос о состоянии от клиента
+  String dev_guid = GenerateAPName();
   String resp;
   String st;
    String response = "{"; 
@@ -8,7 +9,7 @@ void handle_GetState(){ //запрос о состоянии от клиента
    else{
      st = "off";
    }
-   response+= "\"device_guid\": \""+Device_GUID+"\"";
+   response+= "\"device_guid\": \"" + dev_guid + "\"";
    response+= ",\"index\": \""+String(DeviceIndex)+"\""; 
    response+= ",\"state\": \""+st+"\"";
    response+= ",\"ip\": \""+WiFi.localIP().toString()+"\"";
@@ -71,7 +72,7 @@ void handle_ChangeState()
 void handle_Reset()
 {  
    server.send(200, "text/html", "ok");
-   DeviceFrendlyName = "New Robotic Device";
+   DeviceFrendlyName = GenerateAPName();
    eeprom_write_state_new_device(0);   
    eeprom_write_name(DeviceFrendlyName);
    String response = "{"; 
@@ -83,7 +84,7 @@ void handle_FullReset()
 {
    server.send(200, "text/html", "ap mode");
    delay(200);
-   DeviceFrendlyName = "New Robotic Device";
+   DeviceFrendlyName = GenerateAPName();
    eeprom_write_state_new_device(0);   
    eeprom_write_name(DeviceFrendlyName);
    String response = "{"; 
@@ -155,7 +156,7 @@ void restServerRouting() {
 } 
 void wifi_begin(String ssid, String pass){
   WiFi.mode(WIFI_STA);
-  WiFi.hostname(wifi_host_name);
+  WiFi.hostname(GenerateAPName());
   WiFi.begin(ssid, pass);  
   while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(2, HIGH);  

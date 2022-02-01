@@ -9,15 +9,13 @@
 ESP8266WebServer server(80);
 
 WiFiClient client;  
-String Device_GUID = "dDf5FFShellysde";
 int Device_Position = 0;
 bool RealCheck = false;
 int bt_state;
 String MacAdr;
 String ClassDevice = "Shelly";
-String DeviceFrendlyName = Device_GUID;
 int DeviceIndex = 0;
-String wifi_host_name = Device_GUID;
+String DeviceFrendlyName;
 //const char* ssid = "R_302";
 //const char* pass = "ProtProtom";
 //const char* ssid = "rostelecom_104";
@@ -49,7 +47,9 @@ String ServerPASS = "12345678"; //MainAP //rasp
 
 String GenerateAPName()
 {
-  String ssidname = "ShellyAP" + WiFi.macAddress();
+  String addr = WiFi.macAddress(); 
+  addr.remove(0, 9);
+  String ssidname = "NewDev" + addr; 
   return ssidname;
 }
 
