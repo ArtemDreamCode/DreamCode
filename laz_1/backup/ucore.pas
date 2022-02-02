@@ -12,24 +12,15 @@ uses
 { TPingProcess }
 type
   TPingProcess = class(TThread)
-  const
-    c_ping_count   = '1';
-    c_ping_timeout = '1';
-    c_base_mask = '192.168.0.';
-    c_min_range = 100;
-    c_max_range = 125;
-    c_execute_timeout = 5000;
-    c_is_ok: array[Boolean] of string = ('Bad', 'Ok');
-    c_state = '/state';
-    c_Device_GUID = 'dDf5FFShellysde';
   private
     FChangeMainFon: string;
-    FDeviceList, FNewDeviceList, FOldDeviceList: TDeviceList;
+   // FDeviceList, FNewDeviceList, FOldDeviceList: TDeviceList;
     FPingedList: TStringList;
   private
     FAppPath: string;
     fdebuginfo: string;
 // core info
+    procedure DoPing_nmap;
     procedure DoPing;
     procedure DoState;
     procedure DoControll;
@@ -50,9 +41,9 @@ type
     procedure ChangeState;
   public
     property AppPath: string read FAppPath write FAppPath;
-    property DeviceList: TDeviceList read FDeviceList;
-    property NewDeviceList: TDeviceList read FNewDeviceList;
-    property OldDeviceList: TDeviceList read FOldDeviceList;
+//    property DeviceList: TDeviceList read FDeviceList;
+//    property NewDeviceList: TDeviceList read FNewDeviceList;
+//    property OldDeviceList: TDeviceList read FOldDeviceList;
     constructor Create(CreateSuspended: Boolean);
     destructor Destroy; override;
   end;
@@ -77,7 +68,7 @@ begin
   end;
 end;
 
-procedure TPingProcess.DoPing;
+procedure TPingProcess.DoPing_nmap;
 var
   i, k, l: Integer;
   s_ip, s, d, m: string;
@@ -88,7 +79,8 @@ var
 begin
   FPingedList.Clear;
  // RunCommand('/arp-scan --localnet', outArp);
-    RunCommand('/nmap -sn 192.168.0.1/24', outArp);
+    RunCommand('/nmap -sn 192.168.1.1/24', outArp);
+    // arp -a
    ip_map := TStringList.Create;
    ip_dest_map := TStringList.Create;
    ip_dest_map.Duplicates:= dupIgnore;
@@ -128,6 +120,41 @@ begin
    end;
 
   synchronize(@ShowStatePinged);
+end;
+
+procedure TPingProcess.DoPing;
+var
+  i, k, l: Integer;
+  s_ip, s, d, m: string;
+  f: Boolean;
+  ip_map, ip_dest_map: TStringList;
+  outArp: AnsiString;
+
+begin
+  FPingedList.Clear;
+  RunCommand('./arp.sh', outArp);
+  ip_map := TStringList.Create;
+  ip_dest_map := TStringList.Create;
+  ip_dest_map.Duplicates:= dupIgnore;
+  try
+    ip_map.Text := outArp;
+
+      for i := 0 to ip_map.Count - 1 do
+      begin
+        k := Pos(c_Device_GUID, ip_map.Strings[i]);
+        if (k > 0) and (i > 0) then
+        begin
+          s := ip_map.Strings[i - 1];
+          d :=  Copy(s, Pos('ip: ',  s) + Length('ip: '), Length(s));
+          ip_dest_map.Add(d);
+        end;
+      end;
+      FPingedList.Text:= ip_dest_map.Text ;
+   finally
+     ip_map.Free;
+     ip_dest_map.Free;
+   end;
+   synchronize(@ShowStatePinged);
 end;
 
 procedure TPingProcess.DoState;
@@ -191,12 +218,11 @@ var
 begin
   Result := False;
   addr := 'http://' + AValue + c_state;
-  RunCommand('/curl ' + addr, outGet);
-  Result := pos(c_Device_GUID, outGet) > 0;
+  RunCommand('/curl -m 2 ' + addr, outGet);
+  Result := pos(c_Device_GUID, outGet) > 0; //NewTechDev
 
     if Result then
     begin
-
       js := GetJSON(outGet);
       try
        fdebuginfo := 'end parse';
@@ -290,12 +316,12 @@ begin
            if SameText(p.State, 'off') then
              SubItems.Add('⚫')
            else
-             if (num mod 2 = 0) then
-                SubItems.Add('🔥')
-             else
-                SubItems.Add('⚫');
+             SubItems.Add('🔥');
+
            SubItems.Add(p.Name);
            SubItems.Add(p.Ip);
+           SubItems.Add(p.State);
+
         end;
       end;
     finally
@@ -327,12 +353,11 @@ begin
          if SameText(p.State, 'off') then
            SubItems.Add('⚫')
          else
-           if (num mod 2 = 0) then
-              SubItems.Add('🔥')
-           else
-              SubItems.Add('⚫');
+           SubItems.Add('🔥');
+
          SubItems.Add(p.Name);
          SubItems.Add(p.Ip);
+         SubItems.Add(p.State);
       end;
     end;
   finally
@@ -352,16 +377,16 @@ procedure TPingProcess.ChangeState;
 begin
  with MainForm do
  begin
-  sh_sett.Enabled := DeviceList.Count > 0;
+  sh_sett.Enabled := FDeviceList.Count > 0;
 
-  pTabOld.Enabled:= OldDeviceList.Count > 0;
-  pTabNew.Enabled:= NewDeviceList.Count > 0;
+  pTabOld.Enabled:= FOldDeviceList.Count > 0;
+  pTabNew.Enabled:= FNewDeviceList.Count > 0;
 
-  if (DeviceList.Count = 0) then
+  if (FDeviceList.Count = 0) and (pgc.ActivePage = tsSett) then
      pgc.ActivePage := tsMain;
-  if (OldDeviceList.Count = 0) then
+  if (FOldDeviceList.Count = 0) then
      OnCustomTabLinkClickNew;
-  if (NewDeviceList.Count = 0) then
+  if (FNewDeviceList.Count = 0) then
      OnCustomTabLinkClickOLd;
  end;
 end;

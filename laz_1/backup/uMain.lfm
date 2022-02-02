@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 576
+  Left = 702
   Height = 556
-  Top = 283
+  Top = 433
   Width = 960
   Caption = 'Form1'
   ClientHeight = 556
@@ -38,6 +38,7 @@ object Form1: TForm1
         Font.Name = 'Veles'
         ParentFont = False
         TabOrder = 0
+        OnClick = Panel1Click
         object lb_num_sett: TLabel
           Left = 269
           Height = 1
@@ -80,9 +81,9 @@ object Form1: TForm1
         end
         object lb_date: TLabel
           Left = 16
-          Height = 31
+          Height = 36
           Top = 48
-          Width = 40
+          Width = 82
           Caption = 'date'
           Font.Height = -32
           Font.Name = 'Veles'
@@ -199,9 +200,9 @@ object Form1: TForm1
           end
           object lb_cnt_sett: TLabel
             Left = 151
-            Height = 52
+            Height = 61
             Top = 8
-            Width = 10
+            Width = 37
             Align = alCustom
             Alignment = taRightJustify
             Caption = '0'
@@ -216,9 +217,9 @@ object Form1: TForm1
         end
         object lb_time: TLabel
           Left = 16
-          Height = 31
+          Height = 36
           Top = 80
-          Width = 40
+          Width = 81
           Caption = 'time'
           Font.Height = -32
           Font.Name = 'Veles'
@@ -279,6 +280,9 @@ object Form1: TForm1
           Font.Name = 'Inter V'
           ParentFont = False
           TabOrder = 1
+          OnClick = Panel30Click
+          OnMouseDown = Panel30MouseDown
+          OnMouseWheelDown = Panel30MouseWheelDown
         end
         object Panel31: TPanel
           Left = 926
@@ -291,6 +295,7 @@ object Form1: TForm1
           Font.Name = 'Inter V'
           ParentFont = False
           TabOrder = 2
+          OnMouseDown = Panel31MouseDown
         end
         object pTabNew: TPanel
           Left = 72
@@ -416,6 +421,10 @@ object Form1: TForm1
               item
                 Caption = 'ip'
                 Width = 230
+              end            
+              item
+                Caption = 'state'
+                Visible = False
               end>
             Font.Height = -35
             Font.Name = 'Veles'
@@ -468,6 +477,7 @@ object Form1: TForm1
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 0
+            OnClick = Panel37Click
           end
           object Panel41: TPanel
             Left = 0
@@ -508,6 +518,10 @@ object Form1: TForm1
               item
                 Caption = 'ip'
                 Width = 640
+              end            
+              item
+                Caption = 'state'
+                Visible = False
               end>
             Font.Height = -35
             Font.Name = 'Veles'
@@ -802,7 +816,7 @@ object Form1: TForm1
         Left = 200
         Height = 15
         Top = 48
-        Width = 65
+        Width = 68
         Caption = 'pinged list'
         ParentColor = False
       end
@@ -818,7 +832,7 @@ object Form1: TForm1
         Left = 608
         Height = 15
         Top = 48
-        Width = 62
+        Width = 67
         Caption = 'device list'
         ParentColor = False
       end
@@ -826,7 +840,7 @@ object Form1: TForm1
         Left = 24
         Height = 15
         Top = 48
-        Width = 68
+        Width = 72
         Caption = 'all proc log'
         ParentColor = False
       end
@@ -897,7 +911,7 @@ object Form1: TForm1
   end
   object tm_time: TTimer
     OnTimer = tm_timeTimer
-    left = 896
-    top = 48
+    left = 520
+    top = 208
   end
 end

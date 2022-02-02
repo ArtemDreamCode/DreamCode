@@ -9,8 +9,8 @@ uses
     cthreads,
      cmem,
     {$ENDIF}{$ENDIF}
-  Interfaces, generics.collections,// this includes the LCL widgetset
-  Forms, lazcontrols, runtimetypeinfocontrols, uMain, uTypes, uCore
+  Interfaces,// this includes the LCL widgetset
+  Forms, lazcontrols, runtimetypeinfocontrols, uMain, uTypes, uCore, uSett
   { you can add units after this };
 
 {$R *.res}
@@ -20,6 +20,7 @@ begin
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TForm1, MainForm);
+  Application.CreateForm(TfrSett, frSett);
   Application.Run;
 end.
 

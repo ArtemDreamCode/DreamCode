@@ -10,7 +10,7 @@ uses
      cmem,
     {$ENDIF}{$ENDIF}
   Interfaces,// this includes the LCL widgetset
-  Forms, lazcontrols, runtimetypeinfocontrols, uMain, uTypes, uCore
+  Forms, lazcontrols, runtimetypeinfocontrols, uMain, uTypes, uCore, uSett
   { you can add units after this };
 
 {$R *.res}

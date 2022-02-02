@@ -9,7 +9,21 @@ interface
 uses
   Classes, SysUtils, process;
 
+const
+  c_ping_count   = '1';
+  c_ping_timeout = '1';
+  c_base_mask = '192.168.0.';
+  c_min_range = 100;
+  c_max_range = 125;
+  c_execute_timeout = 5000;
+  c_is_ok: array[Boolean] of string = ('Bad', 'Ok');
+  c_state = '/state';
+  c_turn_on = '/relay?turn=on';
+  c_turn_off = '/relay?turn=off';
+  c_Device_GUID = 'NewDev';
+
 type
+   TDeviceMode = (dmNew, dmOld);
  //PDevice = ^TDevice;
  TDevice = packed record
     Ip: string;
@@ -32,6 +46,7 @@ type
     public
         function Add(ADevice : TDevice) : integer;
         function ToString: string; override;
+        function SearchByIp(AValue: string): TDevice;
         procedure Clear;
         property List: TDeviceArrayList read FDeviceArrayList;
         property Count: Integer read GetCount;
@@ -69,7 +84,7 @@ var
 begin
   s := TStringList.Create;
   try
-    s.Add('Devices count: ' + self.FCount.ToString);
+    s.Add('Devices count: ' + self.Count.ToString);
     for P in FDeviceArrayList do
     begin
       s.Add('{ ip: ' + P.Ip);
@@ -85,6 +100,15 @@ begin
   finally
     s.Free;
   end;
+end;
+
+function TDeviceList.SearchByIp(AValue: string): TDevice;
+var
+  elem: TDevice;
+begin
+  for elem in FDeviceArrayList do
+      if SameText(elem.Ip, AValue) then
+         Exit(elem);
 end;
 
 procedure TDeviceList.Clear;

@@ -12,16 +12,6 @@ uses
 { TPingProcess }
 type
   TPingProcess = class(TThread)
-  const
-    c_ping_count   = '1';
-    c_ping_timeout = '1';
-    c_base_mask = '192.168.0.';
-    c_min_range = 100;
-    c_max_range = 125;
-    c_execute_timeout = 5000;
-    c_is_ok: array[Boolean] of string = ('Bad', 'Ok');
-    c_state = '/state';
-    c_Device_GUID = 'NewDev';
   private
     FChangeMainFon: string;
     FDeviceList, FNewDeviceList, FOldDeviceList: TDeviceList;
@@ -78,7 +68,7 @@ begin
   end;
 end;
 
-procedure TPingProcess.DoPing;
+procedure TPingProcess.DoPing_nmap;
 var
   i, k, l: Integer;
   s_ip, s, d, m: string;
@@ -89,7 +79,7 @@ var
 begin
   FPingedList.Clear;
  // RunCommand('/arp-scan --localnet', outArp);
-    RunCommand('nmap -sn 192.168.1.1-20', outArp);
+    RunCommand('/nmap -sn 192.168.1.1/24', outArp);
     // arp -a
    ip_map := TStringList.Create;
    ip_dest_map := TStringList.Create;
@@ -132,7 +122,7 @@ begin
   synchronize(@ShowStatePinged);
 end;
 
-procedure TPingProcess.DoPing_nmap;
+procedure TPingProcess.DoPing;
 var
   i, k, l: Integer;
   s_ip, s, d, m: string;
@@ -228,7 +218,7 @@ var
 begin
   Result := False;
   addr := 'http://' + AValue + c_state;
-  RunCommand('/curl ' + addr, outGet);
+  RunCommand('/curl -m 2 ' + addr, outGet);
   Result := pos(c_Device_GUID, outGet) > 0; //NewTechDev
 
     if Result then
@@ -326,12 +316,12 @@ begin
            if SameText(p.State, 'off') then
              SubItems.Add('⚫')
            else
-             if (num mod 2 = 0) then
-                SubItems.Add('🔥')
-             else
-                SubItems.Add('⚫');
+             SubItems.Add('🔥');
+
            SubItems.Add(p.Name);
            SubItems.Add(p.Ip);
+           SubItems.Add(p.State);
+
         end;
       end;
     finally
@@ -363,12 +353,10 @@ begin
          if SameText(p.State, 'off') then
            SubItems.Add('⚫')
          else
-           if (num mod 2 = 0) then
-              SubItems.Add('🔥')
-           else
-              SubItems.Add('⚫');
+           SubItems.Add('🔥');
          SubItems.Add(p.Name);
          SubItems.Add(p.Ip);
+         SubItems.Add(p.State);
       end;
     end;
   finally

@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
   ComCtrls, Arrow, EditBtn, Calendar, Grids, Buttons, ListViewFilterEdit,
-  DividerBevel, CheckBoxThemed, uCore, uTypes, Types;
+  DividerBevel, CheckBoxThemed, uCore, uTypes, Types, uSett;
 
 
   { TForm1 }
@@ -106,7 +106,16 @@ type
     procedure Arrow1Click(Sender: TObject);
     procedure BeforeDestruction; override;
     procedure FormCreate(Sender: TObject);
+    procedure Panel1Click(Sender: TObject);
     procedure Panel27Click(Sender: TObject);
+    procedure Panel30Click(Sender: TObject);
+    procedure Panel30MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Panel30MouseWheelDown(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure Panel31MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Panel37Click(Sender: TObject);
     procedure Panel3MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure pgc_devChange(Sender: TObject);
@@ -132,6 +141,8 @@ type
     procedure DoShow; override;
     procedure RunProcessPing;
     procedure KillProcessPing;
+  public
+    property PingProcessThread: TPingProcess read FPingProcess write FPingProcess;
   end;
 
 var
@@ -171,9 +182,64 @@ begin
   MainForm.Position:= poDesktopCenter;
 end;
 
+procedure TForm1.Panel1Click(Sender: TObject);
+begin
+
+end;
+
 procedure TForm1.Panel27Click(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TForm1.Panel30Click(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.Panel30MouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+   dev_mode: TDeviceMode;
+   indx: Integer;
+   lv: TListView;
+   ip: string;
+   glist: TDeviceList;
+begin
+
+  if pgc_dev.ActivePage = ts_old then
+  begin
+    dev_mode := dmOld;
+    lv := lv_old;
+    glist := MainForm.PingProcessThread.NewDeviceList;
+  end
+  else begin
+    dev_mode := dmNew;
+    lv := lv_New;
+    glist := MainForm.PingProcessThread.OldDeviceList;
+  end;
+
+  if not Assigned(lv) then
+     Exit;
+
+  indx := lv.Selected.Index;
+  ip := lv.Selected.SubItems[2];
+  if uSett.Execute(glist, ip) then;
+end;
+
+procedure TForm1.Panel30MouseWheelDown(Sender: TObject; Shift: TShiftState;
+  MousePos: TPoint; var Handled: Boolean);
+begin
+end;
+
+procedure TForm1.Panel31MouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+end;
+
+procedure TForm1.Panel37Click(Sender: TObject);
+begin
+
 end;
 
 procedure TForm1.OnCustomTabLinkClickNew;
