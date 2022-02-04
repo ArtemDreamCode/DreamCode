@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 702
+  Left = 550
   Height = 556
-  Top = 433
+  Top = 223
   Width = 960
   Caption = 'Form1'
   ClientHeight = 556
@@ -16,9 +16,9 @@ object Form1: TForm1
     Height = 556
     Top = 0
     Width = 960
-    ActivePage = tsSett
+    ActivePage = tsControll
     Align = alClient
-    TabIndex = 1
+    TabIndex = 2
     TabOrder = 0
     object tsMain: TTabSheet
       Caption = 'tsMain'
@@ -282,6 +282,7 @@ object Form1: TForm1
           TabOrder = 1
           OnClick = Panel30Click
           OnMouseDown = Panel30MouseDown
+          OnMouseUp = Panel30MouseUp
           OnMouseWheelDown = Panel30MouseWheelDown
         end
         object Panel31: TPanel
@@ -391,9 +392,9 @@ object Form1: TForm1
         Height = 405
         Top = 120
         Width = 950
-        ActivePage = ts_new
+        ActivePage = ts_old
         Align = alClient
-        TabIndex = 1
+        TabIndex = 0
         TabOrder = 1
         OnChange = pgc_devChange
         object ts_old: TTabSheet
@@ -433,6 +434,7 @@ object Form1: TForm1
             RowSelect = True
             ScrollBars = ssNone
             TabOrder = 0
+            OnCustomDrawItem = lv_oldCustomDrawItem
             OnMouseDown = lv_oldMouseDown
             OnMouseMove = lv_oldMouseMove
             OnMouseUp = lv_oldMouseUp
@@ -606,8 +608,8 @@ object Form1: TForm1
         HorzScrollBar.Page = 1
         VertScrollBar.Page = 475
         Align = alClient
-        ClientHeight = 523
-        ClientWidth = 948
+        ClientHeight = 521
+        ClientWidth = 946
         TabOrder = 0
         object Panel4: TPanel
           Left = 0
@@ -911,7 +913,7 @@ object Form1: TForm1
   end
   object tm_time: TTimer
     OnTimer = tm_timeTimer
-    left = 520
-    top = 208
+    left = 912
+    top = 48
   end
 end

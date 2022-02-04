@@ -1,7 +1,7 @@
 object frSett: TfrSett
-  Left = 780
+  Left = 832
   Height = 281
-  Top = 334
+  Top = 565
   Width = 504
   BorderIcons = []
   BorderStyle = bsNone
@@ -55,7 +55,9 @@ object frSett: TfrSett
     Top = 93
     Width = 215
     Caption = 'bt_turn'
+    OnClick = bt_turnClick
     OnMouseDown = bt_turnMouseDown
+    OnMouseUp = bt_turnMouseUp
     TabOrder = 1
   end
 end

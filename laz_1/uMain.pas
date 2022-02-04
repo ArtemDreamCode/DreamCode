@@ -94,6 +94,8 @@ type
     tsControll: TTabSheet;
     tsToDo: TTabSheet;
     tsDebug: TTabSheet;
+    procedure lv_oldCustomDrawItem(Sender: TCustomListView; Item: TListItem;
+      State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure lv_oldMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure lv_oldMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer
@@ -110,6 +112,8 @@ type
     procedure Panel27Click(Sender: TObject);
     procedure Panel30Click(Sender: TObject);
     procedure Panel30MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Panel30MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure Panel30MouseWheelDown(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
@@ -134,6 +138,7 @@ type
     procedure tsSettShow(Sender: TObject);
   private
     FPingProcess: TPingProcess;
+    FSettingsForm: TForm;
     F_lv_old_Down, F_lv_new_Down: Boolean;
     dy: Integer;
   protected
@@ -143,6 +148,7 @@ type
     procedure KillProcessPing;
   public
     property PingProcessThread: TPingProcess read FPingProcess write FPingProcess;
+    property SettingsForm: TForm read FSettingsForm write FSettingsForm;
   end;
 
 var
@@ -158,6 +164,7 @@ implementation
 procedure TForm1.AfterConstruction;
 begin
   inherited AfterConstruction;
+  pgc_dev.OnChange(nil);
 //  Color := RGBToColor(239, 239, 244);
 end;
 
@@ -199,32 +206,35 @@ end;
 
 procedure TForm1.Panel30MouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
+begin
+end;
+
+procedure TForm1.Panel30MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
 var
    dev_mode: TDeviceMode;
-   indx: Integer;
    lv: TListView;
-   ip: string;
-   glist: TDeviceList;
 begin
 
   if pgc_dev.ActivePage = ts_old then
   begin
     dev_mode := dmOld;
     lv := lv_old;
-    glist := FNewDeviceList;
   end
   else begin
     dev_mode := dmNew;
     lv := lv_New;
-    glist := FOldDeviceList;
   end;
 
   if not Assigned(lv) then
-     Exit;
+    Exit;
 
-  indx := lv.Selected.Index;
-  ip := lv.Selected.SubItems[2];
-  if uSett.Execute(glist, ip) then;
+  if not Assigned(lv.Selected) then
+    if (lv.Items.Count > 0) then
+      lv.Items[0].Selected:= True;
+
+  uSett.Execute(lv);
+
 end;
 
 procedure TForm1.Panel30MouseWheelDown(Sender: TObject; Shift: TShiftState;
@@ -262,6 +272,12 @@ procedure TForm1.lv_oldMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   F_lv_old_Down := True;
+end;
+
+procedure TForm1.lv_oldCustomDrawItem(Sender: TCustomListView; Item: TListItem;
+  State: TCustomDrawState; var DefaultDraw: Boolean);
+begin
+
 end;
 
 procedure TForm1.lv_oldMouseUp(Sender: TObject; Button: TMouseButton;

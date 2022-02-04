@@ -188,9 +188,7 @@ void handle_reconnect() // подключение к точке доступа
     Serial.println("handle_reconnect");
     if ((server.args() == 1) && (server.argName(0) == "ssid"))
     {
-      eeprom_write_state_wifi_mode(1);
       String ssid = server.arg(0);
-      eeprom_write_server_ssid(ssid);
       Serial.println("ssid: " + eeprom_read_server_ssid());
       Serial.println("pass: " + ServerPASS);
   //    eeprom_write_state(RealCheck);
@@ -202,6 +200,8 @@ void handle_reconnect() // подключение к точке доступа
         Serial.println("connecting to wifi");
         delay(450);
       }
+      eeprom_write_state_wifi_mode(1);
+      eeprom_write_server_ssid(ssid);
       String ip = WiFi.localIP().toString().c_str(); 
       Serial.println("my ip in current network: " + ip);
     

@@ -71,6 +71,7 @@
         <Filename Value="usett.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frSett"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uSett"/>
       </Unit5>

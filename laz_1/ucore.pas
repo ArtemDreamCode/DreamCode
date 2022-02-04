@@ -23,7 +23,7 @@ type
     procedure DoPing_nmap;
     procedure DoPing;
     procedure DoState;
-    procedure DoControll;
+    procedure DoGUIControll;
     function CheckDevice(AValue: string): Boolean;
   protected
     procedure Execute; override;
@@ -40,6 +40,7 @@ type
     procedure LabelCountProc;
     procedure ChangeState;
   public
+    procedure DoProcess;
     property AppPath: string read FAppPath write FAppPath;
     property DeviceList: TDeviceList read FDeviceList;
     property NewDeviceList: TDeviceList read FNewDeviceList;
@@ -59,13 +60,18 @@ procedure TPingProcess.Execute;
 begin
   while not Terminated do
   begin
-     DoPing;
-     Synchronize(@ShowStatePingOk);
-     DoState;
-     Synchronize(@ShowStateStateOk);
-     DoControll;
+     DoProcess;
      sleep(c_execute_timeout);
   end;
+end;
+
+procedure TPingProcess.DoProcess;
+begin
+  DoPing;
+  Synchronize(@ShowStatePingOk);
+  DoState;
+  Synchronize(@ShowStateStateOk);
+  DoGUIControll;
 end;
 
 procedure TPingProcess.DoPing_nmap;
@@ -153,24 +159,26 @@ begin
    finally
      ip_map.Free;
      ip_dest_map.Free;
+     synchronize(@ShowStatePinged);
    end;
-   synchronize(@ShowStatePinged);
 end;
 
 procedure TPingProcess.DoState;
 var
   ip: string;
 begin
-  if FPingedList.Count = 0 then
-    Exit;
- FDeviceList.Clear;
- FOldDeviceList.Clear;
- FNewDeviceList.Clear;
+  FDeviceList.Clear;
+  FOldDeviceList.Clear;
+  FNewDeviceList.Clear;
+  try
+    if FPingedList.Count = 0 then
+      Exit;
 
- for ip in FPingedList do
-  CheckDevice(ip);
-
- Synchronize(@ShowStateDevices);
+    for ip in FPingedList do
+     CheckDevice(ip);
+  finally
+    Synchronize(@ShowStateDevices);
+  end;
 end;
 
 {controll by FOldDeviceList FNewDeviceList}
@@ -184,7 +192,7 @@ http://172.20.10.14/fullreset
 
 http://192.168.4.100/scan
 }
-procedure TPingProcess.DoControll;
+procedure TPingProcess.DoGUIControll;
 begin
   Synchronize(@BuildLVOld);
   Synchronize(@BuildLVNew);
@@ -306,11 +314,11 @@ begin
     MainForm.lv_Old.Clear;
     num := 0;
     try
-     for i:= 0 to 30 do
+ //    for i:= 0 to 30 do
       for p in FOldDeviceList.List do
       begin
         Inc(num);
-        with MainForm.lv_OLd.Items.Add do
+        with MainForm.lv_Old.Items.Add do
         begin
            Caption:= num.ToString + '.';
            if SameText(p.State, 'off') then
@@ -337,13 +345,13 @@ var
   num, i, iSelIndex: Integer;
 begin
   iSelIndex := -1;
-  if MainForm.lv_Old.Selected <> nil then
-    iSelIndex := MainForm.lv_Old.Selected.Index;
-  MainForm.lv_Old.BeginUpdate;
+  if MainForm.lv_New.Selected <> nil then
+    iSelIndex := MainForm.lv_New.Selected.Index;
+  MainForm.lv_New.BeginUpdate;
   MainForm.lv_New.Clear;
   num := 0;
   try
-   for i:= 0 to 30 do
+//   for i:= 0 to 30 do
     for p in FNewDeviceList.List do
     begin
       Inc(num);
@@ -360,9 +368,9 @@ begin
       end;
     end;
   finally
-    if (iSelIndex < MainForm.lv_Old.Items.Count) and (iSelIndex > -1) then
-       MainForm.lv_Old.Selected := MainForm.lv_Old.Items[iSelIndex];
-    MainForm.lv_Old.EndUpdate;
+    if (iSelIndex < MainForm.lv_New.Items.Count) and (iSelIndex > -1) then
+       MainForm.lv_New.Selected := MainForm.lv_New.Items[iSelIndex];
+    MainForm.lv_New.EndUpdate;
   end;
 end;
 
@@ -382,7 +390,11 @@ begin
   pTabNew.Enabled:= NewDeviceList.Count > 0;
 
   if (DeviceList.Count = 0) and (pgc.ActivePage = tsSett) then
+  begin
      pgc.ActivePage := tsMain;
+     if Assigned(MainForm.SettingsForm) then
+        MainForm.SettingsForm.Close;
+  end;
   if (OldDeviceList.Count = 0) then
      OnCustomTabLinkClickNew;
   if (NewDeviceList.Count = 0) then
