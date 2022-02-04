@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
   ComCtrls, Arrow, EditBtn, Calendar, Grids, Buttons, ListViewFilterEdit,
-  DividerBevel, CheckBoxThemed, uCore, uTypes, Types, uSett;
+  DividerBevel, CheckBoxThemed, uCore, uTypes, Types, uSett, fpjson, process;
 
 
   { TForm1 }
@@ -49,6 +49,7 @@ type
     Panel46: TPanel;
     Panel47: TPanel;
     Panel48: TPanel;
+    MainHomePanel: TPanel;
     pTabNew: TPanel;
     pTabOld: TPanel;
     pgc_dev: TPageControl;
@@ -94,6 +95,12 @@ type
     tsControll: TTabSheet;
     tsToDo: TTabSheet;
     tsDebug: TTabSheet;
+    procedure OnHomeControllButtonMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+    procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Image1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer
+      );
     procedure lv_oldCustomDrawItem(Sender: TCustomListView; Item: TListItem;
       State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure lv_oldMouseDown(Sender: TObject; Button: TMouseButton;
@@ -165,6 +172,7 @@ procedure TForm1.AfterConstruction;
 begin
   inherited AfterConstruction;
   pgc_dev.OnChange(nil);
+//  Image1.Canvas.Pen.Width:=4;
 //  Color := RGBToColor(239, 239, 244);
 end;
 
@@ -212,19 +220,13 @@ end;
 procedure TForm1.Panel30MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
-   dev_mode: TDeviceMode;
    lv: TListView;
 begin
 
   if pgc_dev.ActivePage = ts_old then
-  begin
-    dev_mode := dmOld;
-    lv := lv_old;
-  end
-  else begin
-    dev_mode := dmNew;
+    lv := lv_old
+  else
     lv := lv_New;
-  end;
 
   if not Assigned(lv) then
     Exit;
@@ -276,6 +278,70 @@ end;
 
 procedure TForm1.lv_oldCustomDrawItem(Sender: TCustomListView; Item: TListItem;
   State: TCustomDrawState; var DefaultDraw: Boolean);
+begin
+
+end;
+
+procedure TForm1.OnHomeControllButtonMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  p: TPanel;
+  js, js_answ: TJSONData;
+  fip, state, addr,outGet: string;
+begin
+  if not (Sender is TPanel) then
+    Exit;
+  p := (Sender as TPanel);
+  js := GetJSON(p.Hint);
+  try
+    fip := js.FindPath('ip').AsString;
+    state := js.FindPath('state').AsString;
+
+    if sametext('on', state) then
+    begin
+      addr := 'http://' + fip + c_turn_off;
+      RunCommand('/curl -m 2 ' + addr, outGet);
+      js_answ := GetJSON(outGet);
+      try
+        if sametext('off', js_answ.FindPath('state').AsString) then
+        begin
+          p.Color:= clWhite;
+          p.Hint:= '{ip:'+ chr(39) + fIp + chr(39) +',state:'
+                 + chr(39) + 'off' + chr(39) +'}';
+        end;
+      finally
+        js_answ.free;
+      end;
+    end
+    else
+    begin
+      addr := 'http://' + fip + c_turn_on;
+      RunCommand('/curl -m 2 ' + addr, outGet);
+      js_answ := GetJSON(outGet);
+      try
+        if sametext('on', js_answ.FindPath('state').AsString) then
+        begin
+          p.Color:= clGreen;
+          p.Hint:= '{ip:'+ chr(39) + fIp + chr(39) +',state:'
+                 + chr(39) + 'on' + chr(39) +'}';
+        end;
+      finally
+        js_answ.free;
+      end;
+    end;
+  finally
+    js.Free;
+  end;
+end;
+
+procedure TForm1.Image1MouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+
+end;
+
+procedure TForm1.Image1MouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
 begin
 
 end;

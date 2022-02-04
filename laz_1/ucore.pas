@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils,
    process, fpjson,
-   jsonparser, jsonscanner, uTypes, ExtCtrls;
+   jsonparser, jsonscanner, uTypes, ExtCtrls, StdCtrls, Controls, Graphics;
 
 { TPingProcess }
 type
@@ -19,6 +19,7 @@ type
   private
     FAppPath: string;
     fdebuginfo: string;
+    FHomeCotrollButton: THomeCotrollButton;
 // core info
     procedure DoPing_nmap;
     procedure DoPing;
@@ -33,11 +34,12 @@ type
     procedure ShowStatePingOk;
     procedure ShowStateStateOk;
     procedure log;
-// interface info
+// GUI interface info
     procedure ChangeMainFon;
     procedure BuildLVOld;
     procedure BuildLVNew;
     procedure LabelCountProc;
+    procedure BuildHomeButton;
     procedure ChangeState;
   public
     procedure DoProcess;
@@ -45,6 +47,7 @@ type
     property DeviceList: TDeviceList read FDeviceList;
     property NewDeviceList: TDeviceList read FNewDeviceList;
     property OldDeviceList: TDeviceList read FOldDeviceList;
+    property HomeCotrollButton: THomeCotrollButton read FHomeCotrollButton write FHomeCotrollButton;
     constructor Create(CreateSuspended: Boolean);
     destructor Destroy; override;
   end;
@@ -197,6 +200,7 @@ begin
   Synchronize(@BuildLVOld);
   Synchronize(@BuildLVNew);
   Synchronize(@LabelCountProc);
+  Synchronize(@BuildHomeButton);
   Synchronize(@ChangeState);
 
  {  if (FDeviceList.Count = 0) then
@@ -378,6 +382,42 @@ procedure TPingProcess.LabelCountProc;
 begin
   MainForm.lb_cnt_sett.Visible:= FNewDeviceList.Count > 0;
   MainForm.lb_cnt_sett.Caption:= FNewDeviceList.Count.ToString;
+end;
+
+procedure TPingProcess.BuildHomeButton;
+var
+  d: TDevice;
+  p: TPanel;
+  k, i, iSelIndex: Integer;
+begin
+  k := 0;
+
+  for p in FHomeCotrollButton do
+      p.Free;
+
+  SetLength(FHomeCotrollButton, k);
+
+  for d in FOldDeviceList.List do
+  begin
+    Inc(k);
+    SetLength(FHomeCotrollButton, k);
+    FHomeCotrollButton[k - 1] := TPanel.Create(MainForm.MainHomePanel);
+    FHomeCotrollButton[k - 1].Align := alTop;
+    FHomeCotrollButton[k - 1].Height:= 70;
+    FHomeCotrollButton[k - 1].BevelInner:= bvLowered;
+    FHomeCotrollButton[k - 1].BevelInner:= bvRaised;
+    FHomeCotrollButton[k - 1].Caption:= d.Name;
+    FHomeCotrollButton[k - 1].ShowHint:= False;
+    FHomeCotrollButton[k - 1].Hint:= '{ip:'+ chr(39) + d.Ip + chr(39) +',state:'
+                                             + chr(39) + d.State + chr(39) +'}';
+    if SameText('on', d.State) then
+       FHomeCotrollButton[k - 1].Color:= clGreen
+    else
+       FHomeCotrollButton[k - 1].Color:= clWhite;
+
+    FHomeCotrollButton[k - 1].Parent := MainForm.MainHomePanel;
+    FHomeCotrollButton[k - 1].OnMouseUp:= @MainForm.OnHomeControllButtonMouseUp;
+  end;
 end;
 
 procedure TPingProcess.ChangeState;

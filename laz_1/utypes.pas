@@ -7,7 +7,7 @@ unit uTypes;
 interface
 
 uses
-  Classes, SysUtils, process;
+  Classes, SysUtils, process, StdCtrls, ExtCtrls;
 
 const
   c_ping_count   = '1';
@@ -21,9 +21,12 @@ const
   c_turn_on = '/relay?turn=on';
   c_turn_off = '/relay?turn=off';
   c_Device_GUID = 'NewDev';
+  c_MaxDevice = 20;
 
 type
-   TDeviceMode = (dmNew, dmOld);
+
+ THomeCotrollButton = array of TPanel;
+
  //PDevice = ^TDevice;
  TDevice = packed record
     Ip: string;

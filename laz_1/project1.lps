@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="12">
+    <Units Count="16">
       <Unit0>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -36,8 +36,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="uTypes"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="10"/>
-        <CursorPos X="12" Y="21"/>
+        <CursorPos X="49" Y="10"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -45,13 +44,16 @@
         <Filename Value="ucore.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="uCore"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="61"/>
-        <CursorPos X="15" Y="75"/>
+        <TopLine Value="397"/>
+        <CursorPos X="18" Y="420"/>
         <UsageCount Value="217"/>
-        <Bookmarks Count="2">
-          <Item0 Y="388"/>
-          <Item1 X="15" Y="75" ID="1"/>
+        <Bookmarks Count="4">
+          <Item0 Y="428"/>
+          <Item1 X="15" Y="78" ID="1"/>
+          <Item2 X="49" Y="421" ID="3"/>
+          <Item3 Y="232" ID="4"/>
         </Bookmarks>
         <Loaded Value="True"/>
       </Unit4>
@@ -63,9 +65,9 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uSett"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="26"/>
-        <CursorPos X="20" Y="31"/>
-        <UsageCount Value="41"/>
+        <TopLine Value="89"/>
+        <CursorPos X="22" Y="95"/>
+        <UsageCount Value="45"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit5>
@@ -74,12 +76,12 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="270"/>
-        <CursorPos X="35" Y="283"/>
+        <TopLine Value="299"/>
+        <CursorPos Y="292"/>
         <UsageCount Value="106"/>
-        <Bookmarks Count="1">
-          <Item0 Y="209" ID="2"/>
+        <Bookmarks Count="2">
+          <Item0 Y="217" ID="2"/>
+          <Item1 X="18" Y="285" ID="5"/>
         </Bookmarks>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -88,16 +90,16 @@
         <Filename Value="/usr/lib/lazarus/2.0.6/lcl/controls.pp"/>
         <UnitName Value="Controls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="46"/>
-        <CursorPos X="3" Y="51"/>
-        <UsageCount Value="8"/>
+        <TopLine Value="1496"/>
+        <CursorPos X="49" Y="1501"/>
+        <UsageCount Value="10"/>
       </Unit7>
       <Unit8>
         <Filename Value="/usr/lib/lazarus/2.0.6/lcl/forms.pp"/>
         <UnitName Value="Forms"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="616"/>
-        <CursorPos X="15" Y="629"/>
+        <CursorPos X="15" Y="623"/>
         <UsageCount Value="10"/>
       </Unit8>
       <Unit9>
@@ -122,127 +124,155 @@
         <CursorPos X="11" Y="1261"/>
         <UsageCount Value="9"/>
       </Unit11>
+      <Unit12>
+        <Filename Value="/usr/lib/lazarus/2.0.6/lcl/stdctrls.pp"/>
+        <UnitName Value="StdCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1218"/>
+        <CursorPos X="14" Y="1234"/>
+        <UsageCount Value="11"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="/usr/lib/lazarus/2.0.6/lcl/graphics.pp"/>
+        <UnitName Value="Graphics"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="14" Y="17"/>
+        <UsageCount Value="10"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="/usr/lib/lazarus/2.0.6/lcl/extctrls.pp"/>
+        <UnitName Value="ExtCtrls"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="14" Y="17"/>
+        <UsageCount Value="10"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/packages/fcl-json/src/fpjson.pp"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="25" Y="19"/>
+        <UsageCount Value="10"/>
+      </Unit15>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="238" Column="18" TopLine="224"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="245" Column="45" TopLine="228"/>
       </Position1>
       <Position2>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="104" Column="15" TopLine="91"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="398" Column="7" TopLine="394"/>
       </Position2>
       <Position3>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="103" Column="15" TopLine="91"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="418" Column="65" TopLine="394"/>
       </Position3>
       <Position4>
         <Filename Value="uMain.pas"/>
-        <Caret Line="291" Column="3" TopLine="276"/>
+        <Caret Line="98" Column="42" TopLine="85"/>
       </Position4>
       <Position5>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="266" Column="18" TopLine="252"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="418" Column="67" TopLine="394"/>
       </Position5>
       <Position6>
         <Filename Value="uMain.pas"/>
-        <Caret Line="269" Column="10" TopLine="252"/>
+        <Caret Line="289" TopLine="270"/>
       </Position6>
       <Position7>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="179" Column="4" TopLine="165"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="239" Column="12" TopLine="230"/>
       </Position7>
       <Position8>
         <Filename Value="uMain.pas"/>
-        <Caret Line="291" Column="54" TopLine="280"/>
+        <Caret Line="298" Column="13" TopLine="270"/>
       </Position8>
       <Position9>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="162" Column="12" TopLine="144"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="243" Column="60" TopLine="227"/>
       </Position9>
       <Position10>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="200" Column="27" TopLine="189"/>
+        <Filename Value="uMain.pas"/>
+        <Caret Line="293" Column="34" TopLine="276"/>
       </Position10>
       <Position11>
-        <Filename Value="usett.pas"/>
-        <Caret Line="40" Column="63" TopLine="29"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="420" Column="49" TopLine="406"/>
       </Position11>
       <Position12>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="214" Column="22" TopLine="208"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="232" TopLine="235"/>
       </Position12>
       <Position13>
         <Filename Value="uMain.pas"/>
-        <Caret Line="147" Column="73" TopLine="121"/>
+        <Caret Line="308" Column="25" TopLine="290"/>
       </Position13>
       <Position14>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="138" TopLine="124"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="232" TopLine="220"/>
       </Position14>
       <Position15>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="142" Column="36" TopLine="124"/>
+        <Filename Value="usett.pas"/>
+        <Caret Line="98" Column="25" TopLine="86"/>
       </Position15>
       <Position16>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="396" Column="35" TopLine="383"/>
+        <Filename Value="uMain.pas"/>
+        <Caret Line="10" Column="77"/>
       </Position16>
       <Position17>
         <Filename Value="uMain.pas"/>
-        <Caret Line="226" Column="35" TopLine="208"/>
+        <Caret Line="290" Column="32" TopLine="276"/>
       </Position17>
       <Position18>
-        <Filename Value="usett.pas"/>
-        <Caret Line="38" Column="43" TopLine="20"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="387" Column="39" TopLine="400"/>
       </Position18>
       <Position19>
         <Filename Value="uMain.pas"/>
-        <Caret Line="227" Column="42" TopLine="208"/>
+        <Caret Line="98" Column="42" TopLine="85"/>
       </Position19>
       <Position20>
-        <Filename Value="usett.pas"/>
-        <Caret Line="40" Column="37" TopLine="26"/>
+        <Filename Value="uMain.pas"/>
+        <Caret Line="292" TopLine="276"/>
       </Position20>
       <Position21>
-        <Filename Value="usett.pas"/>
-        <Caret Line="47" Column="20" TopLine="33"/>
+        <Filename Value="uMain.pas"/>
+        <Caret Line="294" TopLine="279"/>
       </Position21>
       <Position22>
-        <Filename Value="ucore.pas"/>
-        <Caret Line="396" Column="36" TopLine="383"/>
+        <Filename Value="uMain.pas"/>
+        <Caret Line="298" Column="32" TopLine="292"/>
       </Position22>
       <Position23>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="227" Column="42" TopLine="205"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="232" TopLine="224"/>
       </Position23>
       <Position24>
         <Filename Value="uMain.pas"/>
-        <Caret Line="207" Column="6" TopLine="205"/>
+        <Caret Line="285" Column="18" TopLine="249"/>
       </Position24>
       <Position25>
         <Filename Value="ucore.pas"/>
-        <Caret Line="397" Column="17" TopLine="383"/>
+        <Caret Line="232" TopLine="224"/>
       </Position25>
       <Position26>
         <Filename Value="ucore.pas"/>
-        <Caret Line="75" Column="15" TopLine="61"/>
+        <Caret Line="410" Column="45" TopLine="396"/>
       </Position26>
       <Position27>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="220" Column="21" TopLine="208"/>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="415" Column="76" TopLine="397"/>
       </Position27>
       <Position28>
-        <Filename Value="usett.pas"/>
-        <Caret Line="48" TopLine="34"/>
+        <Filename Value="utypes.pas"/>
+        <Caret Line="10" Column="49"/>
       </Position28>
       <Position29>
-        <Filename Value="usett.pas"/>
-        <Caret Line="45" Column="19" TopLine="22"/>
+        <Filename Value="uMain.pas"/>
+        <Caret Line="318" Column="39" TopLine="299"/>
       </Position29>
       <Position30>
-        <Filename Value="uMain.pas"/>
-        <Caret Line="150" Column="36" TopLine="138"/>
+        <Filename Value="usett.pas"/>
+        <Caret Line="95" Column="22" TopLine="89"/>
       </Position30>
     </JumpHistory>
     <RunParams>
@@ -250,15 +280,4 @@
       <Modes Count="0" ActiveMode=""/>
     </RunParams>
   </ProjectSession>
-  <Debugging>
-    <BreakPoints Count="1">
-      <Item1>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="uMain.pas"/>
-        <Line Value="304"/>
-      </Item1>
-    </BreakPoints>
-  </Debugging>
 </CONFIG>
