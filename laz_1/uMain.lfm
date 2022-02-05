@@ -426,6 +426,10 @@ object Form1: TForm1
               item
                 Caption = 'state'
                 Visible = False
+              end            
+              item
+                Caption = 'isnewdevice'
+                Visible = False
               end>
             Font.Height = -35
             Font.Name = 'Veles'
@@ -617,8 +621,8 @@ object Form1: TForm1
         HorzScrollBar.Page = 1
         VertScrollBar.Page = 475
         Align = alClient
-        ClientHeight = 521
-        ClientWidth = 946
+        ClientHeight = 523
+        ClientWidth = 948
         TabOrder = 0
         object Panel4: TPanel
           Left = 0

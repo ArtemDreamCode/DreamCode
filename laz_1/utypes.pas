@@ -15,11 +15,14 @@ const
   c_base_mask = '192.168.0.';
   c_min_range = 100;
   c_max_range = 125;
-  c_execute_timeout = 5000;
+  c_execute_timeout = 10000;
   c_is_ok: array[Boolean] of string = ('Bad', 'Ok');
   c_state = '/state';
   c_turn_on = '/relay?turn=on';
   c_turn_off = '/relay?turn=off';
+  c_change_name = '/set?name=';
+  c_reset = '/reset';
+  c_fullreset = '/fullreset';
   c_Device_GUID = 'NewDev';
   c_MaxDevice = 20;
 

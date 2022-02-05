@@ -230,7 +230,7 @@ var
 begin
   Result := False;
   addr := 'http://' + AValue + c_state;
-  RunCommand('/curl -m 2 ' + addr, outGet);
+  RunCommand('/curl -m 5 ' + addr, outGet);
   Result := pos(c_Device_GUID, outGet) > 0; //NewTechDev
 
     if Result then
@@ -333,7 +333,7 @@ begin
            SubItems.Add(p.Name);
            SubItems.Add(p.Ip);
            SubItems.Add(p.State);
-
+           SubItems.Add(p.IsNewDevice);
         end;
       end;
     finally
@@ -369,6 +369,7 @@ begin
          SubItems.Add(p.Name);
          SubItems.Add(p.Ip);
          SubItems.Add(p.State);
+         SubItems.Add(p.IsNewDevice);
       end;
     end;
   finally

@@ -260,6 +260,7 @@ begin
   pShNew.Pen.Width:= 3;
   //------------------
   pShOld.Pen.Width:= 1;
+  pTabNew.Enabled := True;
 end;
 
 procedure TForm1.lv_oldMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -358,6 +359,7 @@ begin
   pShOLd.Pen.Width:= 3;
   //------------------
   pShNew.Pen.Width:= 1;
+  pTabOld.Enabled := True;
 end;
 
 procedure TForm1.Panel3MouseUp(Sender: TObject; Button: TMouseButton;
