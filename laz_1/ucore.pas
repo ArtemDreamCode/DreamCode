@@ -318,7 +318,7 @@ begin
     MainForm.lv_Old.Clear;
     num := 0;
     try
- //    for i:= 0 to 30 do
+     for i:= 0 to 30 do
       for p in FOldDeviceList.List do
       begin
         Inc(num);
@@ -355,7 +355,7 @@ begin
   MainForm.lv_New.Clear;
   num := 0;
   try
-//   for i:= 0 to 30 do
+   for i:= 0 to 30 do
     for p in FNewDeviceList.List do
     begin
       Inc(num);

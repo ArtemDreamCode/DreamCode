@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 489
+  Left = 552
   Height = 556
-  Top = 254
+  Top = 213
   Width = 960
   Caption = 'Form1'
   ClientHeight = 556
@@ -16,9 +16,9 @@ object Form1: TForm1
     Height = 556
     Top = 0
     Width = 960
-    ActivePage = tsSett
+    ActivePage = tsControll
     Align = alClient
-    TabIndex = 1
+    TabIndex = 2
     TabOrder = 0
     object tsMain: TTabSheet
       Caption = 'tsMain'
@@ -598,6 +598,23 @@ object Form1: TForm1
           BevelOuter = bvNone
           TabOrder = 3
         end
+        object pEdit1: TPanel
+          Left = 832
+          Height = 84
+          Top = 18
+          Width = 94
+          Align = alRight
+          BevelInner = bvSpace
+          BevelWidth = 2
+          Caption = '🔨'
+          Color = clBtnFace
+          Font.Height = -48
+          Font.Name = 'Inter V'
+          ParentColor = False
+          ParentFont = False
+          TabOrder = 4
+          OnMouseUp = pEditMouseUp
+        end
       end
       object MainHomePanel: TPanel
         Left = 0
@@ -606,213 +623,115 @@ object Form1: TForm1
         Width = 950
         Align = alClient
         BevelOuter = bvNone
+        ClientHeight = 405
+        ClientWidth = 950
         TabOrder = 1
+        object PageControl2: TPageControl
+          Left = 144
+          Height = 200
+          Top = 88
+          Width = 200
+          ActivePage = TabSheet3
+          TabIndex = 2
+          TabOrder = 0
+          TabPosition = tpLeft
+          object TabSheet1: TTabSheet
+            Caption = 'TabSheet1'
+          end
+          object TabSheet2: TTabSheet
+            Caption = 'TabSheet2'
+          end
+          object TabSheet3: TTabSheet
+            Caption = 'TabSheet3'
+          end
+        end
       end
     end
     object tsToDo: TTabSheet
       Caption = 'tsToDo'
       ClientHeight = 525
       ClientWidth = 950
-      object ScrollBox1: TScrollBox
+      object Panel4: TPanel
         Left = 0
-        Height = 525
+        Height = 120
         Top = 0
         Width = 950
-        HorzScrollBar.Page = 1
-        VertScrollBar.Page = 475
-        Align = alClient
-        ClientHeight = 523
-        ClientWidth = 948
+        Align = alTop
+        BevelOuter = bvNone
+        ClientHeight = 120
+        ClientWidth = 950
         TabOrder = 0
-        object Panel4: TPanel
-          Left = 0
-          Height = 25
-          Top = 0
-          Width = 948
-          Align = alTop
-          Caption = 'Panel4'
-          TabOrder = 0
-        end
         object Panel5: TPanel
           Left = 0
-          Height = 25
-          Top = 150
-          Width = 948
-          Align = alTop
-          Caption = 'Panel5'
+          Height = 84
+          Top = 18
+          Width = 72
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '◃'
+          Font.Height = -48
+          Font.Name = 'Inter V'
+          ParentFont = False
+          TabOrder = 0
+          OnMouseUp = Panel3MouseUp
+        end
+        object pEdit: TPanel
+          Left = 832
+          Height = 84
+          Top = 18
+          Width = 94
+          Align = alRight
+          BevelInner = bvSpace
+          BevelWidth = 2
+          Caption = '🔨'
+          Color = clBtnFace
+          Font.Height = -48
+          Font.Name = 'Inter V'
+          ParentColor = False
+          ParentFont = False
           TabOrder = 1
+          OnMouseUp = pEditMouseUp
         end
-        object Panel6: TPanel
-          Tag = 5
-          Left = 0
-          Height = 25
-          Top = 125
-          Width = 948
-          Align = alTop
-          Caption = 'Panel6'
+        object Panel50: TPanel
+          Left = 926
+          Height = 84
+          Top = 18
+          Width = 24
+          Align = alRight
+          BevelOuter = bvNone
+          Font.Height = -48
+          Font.Name = 'Inter V'
+          ParentFont = False
           TabOrder = 2
+          OnMouseDown = Panel31MouseDown
         end
-        object Panel7: TPanel
-          Tag = 4
+        object Panel51: TPanel
           Left = 0
-          Height = 25
-          Top = 100
-          Width = 948
+          Height = 18
+          Top = 0
+          Width = 950
           Align = alTop
-          Caption = 'Panel7'
+          BevelOuter = bvNone
           TabOrder = 3
         end
-        object Panel8: TPanel
-          Tag = 3
+        object Panel52: TPanel
           Left = 0
-          Height = 25
-          Top = 75
-          Width = 948
-          Align = alTop
-          Caption = 'Panel8'
+          Height = 18
+          Top = 102
+          Width = 950
+          Align = alBottom
+          BevelOuter = bvNone
           TabOrder = 4
         end
-        object Panel9: TPanel
-          Tag = 2
-          Left = 0
-          Height = 25
-          Top = 50
-          Width = 948
-          Align = alTop
-          Caption = 'Panel9'
+        object Panel53: TPanel
+          Left = 72
+          Height = 84
+          Top = 18
+          Width = 10
+          Align = alLeft
+          BevelOuter = bvNone
           TabOrder = 5
         end
-        object Panel10: TPanel
-          Tag = 1
-          Left = 0
-          Height = 25
-          Top = 25
-          Width = 948
-          Align = alTop
-          Caption = 'Panel10'
-          TabOrder = 6
-        end
-        object Panel11: TPanel
-          Left = 0
-          Height = 25
-          Top = 450
-          Width = 948
-          Align = alTop
-          Caption = 'Panel11'
-          TabOrder = 7
-        end
-        object Panel12: TPanel
-          Left = 0
-          Height = 25
-          Top = 425
-          Width = 948
-          Align = alTop
-          Caption = 'Panel12'
-          TabOrder = 8
-          Visible = False
-        end
-        object Panel13: TPanel
-          Left = 0
-          Height = 25
-          Top = 400
-          Width = 948
-          Align = alTop
-          Caption = 'Panel13'
-          TabOrder = 9
-          Visible = False
-        end
-        object Panel14: TPanel
-          Left = 0
-          Height = 25
-          Top = 375
-          Width = 948
-          Align = alTop
-          Caption = 'Panel14'
-          TabOrder = 10
-          Visible = False
-        end
-        object Panel15: TPanel
-          Left = 0
-          Height = 25
-          Top = 350
-          Width = 948
-          Align = alTop
-          Caption = 'Panel15'
-          TabOrder = 11
-        end
-        object Panel16: TPanel
-          Left = 0
-          Height = 25
-          Top = 325
-          Width = 948
-          Align = alTop
-          Caption = 'Panel16'
-          TabOrder = 12
-        end
-        object Panel17: TPanel
-          Left = 0
-          Height = 25
-          Top = 300
-          Width = 948
-          Align = alTop
-          Caption = 'Panel17'
-          TabOrder = 13
-        end
-        object Panel18: TPanel
-          Left = 0
-          Height = 25
-          Top = 275
-          Width = 948
-          Align = alTop
-          Caption = 'Panel18'
-          TabOrder = 14
-        end
-        object Panel19: TPanel
-          Tag = 8
-          Left = 0
-          Height = 25
-          Top = 250
-          Width = 948
-          Align = alTop
-          Caption = 'Panel19'
-          TabOrder = 15
-        end
-        object Panel20: TPanel
-          Tag = 7
-          Left = 0
-          Height = 25
-          Top = 225
-          Width = 948
-          Align = alTop
-          Caption = 'Panel20'
-          TabOrder = 16
-        end
-        object Panel21: TPanel
-          Left = 0
-          Height = 25
-          Top = 200
-          Width = 948
-          Align = alTop
-          Caption = 'Panel21'
-          TabOrder = 17
-        end
-        object Panel22: TPanel
-          Tag = 6
-          Left = 0
-          Height = 25
-          Top = 175
-          Width = 948
-          Align = alTop
-          Caption = 'Panel22'
-          TabOrder = 18
-        end
-      end
-      object m: TMemo
-        Left = 32
-        Height = 54
-        Top = 8
-        Width = 150
-        TabOrder = 1
       end
     end
     object tsDebug: TTabSheet
@@ -926,7 +845,7 @@ object Form1: TForm1
   end
   object tm_time: TTimer
     OnTimer = tm_timeTimer
-    left = 912
-    top = 48
+    left = 880
+    top = 160
   end
 end

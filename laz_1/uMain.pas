@@ -23,10 +23,10 @@ type
     lb_time: TLabel;
     lv_old: TListView;
     lv_new: TListView;
-    m: TMemo;
     m_state: TMemo;
     m_device: TMemo;
     m_all_proc: TMemo;
+    PageControl2: TPageControl;
     Panel27: TPanel;
     Panel28: TPanel;
     Panel29: TPanel;
@@ -40,6 +40,7 @@ type
     Panel37: TPanel;
     Panel38: TPanel;
     Panel39: TPanel;
+    Panel4: TPanel;
     Panel40: TPanel;
     Panel41: TPanel;
     Panel42: TPanel;
@@ -50,43 +51,33 @@ type
     Panel47: TPanel;
     Panel48: TPanel;
     MainHomePanel: TPanel;
+    pEdit: TPanel;
+    Panel5: TPanel;
+    Panel50: TPanel;
+    Panel51: TPanel;
+    Panel52: TPanel;
+    Panel53: TPanel;
+    pEdit1: TPanel;
     pTabNew: TPanel;
     pTabOld: TPanel;
     pgc_dev: TPageControl;
-    Panel10: TPanel;
-    Panel11: TPanel;
-    Panel12: TPanel;
-    Panel13: TPanel;
-    Panel14: TPanel;
-    Panel15: TPanel;
-    Panel16: TPanel;
-    Panel17: TPanel;
-    Panel18: TPanel;
-    Panel19: TPanel;
     Panel2: TPanel;
-    Panel20: TPanel;
-    Panel21: TPanel;
-    Panel22: TPanel;
     Panel23: TPanel;
     Panel24: TPanel;
     Panel25: TPanel;
     Panel26: TPanel;
     Panel3: TPanel;
-    Panel4: TPanel;
-    Panel5: TPanel;
-    Panel6: TPanel;
-    Panel7: TPanel;
-    Panel8: TPanel;
-    Panel9: TPanel;
     pgc: TPageControl;
     Panel1: TPanel;
-    ScrollBox1: TScrollBox;
     pShOld: TShape;
     pShNew: TShape;
     sh_sett: TShape;
     sh_home: TShape;
     Shape3: TShape;
     Shape4: TShape;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    TabSheet3: TTabSheet;
     ts_old: TTabSheet;
     ts_new: TTabSheet;
     tm_time: TTimer;
@@ -129,6 +120,8 @@ type
     procedure Panel37Click(Sender: TObject);
     procedure Panel3MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure pEditMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
     procedure pgc_devChange(Sender: TObject);
     procedure pTabNewMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -137,6 +130,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure Shape3MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure shApplyChangeBounds(Sender: TObject);
     procedure sh_settMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure sh_homeMouseUp(Sender: TObject; Button: TMouseButton;
@@ -290,49 +284,60 @@ var
   js, js_answ: TJSONData;
   fip, state, addr,outGet: string;
 begin
+  if not Assigned(Sender) then // осоьенности моментов перестроение (отсутствие begin/end update)
+    Exit;
   if not (Sender is TPanel) then
     Exit;
-  p := (Sender as TPanel);
-  js := GetJSON(p.Hint);
-  try
-    fip := js.FindPath('ip').AsString;
-    state := js.FindPath('state').AsString;
 
-    if sametext('on', state) then
-    begin
-      addr := 'http://' + fip + c_turn_off;
-      RunCommand('/curl -m 2 ' + addr, outGet);
-      js_answ := GetJSON(outGet);
-      try
-        if sametext('off', js_answ.FindPath('state').AsString) then
-        begin
-          p.Color:= clWhite;
-          p.Hint:= '{ip:'+ chr(39) + fIp + chr(39) +',state:'
-                 + chr(39) + 'off' + chr(39) +'}';
+  try
+    p := (Sender as TPanel);
+    js := GetJSON(p.Hint);
+    try
+      fip := js.FindPath('ip').AsString;
+      state := js.FindPath('state').AsString;
+
+      if sametext('on', state) then
+      begin
+        addr := 'http://' + fip + c_turn_off;
+        RunCommand('/curl -m 2 ' + addr, outGet);
+        js_answ := GetJSON(outGet);
+        try
+          if sametext('off', js_answ.FindPath('state').AsString) then
+          begin
+            p.Color:= clWhite;
+            p.Hint:= '{ip:'+ chr(39) + fIp + chr(39) +',state:'
+                   + chr(39) + 'off' + chr(39) +'}';
+          end;
+        finally
+          js_answ.free;
         end;
-      finally
-        js_answ.free;
-      end;
-    end
-    else
-    begin
-      addr := 'http://' + fip + c_turn_on;
-      RunCommand('/curl -m 2 ' + addr, outGet);
-      js_answ := GetJSON(outGet);
-      try
-        if sametext('on', js_answ.FindPath('state').AsString) then
-        begin
-          p.Color:= clGreen;
-          p.Hint:= '{ip:'+ chr(39) + fIp + chr(39) +',state:'
-                 + chr(39) + 'on' + chr(39) +'}';
+        Exit;
+      end
+      else
+      begin
+        addr := 'http://' + fip + c_turn_on;
+        RunCommand('/curl -m 2 ' + addr, outGet);
+        js_answ := GetJSON(outGet);
+        try
+          if sametext('on', js_answ.FindPath('state').AsString) then
+          begin
+            p.Color:= clGreen;
+            p.Hint:= '{ip:'+ chr(39) + fIp + chr(39) +',state:'
+                   + chr(39) + 'on' + chr(39) +'}';
+          end;
+        finally
+          js_answ.free;
         end;
-      finally
-        js_answ.free;
+        Exit;
       end;
+    finally
+      js.Free;
     end;
-  finally
-    js.Free;
+
+  except
+    // хз но иногда крашится
   end;
+
 end;
 
 procedure TForm1.Image1MouseDown(Sender: TObject; Button: TMouseButton;
@@ -368,6 +373,21 @@ begin
   pgc.ActivePage := tsMain;
 end;
 
+procedure TForm1.pEditMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if pEdit.tag = 0 then
+  begin
+    pEdit.BevelInner:= bvLowered;
+    pEdit.tag := 1;
+  end
+  else
+  begin
+    pEdit.BevelInner:= bvSpace;
+    pEdit.tag := 0;
+  end;
+end;
+
 procedure TForm1.pgc_devChange(Sender: TObject);
 begin
   if pgc_dev.ActivePage = ts_old then
@@ -398,6 +418,12 @@ procedure TForm1.Shape3MouseUp(Sender: TObject; Button: TMouseButton;
 begin
   pgc.ActivePage := tsDebug;
 end;
+
+procedure TForm1.shApplyChangeBounds(Sender: TObject);
+begin
+
+end;
+
 
 procedure TForm1.sh_settMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);

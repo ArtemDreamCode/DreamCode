@@ -1,7 +1,7 @@
 object frSett: TfrSett
-  Left = 618
+  Left = 916
   Height = 221
-  Top = 439
+  Top = 683
   Width = 491
   BorderIcons = []
   BorderStyle = bsNone
