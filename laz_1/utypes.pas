@@ -15,7 +15,7 @@ const
   c_base_mask = '192.168.0.';
   c_min_range = 100;
   c_max_range = 125;
-  c_execute_timeout = 5000;
+  c_execute_timeout = 7000;
   c_is_ok: array[Boolean] of string = ('Bad', 'Ok');
   c_state = '/state';
   c_turn_on = '/relay?turn=on';
@@ -30,7 +30,6 @@ type
 
  THomeCotrollButton = array of TPanel;
 
- //PDevice = ^TDevice;
  TDevice = packed record
     Ip: string;
     DeviceClass: string;

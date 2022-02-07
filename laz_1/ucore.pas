@@ -202,23 +202,6 @@ begin
   Synchronize(@LabelCountProc);
   Synchronize(@BuildHomeButton);
   Synchronize(@ChangeState);
-
- {  if (FDeviceList.Count = 0) then
-     FChangeMainFon := FAppPath + 'img/fon_iot.jpg'
-   else
-   if (FOldDeviceList.Count > 0) and (FNewDeviceList.Count > 0) then
-     FChangeMainFon := FAppPath + 'img/fon_iot_all_balls.jpg'
-   else
-   if (FOldDeviceList.Count > 0) and (FNewDeviceList.Count = 0) then
-     FChangeMainFon := FAppPath + 'img/fon_iot_dev.jpg'
-   else
-   if (FOldDeviceList.Count = 0) and (FNewDeviceList.Count > 0) then
-     FChangeMainFon := FAppPath + 'img/fon_iot_sett.jpg'
-   else
-     FChangeMainFon := FAppPath + 'img/fon_iot.jpg';
-
-   Synchronize(@ChangeMainFon); }
-
 end;
 
 function TPingProcess.CheckDevice(AValue: string): Boolean;
@@ -230,6 +213,7 @@ var
 begin
   Result := False;
   addr := 'http://' + AValue + c_state;
+ // RunCommand('/curl --connect-timeout 10 ' + addr, outGet);
   RunCommand('/curl -m 5 ' + addr, outGet);
   Result := pos(c_Device_GUID, outGet) > 0; //NewTechDev
 
@@ -318,7 +302,7 @@ begin
     MainForm.lv_Old.Clear;
     num := 0;
     try
-     for i:= 0 to 30 do
+//     for i:= 0 to 30 do
       for p in FOldDeviceList.List do
       begin
         Inc(num);
@@ -355,7 +339,7 @@ begin
   MainForm.lv_New.Clear;
   num := 0;
   try
-   for i:= 0 to 30 do
+//   for i:= 0 to 30 do
     for p in FNewDeviceList.List do
     begin
       Inc(num);
