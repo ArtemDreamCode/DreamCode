@@ -9,6 +9,8 @@
 ESP8266WebServer server(80);
 
 WiFiClient client;  
+HTTPClient http; // for depricated Get request 
+
 int Device_Position = 0;
 bool RealCheck = false;
 int bt_state;
@@ -55,6 +57,7 @@ String GenerateAPName()
 
 void DoCheckButtonState()
 {
+  String getOut = "";
   int bt = digitalRead(5);
   if (bt != bt_state)
   { //если есть изменение состояния кнопки
@@ -62,13 +65,17 @@ void DoCheckButtonState()
      {
        RealCheck = true;
        digitalWrite(4, HIGH); //включаем
+       getOut = "http://192.168.1.2/switch?turn=on";
      }
      else if (RealCheck)
      {
        RealCheck = false;
        digitalWrite(4, LOW); //выключаем
+       getOut = "http://192.168.1.2/switch?turn=off";
      }
      eeprom_write_state(RealCheck);
+     //todo отправить гет-запрос на сервер о изменения состояния
+     String resp = get(getOut);
   }
   else
   {

@@ -167,6 +167,13 @@ void wifi_begin(String ssid, String pass){
   Serial.println(WiFi.localIP());
   digitalWrite(2, LOW); 
   Serial.println("connected"); 
+  String getOut = "";
+  
+  if (RealCheck)
+    getOut = "http://192.168.1.2/switch?turn=on";
+  else getOut = "http://192.168.1.2/switch?turn=off";
+  String resp = get(getOut); 
+  
   MacAdr = WiFi.macAddress(); //8C:AA:B5:7B:13:73
 }
 
@@ -208,4 +215,17 @@ void handle_reconnect() // подключение к точке доступа
       delay(100);
     }
   //}
+}
+
+String get(String Arequest){
+    http.setTimeout(200);
+    http.begin(client, Arequest); 
+    Serial.println(Arequest);
+    int httpCode = http.GET();
+   // log(String(httpCode)); 
+     
+    String response = http.getString();  
+    Serial.println(response);   
+    http.end();
+    return response;
 }
