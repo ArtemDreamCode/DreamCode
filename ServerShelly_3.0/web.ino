@@ -167,6 +167,7 @@ void wifi_begin(String ssid, String pass){
   Serial.println(WiFi.localIP());
   digitalWrite(2, LOW); 
   Serial.println("connected"); 
+  
   String getOut = "";
   
   if (RealCheck)

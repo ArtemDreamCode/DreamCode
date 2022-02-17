@@ -18,6 +18,8 @@ String MacAdr;
 String ClassDevice = "Shelly";
 int DeviceIndex = 0;
 String DeviceFrendlyName;
+uint32_t TimerGet; //таймер отправки гет-запроса
+const uint32_t ConstTimerGet = 30000; //30 cек
 //const char* ssid = "R_302";
 //const char* pass = "ProtProtom";
 //const char* ssid = "rostelecom_104";
@@ -66,15 +68,18 @@ void DoCheckButtonState()
        RealCheck = true;
        digitalWrite(4, HIGH); //включаем
        getOut = "http://192.168.1.2/switch?turn=on";
+       //getOut = "http://172.18.44.68/switch?turn=on";
      }
      else if (RealCheck)
      {
        RealCheck = false;
        digitalWrite(4, LOW); //выключаем
        getOut = "http://192.168.1.2/switch?turn=off";
+       //getOut = "http://172.18.44.68/switch?turn=off";
+       
      }
      eeprom_write_state(RealCheck);
-     //todo отправить гет-запрос на сервер о изменения состояния
+     ////todo отправить гет-запрос на сервер о изменения состояния
      String resp = get(getOut);
   }
   else
@@ -140,6 +145,15 @@ bool is_new_device()
 
 void loop()
 {
+  if ((millis() - TimerGet) >= ConstTimerGet)
+    if (!is_station)
+    {
+      String getOut = "";
+      if (RealCheck)
+        getOut = "http://192.168.1.2/switch?turn=on";
+      else getOut = "http://192.168.1.2/switch?turn=off";
+      String resp = get(getOut); 
+    }
   DoCheckButtonState();
   server.handleClient();  
   delay(100);
