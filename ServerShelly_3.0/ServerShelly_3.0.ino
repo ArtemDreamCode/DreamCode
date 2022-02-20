@@ -25,6 +25,7 @@ const uint32_t ConstTimerGet = 30000; //30 cек
 //const char* ssid = "rostelecom_104";
 //const char* pass = "63030723";
 
+String ServerIP = "http://192.168.1.2/";
 
 String ShellySSID = "";
 String ShellyPASS = "11001100";
@@ -67,15 +68,13 @@ void DoCheckButtonState()
      {
        RealCheck = true;
        digitalWrite(4, HIGH); //включаем
-       getOut = "http://192.168.1.2/switch?turn=on";
-       //getOut = "http://172.18.44.68/switch?turn=on";
+       getOut = ServerIP + "switch?turn=on";
      }
      else if (RealCheck)
      {
        RealCheck = false;
        digitalWrite(4, LOW); //выключаем
-       getOut = "http://192.168.1.2/switch?turn=off";
-       //getOut = "http://172.18.44.68/switch?turn=off";
+       getOut = ServerIP + "switch?turn=off";
        
      }
      eeprom_write_state(RealCheck);
@@ -146,14 +145,14 @@ bool is_new_device()
 void loop()
 {
   if ((millis() - TimerGet) >= ConstTimerGet)
-    if (!is_station)
+  {
+    TimerGet = millis();
+    if (is_station)
     {
-      String getOut = "";
-      if (RealCheck)
-        getOut = "http://192.168.1.2/switch?turn=on";
-      else getOut = "http://192.168.1.2/switch?turn=off";
+      String getOut = ServerIP + JsonToStr();
       String resp = get(getOut); 
     }
+  }
   DoCheckButtonState();
   server.handleClient();  
   delay(100);

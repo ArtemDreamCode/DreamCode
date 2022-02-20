@@ -1,6 +1,6 @@
-void handle_GetState(){ //запрос о состоянии от клиента
+String JsonToStr()
+{
   String dev_guid = GenerateAPName();
-  String resp;
   String st;
    String response = "{"; 
    if (RealCheck){
@@ -31,8 +31,12 @@ void handle_GetState(){ //запрос о состоянии от клиента
    response+= ",\"flashChipRealSize\": \""+String(ESP.getFlashChipRealSize())+"\"";
    response+= ",\"freeHeap\": \""+String(ESP.getFreeHeap())+"\"";
    response+="}";
-  
-   server.send(200, "text/html", response);
+   
+   return response;
+}
+
+void handle_GetState(){ //запрос о состоянии от клиента
+   server.send(200, "text/html", JsonToStr());
 }
 void handle_ChangeState()
 {
@@ -160,13 +164,13 @@ void wifi_begin(String ssid, String pass){
   WiFi.begin(ssid, pass);  
   while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(2, HIGH);  
-    Serial.println("connecting to wifi");
+    Serial.println("connecting to wifi: " + ssid);
     delay(450);
     DoCheckButtonState();
   }
   Serial.println(WiFi.localIP());
   digitalWrite(2, LOW); 
-  Serial.println("connected"); 
+  Serial.println("connected to " + ssid); 
   
   String getOut = "";
   
