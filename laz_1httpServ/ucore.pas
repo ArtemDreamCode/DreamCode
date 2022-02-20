@@ -14,13 +14,16 @@ type
   { TServerProcess }
   TServerProcess  = class(TThread)
   private
+    _Error: string;
     FServer: TFPHttpServer;
   // route
     procedure OnRequest(Sender: TObject; Var ARequest: TFPHTTPConnectionRequest; Var AResponse : TFPHTTPConnectionResponse);
   protected
     procedure Execute; override;
   public
-//    constructor Create(CreateSuspended: Boolean);
+    procedure StopResource;
+    constructor Create(CreateSuspended: Boolean);
+    destructor Destroy; override;
   end;
 
   TPingProcess = class(TThread)
@@ -94,11 +97,37 @@ end;
 
 procedure TServerProcess.Execute;
 begin
-  FServer := TFPHttpServer.Create(nil);
-  FServer.port := 8080;
-  FServer.threaded := true;
-  FServer.OnRequest := @OnRequest;
-  FServer.Active:= true;
+ try
+    FServer.Active := True;
+  except
+    on E: Exception do
+    begin
+      _Error := E.Message;
+    end;
+  end;
+end;
+
+procedure TServerProcess.StopResource;
+begin
+ FServer.Active:= False;
+end;
+
+constructor TServerProcess.Create(CreateSuspended: Boolean);
+begin
+ FServer := TFPHttpServer.Create(nil);
+ FServer.port := 8080;
+ FServer.threaded := true;
+ FServer.OnRequest := @OnRequest;
+ FreeOnTerminate := true;
+ inherited Create(False);
+ // FServer.Active:= true;
+//  FServer.OnAllowConnect:= ;
+end;
+
+destructor TServerProcess.Destroy;
+begin
+ // FServer.Free;
+  inherited Destroy;
 end;
 
 { TPingProcess }

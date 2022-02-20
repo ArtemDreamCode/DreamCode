@@ -183,7 +183,7 @@ end;
 
 procedure TForm1.BeforeDestruction;
 begin
-  KillProcessPing;
+//  KillProcessPing;
   KillProcessServer;
   inherited BeforeDestruction;
 end;
@@ -479,7 +479,7 @@ end;
 procedure TForm1.DoShow;
 begin
   inherited DoShow;
-  RunProcessPing;
+//  RunProcessPing;
   RunProcessServer;
 end;
 
@@ -487,7 +487,7 @@ procedure TForm1.RunProcessServer;
 begin
   if Assigned(FServerProcess) then
      FServerProcess.Terminate;
-   FServerProcess := TServerProcess.Create(False);
+   FServerProcess := TServerProcess.Create(True);
    FServerProcess.Priority := tpLower;
 end;
 
@@ -509,9 +509,10 @@ end;
 
 procedure TForm1.KillProcessServer;
 begin
-  FServerProcess.Terminate;
-  FServerProcess.WaitFor;
-  FreeAndNil(FServerProcess);
+  FServerProcess.StopResource;
+//  FServerProcess.Terminate;
+//  FServerProcess.WaitFor;
+//  FreeAndNil(FServerProcess);
 end;
 
 end.

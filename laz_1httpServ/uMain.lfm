@@ -82,9 +82,9 @@ object Form1: TForm1
         end
         object lb_date: TLabel
           Left = 16
-          Height = 31
+          Height = 36
           Top = 48
-          Width = 76
+          Width = 82
           Caption = 'date'
           Font.Height = -32
           Font.Name = 'Veles'
@@ -201,7 +201,7 @@ object Form1: TForm1
           end
           object lb_cnt_sett: TLabel
             Left = 151
-            Height = 52
+            Height = 61
             Top = 8
             Width = 37
             Align = alCustom
@@ -218,9 +218,9 @@ object Form1: TForm1
         end
         object lb_time: TLabel
           Left = 16
-          Height = 31
+          Height = 36
           Top = 80
-          Width = 73
+          Width = 81
           Caption = 'time'
           Font.Height = -32
           Font.Name = 'Veles'
