@@ -22,14 +22,14 @@ String JsonToStr()
    else 
       response+= ",\"isnewdevice\": \"new\"";
    response+= ",\"mac\": \""+WiFi.macAddress()+"\"";   
-   response+= ",\"gw\": \""+WiFi.gatewayIP().toString()+"\"";
-   response+= ",\"nm\": \""+WiFi.subnetMask().toString()+"\"";
-   response+= ",\"signalStrengh\": \""+String(WiFi.RSSI())+"\"";
-   response+= ",\"chipId\": \""+String(ESP.getChipId())+"\"";
-   response+= ",\"flashChipId\": \""+String(ESP.getFlashChipId())+"\"";
-   response+= ",\"flashChipSize\": \""+String(ESP.getFlashChipSize())+"\"";
-   response+= ",\"flashChipRealSize\": \""+String(ESP.getFlashChipRealSize())+"\"";
-   response+= ",\"freeHeap\": \""+String(ESP.getFreeHeap())+"\"";
+//   response+= ",\"gw\": \""+WiFi.gatewayIP().toString()+"\"";
+//   response+= ",\"nm\": \""+WiFi.subnetMask().toString()+"\"";
+//   response+= ",\"signalStrengh\": \""+String(WiFi.RSSI())+"\"";
+//   response+= ",\"chipId\": \""+String(ESP.getChipId())+"\"";
+//   response+= ",\"flashChipId\": \""+String(ESP.getFlashChipId())+"\"";
+//   response+= ",\"flashChipSize\": \""+String(ESP.getFlashChipSize())+"\"";
+//   response+= ",\"flashChipRealSize\": \""+String(ESP.getFlashChipRealSize())+"\"";
+//   response+= ",\"freeHeap\": \""+String(ESP.getFreeHeap())+"\"";
    response+="}";
    
    return response;
@@ -175,8 +175,8 @@ void wifi_begin(String ssid, String pass){
   String getOut = "";
   
   if (RealCheck)
-    getOut = "http://192.168.1.2/switch?turn=on";
-  else getOut = "http://192.168.1.2/switch?turn=off";
+    getOut = ServerAddr + "/switch?turn=on";
+  else getOut = ServerAddr + "/switch?turn=off";
   String resp = get(getOut); 
   
   MacAdr = WiFi.macAddress(); //8C:AA:B5:7B:13:73
@@ -228,6 +228,19 @@ String get(String Arequest){
     Serial.println(Arequest);
     int httpCode = http.GET();
    // log(String(httpCode)); 
+     
+    String response = http.getString();  
+    Serial.println(response);   
+    http.end();
+    return response;
+}
+
+String post(String addr, String Arequest){
+    http.setTimeout(200);
+    http.begin(client, addr); 
+    Serial.println(Arequest);
+    http.addHeader("Content-Type", "application/json");
+    int httpCode = http.POST(Arequest);
      
     String response = http.getString();  
     Serial.println(response);   
