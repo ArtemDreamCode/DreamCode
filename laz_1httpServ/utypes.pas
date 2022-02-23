@@ -25,7 +25,7 @@ const
   c_fullreset = '/fullreset';
   c_Device_GUID = 'NewDev';
   c_MaxDevice = 20;
-
+  c_DbName = 'db_dev';
 type
 
  THomeCotrollButton = array of TPanel;
@@ -58,7 +58,7 @@ type
         constructor Create;
     end;
 
-
+function DeviceToStr(ADevice: TDevice): string;
 function show_kb: string;
 function hide_kb: string;
 var
@@ -127,6 +127,25 @@ begin
 
 end;
 
+function DeviceToStr(ADevice: TDevice): string;
+var
+  s: TStringList;
+begin
+  s := TStringList.Create;
+  try
+    s.Add('{ ip: ' + ADevice.Ip);
+    s.Add('DeviceClass: ' + ADevice.DeviceClass);
+    s.Add('State: ' + ADevice.State);
+    s.Add('Name: ' + ADevice.Name);
+    s.Add('GUID: ' + ADevice.GUID);
+    s.Add('DeviceIndex: ' + ADevice.DeviceIndex);
+    s.Add('isnewdevice: ' + ADevice.isnewdevice + '}');
+    s.Add('------------------------------------');
+    Result := s.Text;
+  finally
+    s.Free;
+  end;
+end;
 
 function show_kb: string;
 begin

@@ -8,7 +8,7 @@ uses
   Classes, SysUtils,
    process, fpjson,
    jsonparser, jsonscanner, uTypes, ExtCtrls, StdCtrls, Controls, Graphics,
-   fphttpserver, httpdefs, httproute;
+   fphttpserver, httpdefs, httproute, sqlite3conn, sqldb, Dialogs;
 
 type
   { TServerProcess }
@@ -16,13 +16,22 @@ type
   private
     _Error: string;
     FServer: TFPHttpServer;
-  // route
+    FdbConn: TSQLite3Connection;
+    FdbTransact: TSQLTransaction;
+    FdbQuery: TSQLQuery;
+    fdebuginfo: string;
     procedure OnRequest(Sender: TObject; Var ARequest: TFPHTTPConnectionRequest; Var AResponse : TFPHTTPConnectionResponse);
+    procedure ConnectToDb;
+  private
+    procedure log;
+    // db
+   // function ValidateData(const AIp: string): Boolean;
+    procedure WriteNewData(ADevice: TDevice);
+    function IsDevice(ARequest: TFPHTTPConnectionRequest; var ADevice: TDevice): Boolean;
   protected
     procedure Execute; override;
   public
-    procedure StopResource;
-    constructor Create(CreateSuspended: Boolean);
+    constructor Create;
     destructor Destroy; override;
   end;
 
@@ -75,11 +84,27 @@ uses
 
 { TServerProcess }
 
-procedure TServerProcess.OnRequest(Sender: TObject;
-  var ARequest: TFPHTTPConnectionRequest;
-  var AResponse: TFPHTTPConnectionResponse);
+procedure TServerProcess.OnRequest(Sender: TObject; var ARequest: TFPHTTPConnectionRequest;
+    var AResponse: TFPHTTPConnectionResponse);
+var
+  ADevice: TDevice;
 begin
- if ARequest.QueryFields.Values['turn'] > '' then
+ try
+   fdebuginfo := '[' + ARequest.RemoteAddr +'] identificate device process ...';
+  Synchronize(@log);
+  fdebuginfo := '[' + ARequest.RemoteAddr +'] ' + ARequest.URl;
+  Synchronize(@log);
+//   if IsDevice(ARequest, ADevice) then
+
+   //    WriteNewData(ADevice);
+
+
+ except
+   On E:Exception do
+      ShowMessage('Ошибка [OnRequest to DataBase]: ' + E.Message);
+ end;
+
+{ if ARequest.QueryFields.Values['turn'] > '' then
  begin
    // change state ARequest.RemoteAddress device
    AResponse.Contents.Add(ARequest.RemoteAddress + ' state: ' + ARequest.QueryFields.Values['turn'] + '\n');
@@ -92,7 +117,104 @@ begin
         //todo states of all devices
      AResponse.Contents.Add('State of all devices :)');
    end;
- end;
+ end; }
+end;
+
+procedure TServerProcess.ConnectToDb;
+begin
+  FdbConn := TSQLite3Connection.Create(nil);
+  FdbTransact := TSQLTransaction.Create(nil);
+  FdbQuery := TSQLQuery.Create(nil);
+
+  FdbConn.DatabaseName := c_DbName;
+  FdbConn.Transaction  := FdbTransact;
+  FdbTransact.DataBase := FdbConn;
+  FdbQuery.DataBase    := FdbConn;
+  FdbQuery.Transaction := FdbTransact;
+
+  try
+     FdbConn.Connected:=True;
+  except
+     On E:Exception do
+        ShowMessage('Ошибка открытия базы: '+ E.Message);
+  end;
+end;
+
+procedure TServerProcess.log;
+begin
+  MainForm.m_device.Lines.Add('log ok: ' + fdebuginfo)
+end;
+
+procedure TServerProcess.WriteNewData(ADevice: TDevice);
+begin
+  try
+    with FdbQuery do
+    begin
+      SQL.Clear;
+      SQL.Add('SELECT * FROM devices where ip = :AIp');
+      ParamByName('AIp').Text:= ADevice.Ip;
+      Open;
+    end;
+//    result := FdbQuery.RecordCount = 0;
+  finally
+    FdbQuery.Close;
+  end;
+
+  try
+    with FdbQuery do
+    begin
+      SQL.Clear;
+      SQL.Add('INSERT INTO devices (ip) VALUES(:AIp)');
+      ParamByName('AIp').Text := ADevice.Ip;
+      ExecSQL;
+      FdbTransact.Commit;
+    end;
+  finally
+    FdbQuery.Close;
+  end;
+end;
+
+function TServerProcess.IsDevice(ARequest: TFPHTTPConnectionRequest; var ADevice: TDevice): Boolean;
+var
+  js: TJSONData;
+  AJSONText: string;
+begin
+  Result := False;
+
+ // AJSONText := ARequest.URI;
+  AJSONText := '{' + ARequest.QueryFields.Values['info'] + '}';
+
+  Result := pos(c_Device_GUID, AJSONText) > 0; //NewTechDev
+
+  if Result then
+    begin
+      js := GetJSON(AJSONText);
+      try
+       ADevice.Ip :=          js.FindPath('ip').AsString;
+       ADevice.DeviceClass := js.FindPath('class').AsString;
+       ADevice.State :=       js.FindPath('state').AsString;
+       ADevice.Name :=        js.FindPath('name').AsString;
+       ADevice.GUID :=        js.FindPath('device_guid').AsString;
+       ADevice.DeviceIndex := js.FindPath('index').AsString;
+       ADevice.IsNewDevice := js.FindPath('isnewdevice').AsString;
+
+       fdebuginfo := '[' + ARequest.RemoteAddr +'] is device:' +#13#10+
+       DeviceToStr(ADevice);
+       Synchronize(@log);
+
+       { if (SameText(device.IsNewDevice, 'old')) then
+         FOldDeviceList.Add(device)
+       else
+         FNewDeviceList.Add(device);
+       FDeviceList.Add(device);    }
+      finally
+       js.Free;
+      end;
+    end else
+    begin
+     fdebuginfo := '[' + ARequest.RemoteAddr +'] is not device';
+     Synchronize(@log);
+    end;
 end;
 
 procedure TServerProcess.Execute;
@@ -107,26 +229,24 @@ begin
   end;
 end;
 
-procedure TServerProcess.StopResource;
-begin
- FServer.Active:= False;
-end;
-
-constructor TServerProcess.Create(CreateSuspended: Boolean);
+constructor TServerProcess.Create;
 begin
  FServer := TFPHttpServer.Create(nil);
  FServer.port := 8080;
  FServer.threaded := true;
  FServer.OnRequest := @OnRequest;
  FreeOnTerminate := true;
+ ConnectToDb;
  inherited Create(False);
- // FServer.Active:= true;
-//  FServer.OnAllowConnect:= ;
 end;
 
 destructor TServerProcess.Destroy;
 begin
- // FServer.Free;
+  FServer.Active:= False;
+  FServer.Free;
+  FdbConn.Free;
+  FdbTransact.Free;
+  FdbQuery.Free;
   inherited Destroy;
 end;
 
@@ -312,7 +432,6 @@ begin
        js.Free;
       end;
     end;
-
 end;
 
 procedure TPingProcess.ShowStatePinged;

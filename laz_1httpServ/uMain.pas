@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
-  ComCtrls,  EditBtn, uCore, uTypes, Types, uSett, fpjson, process,
-  fphttpserver;
+  ComCtrls, EditBtn, uCore, uTypes, Types, uSett, sqlite3conn, sqldb, fpjson,
+  process, fphttpserver;
 
   { TForm1 }
 type
@@ -487,7 +487,7 @@ procedure TForm1.RunProcessServer;
 begin
   if Assigned(FServerProcess) then
      FServerProcess.Terminate;
-   FServerProcess := TServerProcess.Create(True);
+   FServerProcess := TServerProcess.Create;
    FServerProcess.Priority := tpLower;
 end;
 
@@ -509,7 +509,6 @@ end;
 
 procedure TForm1.KillProcessServer;
 begin
-  FServerProcess.StopResource;
 //  FServerProcess.Terminate;
 //  FServerProcess.WaitFor;
 //  FreeAndNil(FServerProcess);
