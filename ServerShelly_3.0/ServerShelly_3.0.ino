@@ -19,13 +19,13 @@ String ClassDevice = "Shelly";
 int DeviceIndex = 0;
 String DeviceFrendlyName;
 uint32_t TimerGet; //таймер отправки гет-запроса
-const uint32_t ConstTimerGet = 30000; //30 cек
+const uint32_t ConstTimerGet = 7000;
 //const char* ssid = "R_302";
 //const char* pass = "ProtProtom";
 //const char* ssid = "rostelecom_104";
 //const char* pass = "63030723";
 
-String ServerAddr = "http://192.168.1.2/";
+String ServerAddr = "http://192.168.1.22:8080/";
 
 String ShellySSID = "";
 String ShellyPASS = "11001100";
@@ -98,7 +98,6 @@ void setup()
   Serial.begin(115200);
   pinMode(2, OUTPUT);
   digitalWrite(2, LOW); 
-  //Serial.begin(115200);
   pinMode(4, OUTPUT);
   digitalWrite(4, LOW);
   pinMode(5, INPUT);
@@ -147,8 +146,11 @@ void loop()
   if ((millis() - TimerGet) >= ConstTimerGet)
   {
     TimerGet = millis();
-    if (is_station)
-      String resp = post(ServerAddr, JsonToStr()); 
+    if (is_station){
+      String AData = GetAllStateData();
+      Serial.println("js Data to send : "+ AData);      
+      String resp = post(ServerAddr, AData); 
+    }
   }
   DoCheckButtonState();
   server.handleClient();  

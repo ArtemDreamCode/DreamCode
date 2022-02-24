@@ -38,6 +38,7 @@ type
     GUID: string;
     DeviceIndex: string;
     IsNewDevice: string;
+    srcContent: string;
   end;
 
 type

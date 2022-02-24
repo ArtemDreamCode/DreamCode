@@ -1,4 +1,4 @@
-String JsonToStr()
+String GetAllStateData()
 {
   String dev_guid = GenerateAPName();
   String st;
@@ -36,7 +36,7 @@ String JsonToStr()
 }
 
 void handle_GetState(){ //запрос о состоянии от клиента
-   server.send(200, "text/html", JsonToStr());
+   server.send(200, "text/html", GetAllStateData());
 }
 void handle_ChangeState()
 {

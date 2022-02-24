@@ -23,12 +23,13 @@ type
     procedure OnRequest(Sender: TObject; Var ARequest: TFPHTTPConnectionRequest; Var AResponse : TFPHTTPConnectionResponse);
     procedure ConnectToDb;
   private
-    procedure log;
     // db
    // function ValidateData(const AIp: string): Boolean;
-    procedure WriteNewData(ADevice: TDevice);
+    procedure PrepareData(ADevice: TDevice);
     function IsDevice(ARequest: TFPHTTPConnectionRequest; var ADevice: TDevice): Boolean;
   protected
+    procedure log(const AValue: string);
+    procedure _log;
     procedure Execute; override;
   public
     constructor Create;
@@ -50,6 +51,7 @@ type
     procedure DoState;
     procedure DoGUIControll;
     function CheckDevice(AValue: string): Boolean;
+   // procedure _log;
   protected
     procedure Execute; override;
 // debug info
@@ -90,34 +92,29 @@ var
   ADevice: TDevice;
 begin
  try
-   fdebuginfo := '[' + ARequest.RemoteAddr +'] identificate device process ...';
-  Synchronize(@log);
-  fdebuginfo := '[' + ARequest.RemoteAddr +'] ' + ARequest.URl;
-  Synchronize(@log);
-//   if IsDevice(ARequest, ADevice) then
-
+  Log('[' + ARequest.RemoteAddr +'] ' + ARequest.Content);
+   if IsDevice(ARequest, ADevice) then
+   begin
+     // UpdateData(ADevice);
+     log('is dev');
+     PrepareData(ADevice);
+   end
+   else
+   begin
+      log('not dev');
    //    WriteNewData(ADevice);
-
+   end;
 
  except
    On E:Exception do
       ShowMessage('Ошибка [OnRequest to DataBase]: ' + E.Message);
  end;
+end;
 
-{ if ARequest.QueryFields.Values['turn'] > '' then
- begin
-   // change state ARequest.RemoteAddress device
-   AResponse.Contents.Add(ARequest.RemoteAddress + ' state: ' + ARequest.QueryFields.Values['turn'] + '\n');
-   AResponse.Contents.Add(':)');
- end;
- if ARequest.QueryFields.Values['state'] > '' then
- begin
-   if ARequest.QueryFields.Values['state'] = 'all' then
-   begin
-        //todo states of all devices
-     AResponse.Contents.Add('State of all devices :)');
-   end;
- end; }
+procedure TServerProcess.log(const AValue: string);
+begin
+  fdebuginfo := AValue;
+  Synchronize(@_log);
 end;
 
 procedure TServerProcess.ConnectToDb;
@@ -140,12 +137,14 @@ begin
   end;
 end;
 
-procedure TServerProcess.log;
+procedure TServerProcess._log;
 begin
-  MainForm.m_device.Lines.Add('log ok: ' + fdebuginfo)
+  MainForm.m_device.Lines.Add('[' + TimeToStr(Now) + '] '  + fdebuginfo)
 end;
 
-procedure TServerProcess.WriteNewData(ADevice: TDevice);
+procedure TServerProcess.PrepareData(ADevice: TDevice);
+var
+  c: Boolean;
 begin
   try
     with FdbQuery do
@@ -155,23 +154,39 @@ begin
       ParamByName('AIp').Text:= ADevice.Ip;
       Open;
     end;
-//    result := FdbQuery.RecordCount = 0;
+    c := FdbQuery.RecordCount = 0;
   finally
     FdbQuery.Close;
   end;
 
+  if (c) then
+    try
+      with FdbQuery do
+      begin
+        SQL.Clear;
+        SQL.Add('INSERT INTO devices (ip, data) VALUES(:AIp, :AData)');
+        ParamByName('AIp').Text := ADevice.Ip;
+        ParamByName('AData').Text := ADevice.srcContent;
+        ExecSQL;
+        FdbTransact.Commit;
+      end;
+    finally
+      FdbQuery.Close;
+    end
+  else
   try
     with FdbQuery do
     begin
       SQL.Clear;
-      SQL.Add('INSERT INTO devices (ip) VALUES(:AIp)');
+      SQL.Add('UPDATE devices SET ip =:AIp, data =:AData');
       ParamByName('AIp').Text := ADevice.Ip;
+      ParamByName('AData').Text := ADevice.srcContent;
       ExecSQL;
       FdbTransact.Commit;
     end;
   finally
     FdbQuery.Close;
-  end;
+  end
 end;
 
 function TServerProcess.IsDevice(ARequest: TFPHTTPConnectionRequest; var ADevice: TDevice): Boolean;
@@ -181,8 +196,7 @@ var
 begin
   Result := False;
 
- // AJSONText := ARequest.URI;
-  AJSONText := '{' + ARequest.QueryFields.Values['info'] + '}';
+  AJSONText := ARequest.Content;
 
   Result := pos(c_Device_GUID, AJSONText) > 0; //NewTechDev
 
@@ -197,11 +211,7 @@ begin
        ADevice.GUID :=        js.FindPath('device_guid').AsString;
        ADevice.DeviceIndex := js.FindPath('index').AsString;
        ADevice.IsNewDevice := js.FindPath('isnewdevice').AsString;
-
-       fdebuginfo := '[' + ARequest.RemoteAddr +'] is device:' +#13#10+
-       DeviceToStr(ADevice);
-       Synchronize(@log);
-
+       ADevice.srcContent:=   AJSONText;
        { if (SameText(device.IsNewDevice, 'old')) then
          FOldDeviceList.Add(device)
        else
@@ -210,10 +220,6 @@ begin
       finally
        js.Free;
       end;
-    end else
-    begin
-     fdebuginfo := '[' + ARequest.RemoteAddr +'] is not device';
-     Synchronize(@log);
     end;
 end;
 
