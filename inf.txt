@@ -8,6 +8,10 @@ linux
 	sudo apt install lazarus
 	sudo apt install curl
 	sudo apt install expect
+	
+	3. Если не работает arp.sh: 
+		1. создать новый файл arp.sh из-под убунты и скопировать туда код скрипта
+		3. chmod u+x+r arp.sh
 
 lazarus
 	1. убрать отладочную инф из бинарника(в 4 раза уменьшается размер)
