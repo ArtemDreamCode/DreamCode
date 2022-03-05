@@ -1,0 +1,99 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:testServ.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="testServ.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Width="800" Height="450">
+        
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+  <TabControl>
+    <TabItem Width="200">
+      <TabItem.Header>
+        <TextBlock HorizontalAlignment="Center">Home Controll</TextBlock>
+      </TabItem.Header>
+      <DockPanel Width="800" Height="400">
+        <Rectangle Fill="White" Height="120" DockPanel.Dock="Top"/>
+        <Rectangle Fill="White" Width="60" DockPanel.Dock="Left"/>
+        <Rectangle Fill="White" Height="120" DockPanel.Dock="Bottom"/>
+        <Rectangle Fill="White" Width="60" DockPanel.Dock="Right"/>
+
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Content="Home Controll" Width="160" Height="160" Command="{Binding ServerStart}"/>
+            <Button Width="160" Height="160" Content="Device Controll" Command="{Binding AddDevice}"/> 
+            <Button Width="160" Height="160" Content="Room Controll"/>
+            <Button Width="160" Height="160" Content="Debug Info"/>
+          </StackPanel>
+        
+      </DockPanel>
+    </TabItem>
+    
+    <TabItem Width="200">
+      <TabItem.Header>
+        <TextBlock HorizontalAlignment="Center">Device Controll</TextBlock>
+      </TabItem.Header>
+      <StackPanel Height="200" VerticalAlignment="Top">
+        <TabControl>
+          
+          <TabItem Width="385">
+            <TabItem.Header>
+              <TextBlock HorizontalAlignment="Center">New Devices</TextBlock>
+            </TabItem.Header>
+      
+            <!--////////////////////////////////////-->
+
+                       <ListBox Items="{Binding FakeDevices}">
+            <!-- <ListBox Items="{Binding devices}"> -->
+
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Margin="5">
+                    <TextBlock FontSize="18" Text="{Binding Path=name}" />
+                    <TextBlock Text="{Binding Path=state}" />
+                    <TextBlock Text="{Binding Path=ip}" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+
+
+            <!--////////////////////////////////////-->
+
+          </TabItem>
+          <TabItem Width="385">
+            <TabItem.Header>
+              <TextBlock HorizontalAlignment="Center">Connected Devices</TextBlock>
+            </TabItem.Header>
+          </TabItem>
+        </TabControl>
+      </StackPanel>
+    </TabItem>
+    
+    <TabItem Width="200">
+      <TabItem.Header>
+        <TextBlock HorizontalAlignment="Center">Room Controll</TextBlock>
+      </TabItem.Header>
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Text="{Binding Greeting}"/>
+        <TextBlock Text="{Binding Text}"/>
+        <TextBlock Text="{Binding Hello}"/>
+        <TextBlock Text="Square : " HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Rectangle Fill="Blue" Width="63" Height="41"/>
+      </StackPanel>
+    </TabItem>
+    <TabItem Width="200">
+      <TabItem.Header>
+        <TextBlock HorizontalAlignment="Center">Debug Info</TextBlock>
+      </TabItem.Header>
+      <StackPanel Orientation="Horizontal">
+        <Grid ColumnDefinitions="550,250" RowDefinitions="330,330"  Margin="4">
+          <TextBox Width="550" Text="{Binding ShownValue}" AcceptsReturn="True" TextWrapping="Wrap" />
+        </Grid>
+      </StackPanel>
+    </TabItem>
+  </TabControl>
+</Window>
