@@ -1,0 +1,121 @@
+1. Настройка vbox
+	1.1 сеть - просто выбираем - Сетевой мост
+
+2. Установка ubuntu 20.04
+	2.1 при установке выбираем Minimal + Download updates while installing Ubuntu
+         , больше ничего, ставим..
+		 .
+3. Пакеты (так как версия минимальная, то общая папка не встанет без make и gcc)
+	sudo apt update
+	sudo apt upgrade
+	sudo apt install expect
+	sudo apt install net-tools
+	sudo apt install build-essential (ставим gcc)
+	sudo apt install make
+	sudo apt install curl
+	sudo apt install nmap
+	sudo apt install libcurl4-gnutls-dev
+	sudo apt install git
+	sudo apt-get install jq (процессор json в bush) 
+	restart
+	sudo usermod -aG vboxsf user - (общая папка добавление в группу)
+4. Общие папки
+  4.1 vb - mainmenu - устройства - Подключить образ диска дополнений гостевой ос
+  4.2 sudo usermod -aG vboxsf имя_пользавтеля_ubuntu (добавление в группу)
+  4.3 restart
+  
+5. PostgreSQL
+	5.1 Установка и настройка
+	    [sudo apt-get --purge remove postgresql postgresql-doc postgresql-common (полное удаление pg)]
+		sudo apt install postgresql
+		sudo apt install postgresql-server-dev-12
+		sudo apt-get -y install postgresql-12-cron
+		sudo systemctl is-active postgresql (активность службы)
+		sudo systemctl is-enabled postgresql (включена ли служба)
+		sudo systemctl status postgresql (статус службы)
+		sudo pg_isready (pg сервер готовность принимать подключения)
+		sudo systemctl restart postgresql (рестарт службы)
+	5.2 Создание бд
+		sudo su - postgres (подключение к системе с помощью учетной записи postgres)
+			psql
+			    [DROP USER artem;] (удаление юзера/роли)
+				CREATE USER artem WITH PASSWORD '1';
+				ALTER ROLE artem SUPERUSER;
+				CREATE DATABASE devdb;
+				\list (список баз)
+				GRANT ALL PRIVILEGES ON DATABASE devdb to artem;
+				\q
+			exit
+	5.3 Настройка клиентской аутентификации
+		5.3.1 postgresql.conf
+			sudo nano /etc/postgresql/12/main/postgresql.conf
+			Раскомментируем или добавим строку: listen_addresses = '*'
+			Мы разрешили прослушивание запросов от всех IP-адресов.
+		-- for pgcron--
+		   sudo nano /etc/postgresql/12/main/postgresql.conf
+		   ниже строчки # - Shared Library Preloading -
+			вставляем:
+				shared_preload_libraries = 'pg_cron'    # (change requires restart)
+				cron.database_name = 'devdb'
+		5.3.2 pg_hba.conf
+			sudo nano /etc/postgresql/12/main/pg_hba.conf
+			Добавляем запись в секцию # IPv4 local connections:
+			host     devdb     all     192.168.../32     md5
+			Запись разрешает подключение к БД mybd всем пользователям с IP адресом 192.168..., используя пароль.
+		--for pgcron--
+			добавляем строки
+				# Schedule jobs via background workers instead of localhost connections
+				cron.use_background_workers = on
+				# Increase the number of available background workers from the default of 8
+				max_worker_processes = 20
+				# Connect via a unix domain socket
+				cron.host = '/tmp'
+		5.3.3 sudo systemctl restart postgresql
+	5.4 pgAdmin4 (ставим на хосте)
+		5.4.1 Создаем новое подключение к серверу: Add New Server
+		  Вкладка General:
+		    Name: название сервера (произвольное) devdb;
+		  Вкладка Connection:
+			Host Name: RemoteServerIP;
+			Port: 5432;
+			Maintenance database: devdb;
+			Username: artem	
+			Password: 1
+	
+6. Установка Расширения Postgres - pgsql-http, для отправки http запросов из бд
+	6.1 Ссылка https://github.com/pramsey/pgsql-http
+	6.2 git clone https://github.com/pramsey/pgsql-http.git
+	6.3 заходим в каталог ls pgsql-http
+	6.4 make 
+	6.5 sudo make install 
+	6.6 sudo systemctl restart postgresql
+	6.7 В pgAdmin выполнить CREATE EXTENSION http 
+	
+
+8. Разное
+	8.1 запрос из терминала 
+	  sudo -u postgres -H -- psql -d devdb -c "SELECT *  FROM dev"
+	https://crontab.guru/#*_4_*_*_*  
+	sudo apt-get install jq (процессор json в bush) 
+	sudo apt install socat	()запуск сервера .sh
+	sudo systemctl enable nginx (автозагрузка)
+9. Cron
+	9.1 [перезапуск службы sudo service cron reload ] (стирает все задания !!!)
+	9.2 редактирование файла crontab -e 
+		и добавляем: 
+chmod +x ./test.sh
+
+10. Go
+https://losst.ru/ustanovka-go-ubuntu
+https://go.dev/doc/tutorial/compile-install
+https://blog.logrocket.com/creating-a-web-server-with-golang/
+https://zetcode.com/golang/exec-command/
+https://losst.ru/kak-ustanovit-visual-studio-code-na-ubuntu
+
+11. Lazarus
+  11.1 sudo apt install lazarus
+  11.2 убрать отладочную инф из бинарника(в 4 раза уменьшается размер)
+		Project - Project options - Debugging - check true: -xs, -xg
+		
+12. Python
+	12.1 Tkinter -> sudo apt-get install python-tk

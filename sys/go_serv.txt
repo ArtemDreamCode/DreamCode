@@ -1,0 +1,32 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os/exec"
+)
+
+func kickHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/kick" {
+
+		log.Println(r.RemoteAddr)
+		// fmt.Fprintf(w, "Hello!/n")
+		cmd := exec.Command("/home/artem/dev/dev.sh")
+		//		err :=
+		cmd.Run()
+		//		if err != nil {
+		//			log.Fatal(err)
+		//		}
+		return
+	}
+}
+
+func main() {
+	http.HandleFunc("/kick", kickHandler) // Update this line of code
+
+	fmt.Printf("Starting server at port 8082\n")
+	if err := http.ListenAndServe(":8082", nil); err != nil {
+		log.Fatal(err)
+	}
+}

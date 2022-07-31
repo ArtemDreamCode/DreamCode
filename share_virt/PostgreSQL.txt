@@ -1,0 +1,182 @@
+CREATE TABLE dev (
+    id     integer ,
+    name    varchar(40),
+	state integer
+);
+
+insert into dev (id, name, state) values (1, 'dev1', 0);
+insert into dev (id, name, state) values (2, 'dev2', 1);
+insert into dev (id, name, state) values (3, 'dev3', 0);
+insert into dev (id, name, state) values (4, 'dev4', 1);
+
+select * from dev
+DROP FUNCTION turn_on
+CREATE or replace FUNCTION turn_on(text) RETURNS  text AS
+$BODY$
+declare 
+  s text;
+BEGIN
+    RETURN str(select content from http_get('https://www.google.ru/'));
+ END;
+$BODY$
+LANGUAGE plpgsql;
+
+SELECT us.usename, us.usesuper, us.usecreatedb
+FROM pg_catalog.pg_user us;
+
+SELECT count(*) FROM pg_stat_activity;
+SELECT * FROM pg_stat_activity pg_act where not pg_act.state_change is null;
+
+select pid as process_id, usename as username, datname as database_name, client_addr as client_address, application_name, backend_start, state, state_change from pg_stat_activity;
+
+
+WITH event_types(wait_event_type) AS(
+  VALUES
+    ('lwlock')
+  , ('lock')
+  , ('bufferpin')
+  , ('client')
+  , ('extension')
+  , ('ipc')
+  , ('timeout')
+  , ('io')
+)
+, events(wait_event) AS(
+  VALUES
+    ('walwritelock')
+  , ('wal_insert')
+  , ('buffer_content')
+  , ('buffer_io')
+  , ('lock_manager')
+  , ('relation')
+  , ('extend')
+  , ('page')
+  , ('tuple')
+  , ('transactionid')
+  , ('virtualxid')
+  , ('speculative token')
+  , ('object')
+  , ('userlock')
+  , ('advisory')
+  , ('clientread')
+  , ('datafileextend')
+  , ('datafileread')
+  , ('datafilewrite')
+  , ('slruread')
+  , ('slruwrite')
+)
+, states(state) AS(
+  VALUES
+    ('running')
+  , ('maintenance')
+  , ('waiting')
+  , ('transaction')
+  , ('idle')
+)
+, stats AS(
+  SELECT
+    pid
+  , datname
+  , state
+  , lower(wait_event_type) wait_event_type
+  , lower(wait_event) wait_event
+  , query
+  FROM
+    pg_stat_activity
+  WHERE
+    pid <> pg_backend_pid()
+)
+, dbs AS(
+  SELECT
+    datname
+  FROM
+    pg_database db
+  WHERE
+    NOT db.datistemplate
+)
+  SELECT
+    date_part('epoch', now())::integer ts
+  , coalesce(s.qty, 0) val
+  , dbs.datname dbname
+  , states.state
+  , true total
+  FROM
+    dbs
+  CROSS JOIN
+    states
+  NATURAL LEFT JOIN
+    (
+      SELECT
+        datname
+      , CASE
+          WHEN query ~* E'^(\\s*(--[^\\n]*\\n|/\\*.*\\*/|\\n))*(autovacuum|VACUUM|ANALYZE|REINDEX|CLUSTER|CREATE|ALTER|TRUNCATE|DROP)' THEN
+            'maintenance'
+          WHEN wait_event IS NOT NULL AND
+            wait_event <> 'clientread' AND
+            state = 'active' THEN
+            'waiting'
+          WHEN state = 'active' THEN
+            'running'
+          WHEN state = 'idle' THEN
+            'idle'
+          WHEN state IN ('idle in transaction', 'idle in transaction (aborted)') THEN
+            'transaction'
+          WHEN state = 'fastpath function call' THEN
+            'fastpath'
+          ELSE
+            'disabled'
+        END state
+      , count(*) qty
+      FROM
+        stats
+      GROUP BY
+        1, 2
+    ) s
+UNION
+  SELECT
+    date_part('epoch', now())::integer ts
+  , coalesce(t.qty, 0) val
+  , dbs.datname dbname
+  , event_types.wait_event_type
+  , false total
+  FROM
+    dbs
+  CROSS JOIN
+    event_types
+  NATURAL LEFT JOIN
+    (
+      SELECT
+        datname
+      , wait_event_type
+      , count(*) qty
+      FROM
+        stats
+      WHERE
+        wait_event_type IS NOT NULL
+      GROUP BY
+        1, 2
+    ) t
+UNION
+  SELECT
+    date_part('epoch', now())::integer ts
+  , coalesce(e.qty, 0) val
+  , dbs.datname dbname
+  , events.wait_event
+  , false total
+  FROM
+    dbs
+  CROSS JOIN
+    events
+  NATURAL LEFT JOIN
+    (
+      SELECT
+        datname
+      , wait_event
+      , count(*) qty
+      FROM
+        stats
+      WHERE
+        wait_event IS NOT NULL
+      GROUP BY
+        1, 2
+    ) e;

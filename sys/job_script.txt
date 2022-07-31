@@ -1,0 +1,4 @@
+#!/bin/sh
+date +%F-%H-%M-%S > $HOME/test/output.log
+nmap -sn 192.168.1.1/24 >> $HOME/test/output.log
+sudo -u postgres -H -- psql -d devdb -c  "call raw_data('$(cat ${HOME}/test/output.log)')"

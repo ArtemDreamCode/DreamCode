@@ -1,0 +1,10 @@
+-- установка pg + pgAdmin
+https://ruvds.com/ru/helpcenter/postgresql-pgadmin-ubuntu/
+
+-- настройка удаленного подключения
+https://www.dmosk.ru/miniinstruktions.php?mini=pgsql-remote
+https://mhelp.pro/ru/kak-nastroit-udalennoye-podklyucheniye-k-bd-postgresql-iz-windows/#pryamoye-podklyucheniye-k-postgresql
+
+-- либа http для pg 
+https://github.com/pramsey/pgsql-http
+

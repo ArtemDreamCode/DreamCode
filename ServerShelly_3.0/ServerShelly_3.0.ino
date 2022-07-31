@@ -20,11 +20,6 @@ int DeviceIndex = 0;
 String DeviceFrendlyName;
 uint32_t TimerGet; //таймер отправки гет-запроса
 const uint32_t ConstTimerGet = 30000; //30 cек
-//const char* ssid = "R_302";
-//const char* pass = "ProtProtom";
-//const char* ssid = "rostelecom_104";
-//const char* pass = "63030723";
-
 
 String ShellySSID = "";
 String ShellyPASS = "11001100";
@@ -67,14 +62,14 @@ void DoCheckButtonState()
      {
        RealCheck = true;
        digitalWrite(4, HIGH); //включаем
-       getOut = "http://192.168.1.2/switch?turn=on";
+       getOut = "http://192.168.1.72:8082/kick";
        //getOut = "http://172.18.44.68/switch?turn=on";
      }
      else if (RealCheck)
      {
        RealCheck = false;
        digitalWrite(4, LOW); //выключаем
-       getOut = "http://192.168.1.2/switch?turn=off";
+       getOut = "http://192.168.1.72:8082/kick";
        //getOut = "http://172.18.44.68/switch?turn=off";
        
      }
@@ -113,6 +108,9 @@ void setup()
   
   server.onNotFound(handleNotFound);
   server.begin();
+
+
+  //set_AP_mode();
   
   if (!is_station())
   {
@@ -150,8 +148,8 @@ void loop()
     {
       String getOut = "";
       if (RealCheck)
-        getOut = "http://192.168.1.2/switch?turn=on";
-      else getOut = "http://192.168.1.2/switch?turn=off";
+        getOut = "http://192.168.1.72:8082/kick";
+      else getOut = "http://192.168.1.72:8082/kick";
       String resp = get(getOut); 
     }
   DoCheckButtonState();
