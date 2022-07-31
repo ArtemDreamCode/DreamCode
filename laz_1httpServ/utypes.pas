@@ -7,7 +7,7 @@ unit uTypes;
 interface
 
 uses
-  Classes, SysUtils, process, StdCtrls, ExtCtrls;
+  Classes, SysUtils, process, StdCtrls, ExtCtrls, fgl;
 
 const
   c_ping_count   = '1';

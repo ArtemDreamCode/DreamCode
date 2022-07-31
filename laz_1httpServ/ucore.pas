@@ -18,14 +18,11 @@ type
     FServer: TFPHttpServer;
     FdbConn: TSQLite3Connection;
     FdbTransact: TSQLTransaction;
-    FdbQuery: TSQLQuery;
     fdebuginfo: string;
     procedure OnRequest(Sender: TObject; Var ARequest: TFPHTTPConnectionRequest; Var AResponse : TFPHTTPConnectionResponse);
-    procedure ConnectToDb;
+    function ContentMap(AContent: string): Boolean;
   private
-    // db
-   // function ValidateData(const AIp: string): Boolean;
-    procedure PrepareData(ADevice: TDevice);
+    FDevList: TDeviceList;
     function IsDevice(ARequest: TFPHTTPConnectionRequest; var ADevice: TDevice): Boolean;
   protected
     procedure log(const AValue: string);
@@ -92,23 +89,63 @@ var
   ADevice: TDevice;
 begin
  try
-  Log('[' + ARequest.RemoteAddr +'] ' + ARequest.Content);
-   if IsDevice(ARequest, ADevice) then
+  Log('ARequest.RemoteAddr: [' + ARequest.RemoteAddr +'] ');
+  Log('ARequest.URI: [' + ARequest.URI +'] ');
+  Log('----------------------------------------');
+  Log('ARequest.Content: [' + ARequest.Content +'] ');
+  Log('----------------------------------------');
+
+  if (SameText(ARequest.URI, '/dev.json')) then // post req from job
+    if not ContentMap(ARequest.Content) then
+      Exit;
+
+ {  if IsDevice(ARequest, ADevice) then
    begin
-     // UpdateData(ADevice);
      log('is dev');
-     PrepareData(ADevice);
    end
    else
    begin
       log('not dev');
-   //    WriteNewData(ADevice);
-   end;
+   end;   }
 
  except
    On E:Exception do
-      ShowMessage('Ошибка [OnRequest to DataBase]: ' + E.Message);
+   begin
+    //  ShowMessage('Ошибка [OnRequest]: ' + E.Message);
+      Log('Ошибка [OnRequest]: ' + E.Message);
+   end;
  end;
+end;
+
+function TServerProcess.ContentMap(AContent: string): Boolean;
+var
+  js: TJSONData;
+  jsarr: TJSONArray;
+begin
+  Result := True;
+  js := GetJSON(AContent);
+  try
+  jsarr := TJSONArray(js.FindPath('devices').AsJSON);
+ { if Result then
+    begin
+      js := GetJSON(AJSONText);
+      try
+       ADevice.Ip :=          js.FindPath('ip').AsString;
+       ADevice.DeviceClass := js.FindPath('class').AsString;
+       ADevice.State :=       js.FindPath('state').AsString;
+       ADevice.Name :=        js.FindPath('name').AsString;
+       ADevice.GUID :=        js.FindPath('device_guid').AsString;
+       ADevice.DeviceIndex := js.FindPath('index').AsString;
+       ADevice.IsNewDevice := js.FindPath('isnewdevice').AsString;
+       ADevice.srcContent:=   AJSONText;
+       { if (SameText(device.IsNewDevice, 'old')) then
+         FOldDeviceList.Add(device)
+       else
+         FNewDeviceList.Add(device);
+       FDeviceList.Add(device);    }}
+      finally
+       js.Free;
+      end;
 end;
 
 procedure TServerProcess.log(const AValue: string);
@@ -117,76 +154,9 @@ begin
   Synchronize(@_log);
 end;
 
-procedure TServerProcess.ConnectToDb;
-begin
-  FdbConn := TSQLite3Connection.Create(nil);
-  FdbTransact := TSQLTransaction.Create(nil);
-  FdbQuery := TSQLQuery.Create(nil);
-
-  FdbConn.DatabaseName := c_DbName;
-  FdbConn.Transaction  := FdbTransact;
-  FdbTransact.DataBase := FdbConn;
-  FdbQuery.DataBase    := FdbConn;
-  FdbQuery.Transaction := FdbTransact;
-
-  try
-     FdbConn.Connected:=True;
-  except
-     On E:Exception do
-        ShowMessage('Ошибка открытия базы: '+ E.Message);
-  end;
-end;
-
 procedure TServerProcess._log;
 begin
   MainForm.m_device.Lines.Add('[' + TimeToStr(Now) + '] '  + fdebuginfo)
-end;
-
-procedure TServerProcess.PrepareData(ADevice: TDevice);
-var
-  c: Boolean;
-begin
-  try
-    with FdbQuery do
-    begin
-      SQL.Clear;
-      SQL.Add('SELECT * FROM devices where ip = :AIp');
-      ParamByName('AIp').Text:= ADevice.Ip;
-      Open;
-    end;
-    c := FdbQuery.RecordCount = 0;
-  finally
-    FdbQuery.Close;
-  end;
-
-  if (c) then
-    try
-      with FdbQuery do
-      begin
-        SQL.Clear;
-        SQL.Add('INSERT INTO devices (ip, data) VALUES(:AIp, :AData)');
-        ParamByName('AIp').Text := ADevice.Ip;
-        ParamByName('AData').Text := ADevice.srcContent;
-        ExecSQL;
-        FdbTransact.Commit;
-      end;
-    finally
-      FdbQuery.Close;
-    end
-  else
-  try
-    with FdbQuery do
-    begin
-      SQL.Clear;
-      SQL.Add('UPDATE devices SET ip =:AIp, data =:AData');
-      ParamByName('AIp').Text := ADevice.Ip;
-      ParamByName('AData').Text := ADevice.srcContent;
-      ExecSQL;
-      FdbTransact.Commit;
-    end;
-  finally
-    FdbQuery.Close;
-  end
 end;
 
 function TServerProcess.IsDevice(ARequest: TFPHTTPConnectionRequest; var ADevice: TDevice): Boolean;
@@ -242,7 +212,7 @@ begin
  FServer.threaded := true;
  FServer.OnRequest := @OnRequest;
  FreeOnTerminate := true;
- ConnectToDb;
+ FDevList := TDeviceList.Create;
  inherited Create(False);
 end;
 
@@ -250,9 +220,7 @@ destructor TServerProcess.Destroy;
 begin
   FServer.Active:= False;
   FServer.Free;
-  FdbConn.Free;
-  FdbTransact.Free;
-  FdbQuery.Free;
+  FDevList.Free;
   inherited Destroy;
 end;
 
@@ -442,48 +410,32 @@ end;
 
 procedure TPingProcess.ShowStatePinged;
 begin
-  MainForm.m_state.Lines.Assign(FPingedList);
-  MainForm.m_state.Lines.Add(DateTimeToStr(Now));
-  MainForm.m_state.Lines.Add('=================');
   MainForm.img_state.Picture.LoadFromFile('img/wifi_black.png');
 end;
 
 procedure TPingProcess.ShowStateDevices;
 begin
-  MainForm.m_device.Clear;
-  MainForm.m_device.Lines.Add(FDeviceList.ToString);
-  MainForm.m_device.Lines.Add(DateTimeToStr(Now));
-  MainForm.m_device.Lines.Add('=================');
   MainForm.img_state.Picture.LoadFromFile('img/wifi_green.png');
 end;
 
 procedure TPingProcess.ShowStatePingOk;
 begin
-  MainForm.m_all_proc.Clear;
-  MainForm.m_all_proc.Lines.Add('PingOk');
-  MainForm.m_all_proc.Lines.Add(DateTimeToStr(Now));
-  MainForm.m_all_proc.Lines.Add('=================');
+
 end;
 
 procedure TPingProcess.ShowStateStateOk;
 begin
-  MainForm.m_all_proc.Clear;
-  MainForm.m_all_proc.Lines.Add('StateOk');
-  MainForm.m_all_proc.Lines.Add(DateTimeToStr(Now));
-  MainForm.m_all_proc.Lines.Add('=================');
+
 end;
 
 procedure TPingProcess.log;
 begin
-  MainForm.m_device.Lines.Add('log ok: ' + fdebuginfo)
+
 end;
 
 procedure TPingProcess.ChangeMainFon;
 begin
-{  MainForm.lb_num_sett.Visible := (FNewDeviceList.Count > 0);
-  MainForm.lb_num_sett.Caption := FNewDeviceList.Count.ToString;
-  MainForm.img_main.Picture.LoadFromFile(FChangeMainFon);
-  MainForm.lb_num_sett.BringToFront; }
+
 end;
 
 procedure TPingProcess.BuildLVOld;

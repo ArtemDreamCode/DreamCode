@@ -22,9 +22,7 @@ type
     lb_time: TLabel;
     lv_old: TListView;
     lv_new: TListView;
-    m_state: TMemo;
     m_device: TMemo;
-    m_all_proc: TMemo;
     PageControl2: TPageControl;
     Panel27: TPanel;
     Panel28: TPanel;
@@ -141,7 +139,6 @@ type
     procedure tm_timeTimer(Sender: TObject);
     procedure tsSettShow(Sender: TObject);
   private
-    FPingProcess: TPingProcess;
     FServerProcess: TServerProcess;
     FSettingsForm: TForm;
     F_lv_old_Down, F_lv_new_Down: Boolean;
@@ -149,12 +146,10 @@ type
   protected
     procedure ShowTime;
     procedure DoShow; override;
-    procedure RunProcessPing;
     procedure RunProcessServer;
-    procedure KillProcessPing;
     procedure KillProcessServer;
   public
-    property PingProcessThread: TPingProcess read FPingProcess write FPingProcess;
+ //   property PingProcessThread: TPingProcess read FPingProcess write FPingProcess;
     property SettingsForm: TForm read FSettingsForm write FSettingsForm;
   end;
 
@@ -489,22 +484,6 @@ begin
      FServerProcess.Terminate;
    FServerProcess := TServerProcess.Create;
    FServerProcess.Priority := tpLower;
-end;
-
-procedure TForm1.RunProcessPing;
-begin
-  if Assigned(FPingProcess) then
-     FPingProcess.Terminate;
-   FPingProcess := TPingProcess.Create(True);
-   FPingProcess.Priority := tpLower;
-   FPingProcess.AppPath := ExtractFilePath(Application.ExeName);
-end;
-
-procedure TForm1.KillProcessPing;
-begin
-  FPingProcess.Terminate;
-  FPingProcess.WaitFor;
-  FreeAndNil(FPingProcess);
 end;
 
 procedure TForm1.KillProcessServer;
