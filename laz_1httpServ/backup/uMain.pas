@@ -6,12 +6,13 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
-  ComCtrls,  EditBtn, uCore, uTypes, Types, uSett, fpjson, process,
-  fphttpserver;
+  ComCtrls, EditBtn, uCore, uTypes, Types, uSett, sqlite3conn, sqldb, fpjson,
+  process, fphttpserver;
 
   { TForm1 }
 type
   TForm1 = class(TForm)
+    Button1: TButton;
     img_state: TImage;
     Label1: TLabel;
     Label2: TLabel;
@@ -22,9 +23,8 @@ type
     lb_time: TLabel;
     lv_old: TListView;
     lv_new: TListView;
-    m_state: TMemo;
     m_device: TMemo;
-    m_all_proc: TMemo;
+    m_dev: TMemo;
     PageControl2: TPageControl;
     Panel27: TPanel;
     Panel28: TPanel;
@@ -85,6 +85,7 @@ type
     tsControll: TTabSheet;
     tsToDo: TTabSheet;
     tsDebug: TTabSheet;
+    procedure Button1Click(Sender: TObject);
     procedure FServerRequest(Sender: TObject;
       var ARequest: TFPHTTPConnectionRequest;
       var AResponse: TFPHTTPConnectionResponse);
@@ -141,7 +142,6 @@ type
     procedure tm_timeTimer(Sender: TObject);
     procedure tsSettShow(Sender: TObject);
   private
-    FPingProcess: TPingProcess;
     FServerProcess: TServerProcess;
     FSettingsForm: TForm;
     F_lv_old_Down, F_lv_new_Down: Boolean;
@@ -149,12 +149,10 @@ type
   protected
     procedure ShowTime;
     procedure DoShow; override;
-    procedure RunProcessPing;
     procedure RunProcessServer;
-    procedure KillProcessPing;
     procedure KillProcessServer;
   public
-    property PingProcessThread: TPingProcess read FPingProcess write FPingProcess;
+ //   property PingProcessThread: TPingProcess read FPingProcess write FPingProcess;
     property SettingsForm: TForm read FSettingsForm write FSettingsForm;
   end;
 
@@ -165,7 +163,7 @@ implementation
 
 {$R *.lfm}
 
-
+ // size op = 10,6 mbit on start !
 { TForm1 }
 
 procedure TForm1.AfterConstruction;
@@ -183,7 +181,7 @@ end;
 
 procedure TForm1.BeforeDestruction;
 begin
-  KillProcessPing;
+//  KillProcessPing;
   KillProcessServer;
   inherited BeforeDestruction;
 end;
@@ -357,6 +355,11 @@ begin
   //Handled := true;
 end;
 
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+
+end;
+
 procedure TForm1.Image1MouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
@@ -479,7 +482,7 @@ end;
 procedure TForm1.DoShow;
 begin
   inherited DoShow;
-  RunProcessPing;
+//  RunProcessPing;
   RunProcessServer;
 end;
 
@@ -487,31 +490,15 @@ procedure TForm1.RunProcessServer;
 begin
   if Assigned(FServerProcess) then
      FServerProcess.Terminate;
-   FServerProcess := TServerProcess.Create(False);
+   FServerProcess := TServerProcess.Create;
    FServerProcess.Priority := tpLower;
-end;
-
-procedure TForm1.RunProcessPing;
-begin
-  if Assigned(FPingProcess) then
-     FPingProcess.Terminate;
-   FPingProcess := TPingProcess.Create(True);
-   FPingProcess.Priority := tpLower;
-   FPingProcess.AppPath := ExtractFilePath(Application.ExeName);
-end;
-
-procedure TForm1.KillProcessPing;
-begin
-  FPingProcess.Terminate;
-  FPingProcess.WaitFor;
-  FreeAndNil(FPingProcess);
 end;
 
 procedure TForm1.KillProcessServer;
 begin
-  FServerProcess.Terminate;
-  FServerProcess.WaitFor;
-  FreeAndNil(FServerProcess);
+//  FServerProcess.Terminate;
+//  FServerProcess.WaitFor;
+//  FreeAndNil(FServerProcess);
 end;
 
 end.

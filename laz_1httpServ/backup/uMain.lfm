@@ -16,9 +16,9 @@ object Form1: TForm1
     Height = 581
     Top = 0
     Width = 957
-    ActivePage = tsMain
+    ActivePage = tsDebug
     Align = alClient
-    TabIndex = 0
+    TabIndex = 4
     TabOrder = 0
     OnChange = pgcChange
     object tsMain: TTabSheet
@@ -82,9 +82,9 @@ object Form1: TForm1
         end
         object lb_date: TLabel
           Left = 16
-          Height = 31
+          Height = 36
           Top = 48
-          Width = 76
+          Width = 82
           Caption = 'date'
           Font.Height = -32
           Font.Name = 'Veles'
@@ -201,7 +201,7 @@ object Form1: TForm1
           end
           object lb_cnt_sett: TLabel
             Left = 151
-            Height = 52
+            Height = 61
             Top = 8
             Width = 37
             Align = alCustom
@@ -218,9 +218,9 @@ object Form1: TForm1
         end
         object lb_time: TLabel
           Left = 16
-          Height = 31
+          Height = 36
           Top = 80
-          Width = 73
+          Width = 81
           Caption = 'time'
           Font.Height = -32
           Font.Name = 'Veles'
@@ -739,14 +739,6 @@ object Form1: TForm1
       Caption = 'tsDebug'
       ClientHeight = 550
       ClientWidth = 947
-      object m_state: TMemo
-        Left = 200
-        Height = 365
-        Top = 136
-        Width = 408
-        ScrollBars = ssAutoVertical
-        TabOrder = 0
-      end
       object Label1: TLabel
         Left = 200
         Height = 15
@@ -756,12 +748,17 @@ object Form1: TForm1
         ParentColor = False
       end
       object m_device: TMemo
-        Left = 616
+        Left = 344
         Height = 365
         Top = 136
-        Width = 320
-        ScrollBars = ssAutoVertical
-        TabOrder = 1
+        Width = 592
+        Color = clBlack
+        Font.Color = clTeal
+        Font.Height = -11
+        Font.Name = 'System-ui'
+        ParentFont = False
+        ScrollBars = ssBoth
+        TabOrder = 0
       end
       object Label2: TLabel
         Left = 608
@@ -779,24 +776,16 @@ object Form1: TForm1
         Caption = 'all proc log'
         ParentColor = False
       end
-      object m_all_proc: TMemo
-        Left = 24
-        Height = 365
-        Top = 136
-        Width = 168
-        ScrollBars = ssAutoVertical
-        TabOrder = 2
-      end
       object Panel35: TPanel
         Left = 0
         Height = 120
         Top = 0
-        Width = 950
+        Width = 947
         Align = alTop
         BevelOuter = bvNone
         ClientHeight = 120
-        ClientWidth = 950
-        TabOrder = 3
+        ClientWidth = 947
+        TabOrder = 1
         object Panel36: TPanel
           Left = 0
           Height = 84
@@ -812,7 +801,7 @@ object Form1: TForm1
           OnMouseUp = Panel3MouseUp
         end
         object Panel38: TPanel
-          Left = 926
+          Left = 923
           Height = 84
           Top = 18
           Width = 24
@@ -827,7 +816,7 @@ object Form1: TForm1
           Left = 0
           Height = 18
           Top = 0
-          Width = 950
+          Width = 947
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 2
@@ -836,13 +825,35 @@ object Form1: TForm1
           Left = 0
           Height = 18
           Top = 102
-          Width = 950
+          Width = 947
           Align = alBottom
           BevelOuter = bvNone
           TabOrder = 3
         end
+        object Button1: TButton
+          Left = 32
+          Height = 25
+          Top = 104
+          Width = 75
+          Caption = 'Button1'
+          OnClick = Button1Click
+          TabOrder = 4
+        end
       end
     end
+  end
+  object m_dev: TMemo
+    Left = 16
+    Height = 376
+    Top = 168
+    Width = 312
+    Color = clBlack
+    Font.Color = clTeal
+    Font.Height = -11
+    Font.Name = 'System-ui'
+    ParentFont = False
+    ScrollBars = ssBoth
+    TabOrder = 1
   end
   object tm_time: TTimer
     OnTimer = tm_timeTimer

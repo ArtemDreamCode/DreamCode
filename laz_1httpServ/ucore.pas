@@ -18,15 +18,17 @@ type
     FServer: TFPHttpServer;
     FdbConn: TSQLite3Connection;
     FdbTransact: TSQLTransaction;
-    fdebuginfo: string;
+    fdebuginfoAdd, fdebuginfoText: string;
     procedure OnRequest(Sender: TObject; Var ARequest: TFPHTTPConnectionRequest; Var AResponse : TFPHTTPConnectionResponse);
-    function ContentMap(AContent: string): Boolean;
+    function ContentToMap(AContent: string): Boolean;
   private
     FDevList: TDeviceList;
     function IsDevice(ARequest: TFPHTTPConnectionRequest; var ADevice: TDevice): Boolean;
   protected
-    procedure log(const AValue: string);
-    procedure _log;
+    procedure logAdd(const AValue: string);
+    procedure _logAdd;
+    procedure logText(const AValue: string);
+    procedure _logText;
     procedure Execute; override;
   public
     constructor Create;
@@ -89,74 +91,99 @@ var
   ADevice: TDevice;
 begin
  try
-  Log('ARequest.RemoteAddr: [' + ARequest.RemoteAddr +'] ');
-  Log('ARequest.URI: [' + ARequest.URI +'] ');
-  Log('----------------------------------------');
-  Log('ARequest.Content: [' + ARequest.Content +'] ');
-  Log('----------------------------------------');
-
+{  logAdd('ARequest.RemoteAddr: [' + ARequest.RemoteAddr +'] ');
+  logAdd('ARequest.URI: [' + ARequest.URI +'] ');
+  logAdd('----------------------------------------');
+  logAdd('ARequest.Content: [' + ARequest.Content +'] ');
+  logAdd('----------------------------------------');
+}
   if (SameText(ARequest.URI, '/dev.json')) then // post req from job
-    if not ContentMap(ARequest.Content) then
+  begin
+    if not ContentToMap(ARequest.Content) then
       Exit;
-
- {  if IsDevice(ARequest, ADevice) then
-   begin
-     log('is dev');
-   end
-   else
-   begin
-      log('not dev');
-   end;   }
-
+    logText(FDevList.ToString);
+  end;
  except
    On E:Exception do
    begin
     //  ShowMessage('Ошибка [OnRequest]: ' + E.Message);
-      Log('Ошибка [OnRequest]: ' + E.Message);
+      logAdd('Ошибка [OnRequest]: ' + E.Message);
    end;
  end;
 end;
 
-function TServerProcess.ContentMap(AContent: string): Boolean;
+function TServerProcess.ContentToMap(AContent: string): Boolean;
 var
-  js: TJSONData;
-  jsarr: TJSONArray;
+  JsonParser: TJSONParser;
+  JsonObject: TJSONObject;
+  jdev: TJSONData;
+  JsonEnum: TBaseJSONEnumerator;
+  i: integer;
+  ADevice: TDevice;
 begin
+  FDevList.Clear;
   Result := True;
-  js := GetJSON(AContent);
   try
-  jsarr := TJSONArray(js.FindPath('devices').AsJSON);
- { if Result then
-    begin
-      js := GetJSON(AJSONText);
+    JsonParser := TJSONParser.Create(AContent, DefaultOptions);
+    try
+      JsonObject := JsonParser.Parse as TJSONObject;
       try
-       ADevice.Ip :=          js.FindPath('ip').AsString;
-       ADevice.DeviceClass := js.FindPath('class').AsString;
-       ADevice.State :=       js.FindPath('state').AsString;
-       ADevice.Name :=        js.FindPath('name').AsString;
-       ADevice.GUID :=        js.FindPath('device_guid').AsString;
-       ADevice.DeviceIndex := js.FindPath('index').AsString;
-       ADevice.IsNewDevice := js.FindPath('isnewdevice').AsString;
-       ADevice.srcContent:=   AJSONText;
-       { if (SameText(device.IsNewDevice, 'old')) then
-         FOldDeviceList.Add(device)
-       else
-         FNewDeviceList.Add(device);
-       FDeviceList.Add(device);    }}
+        JsonEnum := JsonObject.GetEnumerator;
+        try
+          while JsonEnum.MoveNext do
+            if JsonObject.Types[JsonEnum.Current.Key] = jtArray then
+               for i:=0 to Pred(TJSONArray(JsonEnum.Current.Value).Count) do
+               begin
+                 jdev := GetJSON(TJSONArray(JsonEnum.Current.Value).Items[i].AsJSON);
+                 ADevice.Ip :=          jdev.FindPath('ip').AsString;
+                 ADevice.DeviceClass := jdev.FindPath('class').AsString;
+                 ADevice.State :=       jdev.FindPath('state').AsString;
+                 ADevice.Name :=        jdev.FindPath('name').AsString;
+                 ADevice.GUID :=        jdev.FindPath('device_guid').AsString;
+                 ADevice.DeviceIndex := jdev.FindPath('index').AsString;
+                 ADevice.IsNewDevice := jdev.FindPath('isnewdevice').AsString;
+                 FDevList.Add(ADevice);
+               end;
+        finally
+          FreeAndNil(JsonEnum)
+        end;
       finally
-       js.Free;
+        FreeAndNil(JsonObject);
       end;
+    finally
+      FreeAndNil(JsonParser);
+    end;
+
+  except
+  On E:Exception do
+   begin
+      Result := False;
+      logAdd('Ошибка [ContentToMap]: ' + E.Message);
+   end;
+  end;
 end;
 
-procedure TServerProcess.log(const AValue: string);
+procedure TServerProcess.logAdd(const AValue: string);
 begin
-  fdebuginfo := AValue;
-  Synchronize(@_log);
+  fdebuginfoAdd := AValue;
+  Synchronize(@_logAdd);
 end;
 
-procedure TServerProcess._log;
+procedure TServerProcess._logAdd;
 begin
-  MainForm.m_device.Lines.Add('[' + TimeToStr(Now) + '] '  + fdebuginfo)
+  MainForm.m_device.Lines.Add('[' + TimeToStr(Now) + '] '  + fdebuginfoAdd)
+end;
+
+procedure TServerProcess.logText(const AValue: string);
+begin
+  fdebuginfoText := AValue;
+  Synchronize(@_logText);
+end;
+
+procedure TServerProcess._logText;
+begin
+  MainForm.m_device.Clear;
+  MainForm.m_device.Lines.Add('[' + TimeToStr(Now) + '] '  + fdebuginfoText)
 end;
 
 function TServerProcess.IsDevice(ARequest: TFPHTTPConnectionRequest; var ADevice: TDevice): Boolean;

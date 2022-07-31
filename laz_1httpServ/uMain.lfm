@@ -400,8 +400,8 @@ object Form1: TForm1
         OnChange = pgc_devChange
         object ts_old: TTabSheet
           Caption = 'ts_old'
-          ClientHeight = 399
-          ClientWidth = 937
+          ClientHeight = 426
+          ClientWidth = 943
           object lv_old: TListView
             Left = 80
             Height = 367
@@ -474,8 +474,8 @@ object Form1: TForm1
         end
         object ts_new: TTabSheet
           Caption = 'ts_new'
-          ClientHeight = 399
-          ClientWidth = 937
+          ClientHeight = 426
+          ClientWidth = 943
           object Panel37: TPanel
             Left = 0
             Height = 342
@@ -748,12 +748,12 @@ object Form1: TForm1
         ParentColor = False
       end
       object m_device: TMemo
-        Left = 24
+        Left = 344
         Height = 365
         Top = 136
-        Width = 912
+        Width = 592
         Color = clBlack
-        Font.Color = clTeal
+        Font.Color = clInactiveCaptionText
         Font.Height = -11
         Font.Name = 'System-ui'
         ParentFont = False

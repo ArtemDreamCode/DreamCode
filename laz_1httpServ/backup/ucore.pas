@@ -8,19 +8,31 @@ uses
   Classes, SysUtils,
    process, fpjson,
    jsonparser, jsonscanner, uTypes, ExtCtrls, StdCtrls, Controls, Graphics,
-   fphttpserver, httpdefs, httproute;
+   fphttpserver, httpdefs, httproute, sqlite3conn, sqldb, Dialogs;
 
 type
   { TServerProcess }
   TServerProcess  = class(TThread)
   private
+    _Error: string;
     FServer: TFPHttpServer;
-  // route
+    FdbConn: TSQLite3Connection;
+    FdbTransact: TSQLTransaction;
+    fdebuginfoAdd, fdebuginfoText: string;
     procedure OnRequest(Sender: TObject; Var ARequest: TFPHTTPConnectionRequest; Var AResponse : TFPHTTPConnectionResponse);
+    function ContentToMap(AContent: string): Boolean;
+  private
+    FDevList: TDeviceList;
+    function IsDevice(ARequest: TFPHTTPConnectionRequest; var ADevice: TDevice): Boolean;
   protected
+    procedure logAdd(const AValue: string);
+    procedure _logAdd;
+    procedure logText(const AValue: string);
+    procedure _logText;
     procedure Execute; override;
   public
-//    constructor Create(CreateSuspended: Boolean);
+    constructor Create;
+    destructor Destroy; override;
   end;
 
   TPingProcess = class(TThread)
@@ -38,6 +50,7 @@ type
     procedure DoState;
     procedure DoGUIControll;
     function CheckDevice(AValue: string): Boolean;
+   // procedure _log;
   protected
     procedure Execute; override;
 // debug info
@@ -72,32 +85,179 @@ uses
 
 { TServerProcess }
 
-procedure TServerProcess.OnRequest(Sender: TObject;
-  var ARequest: TFPHTTPConnectionRequest;
-  var AResponse: TFPHTTPConnectionResponse);
+procedure TServerProcess.OnRequest(Sender: TObject; var ARequest: TFPHTTPConnectionRequest;
+    var AResponse: TFPHTTPConnectionResponse);
+var
+  ADevice: TDevice;
 begin
- if ARequest.QueryFields.Values['turn'] > '' then
- begin
-   AResponse.Contents.Add(ARequest.RemoteAddress + ' state: ' + ARequest.QueryFields.Values['turn'] + '\n');
-   AResponse.Contents.Add(':)');
- end;
- if ARequest.QueryFields.Values['state'] > '' then
- begin
-   if ARequest.QueryFields.Values['state'] = 'all' then
+ try
+{  logAdd('ARequest.RemoteAddr: [' + ARequest.RemoteAddr +'] ');
+  logAdd('ARequest.URI: [' + ARequest.URI +'] ');
+  logAdd('----------------------------------------');
+  logAdd('ARequest.Content: [' + ARequest.Content +'] ');
+  logAdd('----------------------------------------');
+}
+  if (SameText(ARequest.URI, '/dev.json')) then // post req from job
+  begin
+    if not ContentToMap(ARequest.Content) then
+      Exit;
+    logText(FDevList.ToString);
+  end;
+ {  if IsDevice(ARequest, ADevice) then
    begin
-        //todo states of all devices
-     AResponse.Contents.Add('State of all devices :)');
+     logAdd('is dev');
+   end
+   else
+   begin
+      logAdd('not dev');
+   end;   }
+
+ except
+   On E:Exception do
+   begin
+    //  ShowMessage('Ошибка [OnRequest]: ' + E.Message);
+      logAdd('Ошибка [OnRequest]: ' + E.Message);
    end;
  end;
 end;
 
+function TServerProcess.ContentToMap(AContent: string): Boolean;
+var
+  JsonParser: TJSONParser;
+  JsonObject: TJSONObject;
+  jdev: TJSONData;
+  JsonEnum: TBaseJSONEnumerator;
+  i: integer;
+  ADevice: TDevice;
+begin
+  FDevList.Clear;
+  Result := True;
+  try
+    JsonParser := TJSONParser.Create(AContent, DefaultOptions);
+    try
+      JsonObject := JsonParser.Parse as TJSONObject;
+      try
+        JsonEnum := JsonObject.GetEnumerator;
+        try
+          while JsonEnum.MoveNext do
+            if JsonObject.Types[JsonEnum.Current.Key] = jtArray then
+               for i:=0 to Pred(TJSONArray(JsonEnum.Current.Value).Count) do
+               begin
+                 jdev := GetJSON(TJSONArray(JsonEnum.Current.Value).Items[i].AsJSON);
+                 ADevice.Ip :=          jdev.FindPath('ip').AsString;
+                 ADevice.DeviceClass := jdev.FindPath('class').AsString;
+                 ADevice.State :=       jdev.FindPath('state').AsString;
+                 ADevice.Name :=        jdev.FindPath('name').AsString;
+                 ADevice.GUID :=        jdev.FindPath('device_guid').AsString;
+                 ADevice.DeviceIndex := jdev.FindPath('index').AsString;
+                 ADevice.IsNewDevice := jdev.FindPath('isnewdevice').AsString;
+                 FDevList.Add(ADevice);
+               end;
+        finally
+          FreeAndNil(JsonEnum)
+        end;
+      finally
+        FreeAndNil(JsonObject);
+      end;
+    finally
+      FreeAndNil(JsonParser);
+    end;
+
+  except
+  On E:Exception do
+   begin
+      Result := False;
+      logAdd('Ошибка [ContentToMap]: ' + E.Message);
+   end;
+  end;
+end;
+
+procedure TServerProcess.logAdd(const AValue: string);
+begin
+  fdebuginfoAdd := AValue;
+  Synchronize(@_logAdd);
+end;
+
+procedure TServerProcess._logAdd;
+begin
+  MainForm.m_device.Clear;
+  MainForm.m_device.Lines.Add('[' + TimeToStr(Now) + '] '  + fdebuginfoAdd)
+end;
+
+procedure TServerProcess.logText(const AValue: string);
+begin
+  fdebuginfoText := AValue;
+  Synchronize(@_logText);
+end;
+
+procedure TServerProcess._logText;
+begin
+  MainForm.m_device.Lines.Add('[' + TimeToStr(Now) + '] '  + fdebuginfoText)
+end;
+
+function TServerProcess.IsDevice(ARequest: TFPHTTPConnectionRequest; var ADevice: TDevice): Boolean;
+var
+  js: TJSONData;
+  AJSONText: string;
+begin
+  Result := False;
+
+  AJSONText := ARequest.Content;
+
+  Result := pos(c_Device_GUID, AJSONText) > 0; //NewTechDev
+
+  if Result then
+    begin
+      js := GetJSON(AJSONText);
+      try
+       ADevice.Ip :=          js.FindPath('ip').AsString;
+       ADevice.DeviceClass := js.FindPath('class').AsString;
+       ADevice.State :=       js.FindPath('state').AsString;
+       ADevice.Name :=        js.FindPath('name').AsString;
+       ADevice.GUID :=        js.FindPath('device_guid').AsString;
+       ADevice.DeviceIndex := js.FindPath('index').AsString;
+       ADevice.IsNewDevice := js.FindPath('isnewdevice').AsString;
+       ADevice.srcContent:=   AJSONText;
+       { if (SameText(device.IsNewDevice, 'old')) then
+         FOldDeviceList.Add(device)
+       else
+         FNewDeviceList.Add(device);
+       FDeviceList.Add(device);    }
+      finally
+       js.Free;
+      end;
+    end;
+end;
+
 procedure TServerProcess.Execute;
 begin
-  FServer := TFPHttpServer.Create(nil);
-  FServer.port := 8080;
-  FServer.threaded := true;
-  FServer.OnRequest := @OnRequest;
-  FServer.Active:= true;
+ try
+    FServer.Active := True;
+  except
+    on E: Exception do
+    begin
+      _Error := E.Message;
+    end;
+  end;
+end;
+
+constructor TServerProcess.Create;
+begin
+ FServer := TFPHttpServer.Create(nil);
+ FServer.port := 8080;
+ FServer.threaded := true;
+ FServer.OnRequest := @OnRequest;
+ FreeOnTerminate := true;
+ FDevList := TDeviceList.Create;
+ inherited Create(False);
+end;
+
+destructor TServerProcess.Destroy;
+begin
+  FServer.Active:= False;
+  FServer.Free;
+  FDevList.Free;
+  inherited Destroy;
 end;
 
 { TPingProcess }
@@ -282,53 +442,36 @@ begin
        js.Free;
       end;
     end;
-
 end;
 
 procedure TPingProcess.ShowStatePinged;
 begin
-  MainForm.m_state.Lines.Assign(FPingedList);
-  MainForm.m_state.Lines.Add(DateTimeToStr(Now));
-  MainForm.m_state.Lines.Add('=================');
   MainForm.img_state.Picture.LoadFromFile('img/wifi_black.png');
 end;
 
 procedure TPingProcess.ShowStateDevices;
 begin
-  MainForm.m_device.Clear;
-  MainForm.m_device.Lines.Add(FDeviceList.ToString);
-  MainForm.m_device.Lines.Add(DateTimeToStr(Now));
-  MainForm.m_device.Lines.Add('=================');
   MainForm.img_state.Picture.LoadFromFile('img/wifi_green.png');
 end;
 
 procedure TPingProcess.ShowStatePingOk;
 begin
-  MainForm.m_all_proc.Clear;
-  MainForm.m_all_proc.Lines.Add('PingOk');
-  MainForm.m_all_proc.Lines.Add(DateTimeToStr(Now));
-  MainForm.m_all_proc.Lines.Add('=================');
+
 end;
 
 procedure TPingProcess.ShowStateStateOk;
 begin
-  MainForm.m_all_proc.Clear;
-  MainForm.m_all_proc.Lines.Add('StateOk');
-  MainForm.m_all_proc.Lines.Add(DateTimeToStr(Now));
-  MainForm.m_all_proc.Lines.Add('=================');
+
 end;
 
 procedure TPingProcess.log;
 begin
-  MainForm.m_device.Lines.Add('log ok: ' + fdebuginfo)
+
 end;
 
 procedure TPingProcess.ChangeMainFon;
 begin
-{  MainForm.lb_num_sett.Visible := (FNewDeviceList.Count > 0);
-  MainForm.lb_num_sett.Caption := FNewDeviceList.Count.ToString;
-  MainForm.img_main.Picture.LoadFromFile(FChangeMainFon);
-  MainForm.lb_num_sett.BringToFront; }
+
 end;
 
 procedure TPingProcess.BuildLVOld;

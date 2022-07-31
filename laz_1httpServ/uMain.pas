@@ -83,6 +83,7 @@ type
     tsControll: TTabSheet;
     tsToDo: TTabSheet;
     tsDebug: TTabSheet;
+    procedure Button1Click(Sender: TObject);
     procedure FServerRequest(Sender: TObject;
       var ARequest: TFPHTTPConnectionRequest;
       var AResponse: TFPHTTPConnectionResponse);
@@ -160,7 +161,7 @@ implementation
 
 {$R *.lfm}
 
-
+ // size op = 10,6 mbit on start !
 { TForm1 }
 
 procedure TForm1.AfterConstruction;
@@ -350,6 +351,11 @@ begin
   LState := ARequest.QueryFields.Values['turn'];
   AResponse.Content := 'led1 state ' + LState + '!';
   //Handled := true;
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+
 end;
 
 procedure TForm1.Image1MouseDown(Sender: TObject; Button: TMouseButton;
