@@ -62,20 +62,18 @@ void DoCheckButtonState()
      {
        RealCheck = true;
        digitalWrite(4, HIGH); //включаем
-       getOut = "http://192.168.1.72:8082/kick";
-       //getOut = "http://172.18.44.68/switch?turn=on";
+       getOut = "http://192.168.1.67:8080/on";
+
      }
      else if (RealCheck)
      {
        RealCheck = false;
        digitalWrite(4, LOW); //выключаем
-       getOut = "http://192.168.1.72:8082/kick";
-       //getOut = "http://172.18.44.68/switch?turn=off";
-       
+       getOut = "http://192.168.1.67:8080/off";
+     
      }
-     eeprom_write_state(RealCheck);
-     ////todo отправить гет-запрос на сервер о изменения состояния
      String resp = get(getOut);
+     eeprom_write_state(RealCheck);
   }
   else
   {
@@ -143,15 +141,15 @@ bool is_new_device()
 
 void loop()
 {
-  if ((millis() - TimerGet) >= ConstTimerGet)
-    if (!is_station)
-    {
-      String getOut = "";
-      if (RealCheck)
+ // if ((millis() - TimerGet) >= ConstTimerGet)
+  //  if (!is_station)
+  //  {
+   //   String getOut = "";
+   /*   if (RealCheck)
         getOut = "http://192.168.1.72:8082/kick";
-      else getOut = "http://192.168.1.72:8082/kick";
-      String resp = get(getOut); 
-    }
+      else getOut = "http://192.168.1.72:8082/kick";*/
+   //   String resp = get(getOut); 
+   // }
   DoCheckButtonState();
   server.handleClient();  
   delay(100);

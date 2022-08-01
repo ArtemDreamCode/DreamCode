@@ -41,18 +41,22 @@ void handle_ChangeState()
   //если аргумент один и он "turn"
   {
     state_buf = server.arg(0);
+    String getOut = "";
     if (state_buf == "on")
     {
-      RealCheck = true;
+      if (RealCheck) return;
+      RealCheck = true;     
       digitalWrite(4, HIGH); //выключаем
-      //включить лампочку
+      getOut = "http://192.168.1.67:8080/on";
     }
     else if(state_buf == "off")
     {
+      if (!RealCheck) return;
       RealCheck = false;
       digitalWrite(4, LOW); //выключаем
-      //выключить лампочку
+      getOut = "http://192.168.1.67:8080/off";
     }
+    String resp = get(getOut);
     eeprom_write_state(RealCheck);
   }
   

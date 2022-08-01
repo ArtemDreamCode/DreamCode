@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="15">
+      <Unit0>
+        <Filename Value="project1.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="50" Y="18"/>
+        <UsageCount Value="214"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="uMain"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="74"/>
+        <CursorPos X="3" Y="79"/>
+        <UsageCount Value="214"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="ipping.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="IpPing"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="19" Y="21"/>
+        <UsageCount Value="208"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="utypes.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uTypes"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="129"/>
+        <CursorPos X="13" Y="152"/>
+        <UsageCount Value="202"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="ucore.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uCore"/>
+        <TopLine Value="36"/>
+        <CursorPos X="27" Y="117"/>
+        <UsageCount Value="217"/>
+        <Bookmarks Count="5">
+          <Item0 Y="596"/>
+          <Item1 X="15" Y="278" ID="1"/>
+          <Item2 X="49" Y="589" ID="3"/>
+          <Item3 Y="415" ID="4"/>
+          <Item4 X="8" Y="228" ID="8"/>
+        </Bookmarks>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="usett.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frSett"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="uSett"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="100"/>
+        <CursorPos X="24" Y="122"/>
+        <UsageCount Value="216"/>
+        <Bookmarks Count="2">
+          <Item0 Y="228" ID="7"/>
+          <Item1 Y="143" ID="8"/>
+        </Bookmarks>
+      </Unit5>
+      <Unit6>
+        <Filename Value="uMain.pas"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="72"/>
+        <CursorPos X="19" Y="83"/>
+        <UsageCount Value="102"/>
+        <Bookmarks Count="4">
+          <Item0 Y="214" ID="2"/>
+          <Item1 X="18" Y="283" ID="5"/>
+          <Item2 X="18" Y="379" ID="6"/>
+          <Item3 X="5" Y="344" ID="7"/>
+        </Bookmarks>
+      </Unit6>
+      <Unit7>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/rtl/objpas/classes/classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1655"/>
+        <CursorPos X="16" Y="1669"/>
+        <UsageCount Value="5"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/packages/fcl-web/src/base/fphttpserver.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="23"/>
+        <CursorPos X="25" Y="38"/>
+        <UsageCount Value="6"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/packages/fcl-web/src/base/httpdefs.pp"/>
+        <UnitName Value="HTTPDefs"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="434"/>
+        <CursorPos X="14" Y="449"/>
+        <UsageCount Value="7"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/packages/fcl-net/src/ssockets.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="94"/>
+        <CursorPos X="72" Y="108"/>
+        <UsageCount Value="1"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/packages/fcl-db/src/sqldb/sqldb.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="602"/>
+        <CursorPos X="3" Y="616"/>
+        <UsageCount Value="5"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/rtl/inc/objpash.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="178"/>
+        <CursorPos X="23" Y="194"/>
+        <UsageCount Value="6"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/packages/fcl-json/src/jsonscanner.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="41"/>
+        <CursorPos X="3" Y="57"/>
+        <UsageCount Value="6"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="/usr/lib/lazarus/2.0.6/lcl/stdctrls.pp"/>
+        <UnitName Value="StdCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="792"/>
+        <CursorPos X="15" Y="807"/>
+        <UsageCount Value="6"/>
+      </Unit14>
+    </Units>
+    <JumpHistory Count="20" HistoryIndex="19">
+      <Position1>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="109" Column="54" TopLine="86"/>
+      </Position1>
+      <Position2>
+        <Filename Value="utypes.pas"/>
+        <Caret Line="55" Column="28" TopLine="32"/>
+      </Position2>
+      <Position3>
+        <Filename Value="utypes.pas"/>
+        <Caret Line="116" Column="39" TopLine="100"/>
+      </Position3>
+      <Position4>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="91" Column="10" TopLine="85"/>
+      </Position4>
+      <Position5>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="111" Column="60" TopLine="86"/>
+      </Position5>
+      <Position6>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="107" Column="73" TopLine="92"/>
+      </Position6>
+      <Position7>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="102" Column="11" TopLine="92"/>
+      </Position7>
+      <Position8>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="111" Column="26" TopLine="92"/>
+      </Position8>
+      <Position9>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="107" TopLine="94"/>
+      </Position9>
+      <Position10>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="111" TopLine="94"/>
+      </Position10>
+      <Position11>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="113" TopLine="94"/>
+      </Position11>
+      <Position12>
+        <Filename Value="utypes.pas"/>
+        <Caret Line="57" Column="42" TopLine="39"/>
+      </Position12>
+      <Position13>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="111" TopLine="91"/>
+      </Position13>
+      <Position14>
+        <Filename Value="utypes.pas"/>
+        <Caret Line="140" Column="34" TopLine="125"/>
+      </Position14>
+      <Position15>
+        <Filename Value="utypes.pas"/>
+        <Caret Line="141" Column="36" TopLine="125"/>
+      </Position15>
+      <Position16>
+        <Filename Value="utypes.pas"/>
+        <Caret Line="144" Column="27" TopLine="124"/>
+      </Position16>
+      <Position17>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="117" Column="32" TopLine="97"/>
+      </Position17>
+      <Position18>
+        <Filename Value="utypes.pas"/>
+        <Caret Line="138" TopLine="123"/>
+      </Position18>
+      <Position19>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="21" Column="20"/>
+      </Position19>
+      <Position20>
+        <Filename Value="ucore.pas"/>
+        <Caret Line="117" Column="32" TopLine="36"/>
+      </Position20>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>
