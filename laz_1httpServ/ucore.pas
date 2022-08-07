@@ -24,7 +24,6 @@ type
     procedure GUIControll; // for sync
   private
     FDevList: TDeviceList;
-    FBtnLIst: TList;
   protected
     procedure logAdd(const AValue: string);
     procedure _logAdd;
@@ -207,7 +206,6 @@ begin
  FServer.OnRequest := @OnRequest;
  FreeOnTerminate := true;
  FDevList := TDeviceList.Create;
- FBtnLIst := TList.Create;
  inherited Create(False);
 end;
 
@@ -216,7 +214,6 @@ begin
   FServer.Active:= False;
   FServer.Free;
   FDevList.Free;
-  FBtnLIst.Free;
   inherited Destroy;
 end;
 

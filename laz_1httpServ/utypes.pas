@@ -7,7 +7,7 @@ unit uTypes;
 interface
 
 uses
-  Classes, SysUtils, process, StdCtrls, ExtCtrls, fgl, Graphics, Controls;
+  Classes, SysUtils, process, StdCtrls, ExtCtrls, fgl, Graphics, Controls, fphttpclient, Forms;
 
 const
   c_ping_count   = '1';
@@ -51,6 +51,7 @@ type
    TDevButtonController = class
    private
      FlastTop: Integer;
+     procedure t_Get(p_bt: PtrInt); // for BeginThread for AntiFreeze Click Button
    public
       function FindByIp(const ATextTag: string): Boolean;
       procedure Add(const ADevice: TDevice);
@@ -71,6 +72,8 @@ type
      procedure SetState(AValue: string);
    public
      ip: string;
+     AllowedToClick: Boolean;
+     procedure CustomDrawState(AValue: string);
      property State: string read GetState write SetState;
      property IsLife: Byte read GetIsLife write SetIsLife;
      constructor Create(AOwner: TComponent);
@@ -170,6 +173,31 @@ begin
   end;
 end;
 
+procedure TDevButtonController.t_Get(p_bt: PtrInt);
+var
+  bt: TDevButton;
+  outGet: string;
+begin
+  bt := TDevButton(p_bt);
+  bt.AllowedToClick := False;
+  try
+    with TFPHttpClient.Create(nil) do
+      try
+        if (bt.State = 'on') then
+          RunCommand('/curl -m 2 http://' + bt.ip + '/relay?turn=off', outGet)
+         // Get('http://' + bt.ip + '/relay?turn=off')
+        else
+          RunCommand('/curl -m 2 http://' + bt.ip + '/relay?turn=on', outGet)
+         // Get('http://' + bt.ip + '/relay?turn=on');
+      finally
+        Free;
+      end;
+
+  finally
+    bt.AllowedToClick := True;
+  end;
+end;
+
 procedure TDevButtonController.OnBaseDevMouseUp(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
@@ -179,12 +207,21 @@ begin
   if not (Sender is TDevButton) then
      Exit;
   bt := (Sender as TDevButton);
-
-  if (bt.State = 'on') then
-    RunCommand('/curl -m 2 http://' + bt.ip + '/relay?turn=off', outGet)
-  else
-    RunCommand('/curl -m 2 http://' + bt.ip + '/relay?turn=on', outGet)
-end;
+  if not (bt.AllowedToClick) then
+    Exit;
+  with TFPHttpClient.Create(nil) do
+    try
+      if (bt.State = 'on') then
+        bt.CustomDrawState('off')
+      else
+        bt.CustomDrawState('on');
+//    t_Get(PtrInt(Pointer(bt)));
+      Forms.Application.QueueAsyncCall(@t_get, PtrInt(Pointer(bt)));
+    finally
+      Free;
+    end;
+    bt.Enabled:= TRue;
+ end;
 
 constructor TDevButtonController.Create;
 begin
@@ -212,18 +249,26 @@ begin
   FIsLife := AValue;
 end;
 
-procedure TDevButton.SetState(AValue: string);
+procedure TDevButton.CustomDrawState(AValue: string);
 begin
   if (AValue = 'on') then
-    begin
-      self.Color:= clGreen;
-      self.Font.Color := clWhite;
-    end
+  begin
+    self.Color:= clGreen;
+    self.Font.Color := clWhite;
+  end
   else
   begin
     self.Color:= clWhite;
     self.Font.Color := clBlack;
   end;
+end;
+
+procedure TDevButton.SetState(AValue: string);
+begin
+  if (AValue = 'on') then
+      CustomDrawState('on')
+  else
+    CustomDrawState('off');
   FState := AValue;
 end;
 
@@ -231,6 +276,7 @@ constructor TDevButton.Create(AOwner: TComponent);
 begin
   Inherited Create(AOwner);
   self.Color:= clWhite;
+  AllowedToClick := True;
 end;
 
 { TDeviceList }

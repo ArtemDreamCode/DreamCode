@@ -16,6 +16,7 @@ uses
 {$R *.res}
 
 begin
+  SetHeapTraceOutput('heaptrace.trc');
   RequireDerivedFormResource:=True;
   Application.Scaled:=True;
   Application.Initialize;
