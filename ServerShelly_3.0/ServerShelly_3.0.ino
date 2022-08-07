@@ -62,14 +62,14 @@ void DoCheckButtonState()
      {
        RealCheck = true;
        digitalWrite(4, HIGH); //включаем
-       getOut = "http://192.168.1.67:8080/on";
+       getOut = "http://192.168.1.48:8080/on";
 
      }
      else if (RealCheck)
      {
        RealCheck = false;
        digitalWrite(4, LOW); //выключаем
-       getOut = "http://192.168.1.67:8080/off";
+       getOut = "http://192.168.1.48:8080/off";
      
      }
      String resp = get(getOut);

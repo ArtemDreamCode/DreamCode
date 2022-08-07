@@ -47,14 +47,14 @@ void handle_ChangeState()
       if (RealCheck) return;
       RealCheck = true;     
       digitalWrite(4, HIGH); //выключаем
-      getOut = "http://192.168.1.67:8080/on";
+      getOut = "http://192.168.1.48:8080/on";
     }
     else if(state_buf == "off")
     {
       if (!RealCheck) return;
       RealCheck = false;
       digitalWrite(4, LOW); //выключаем
-      getOut = "http://192.168.1.67:8080/off";
+      getOut = "http://192.168.1.48:8080/off";
     }
     String resp = get(getOut);
     eeprom_write_state(RealCheck);

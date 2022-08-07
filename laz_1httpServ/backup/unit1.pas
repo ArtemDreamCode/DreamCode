@@ -35,6 +35,8 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
+    procedure tsMainContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
   private
     FPingProcess: TPingProcess;
   protected
@@ -69,6 +71,12 @@ procedure TForm1.BeforeDestruction;
 begin
   KillProcessPing;
   inherited BeforeDestruction;
+end;
+
+procedure TForm1.tsMainContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+
 end;
 
 procedure TForm1.DoShow;

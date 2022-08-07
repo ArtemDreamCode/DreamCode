@@ -103,7 +103,7 @@
 	9.1 [перезапуск службы sudo service cron reload ] (стирает все задания !!!)
 	9.2 редактирование файла crontab -e 
 		и добавляем: 
-chmod +x ./test.sh
+chmod +x ./dev.sh
 
 10. Go
 https://losst.ru/ustanovka-go-ubuntu

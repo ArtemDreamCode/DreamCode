@@ -7,7 +7,7 @@ unit uTypes;
 interface
 
 uses
-  Classes, SysUtils, process, StdCtrls, ExtCtrls, fgl;
+  Classes, SysUtils, process, StdCtrls, ExtCtrls, fgl, Graphics, Controls;
 
 const
   c_ping_count   = '1';
@@ -39,10 +39,42 @@ type
     DeviceIndex: string;
     IsNewDevice: string;
     srcContent: string;
+    IsLife: Byte; // syntetic - if device not ping = false
   end;
 
 type
    TDeviceArrayList = Array of TDevice;
+
+   { TDevButton }
+
+   { TDevButtonController }
+   TDevButtonController = class
+   private
+     FlastTop: Integer;
+   public
+      function FindByIp(const ATextTag: string): Boolean;
+      procedure Add(const ADevice: TDevice);
+      procedure Delete(const ATextTag: string);
+      procedure Refresh(const ADevice: TDevice);
+      procedure OnBaseDevMouseUp(Sender: TObject; Button: TMouseButton;
+                  Shift: TShiftState; X, Y: Integer);
+      constructor Create;
+   end;
+
+   TDevButton = class(TPanel)
+   private
+     FState: string;
+     FIsLife: Byte;
+     function GetIsLife: Byte;
+     function GetState: string;
+     procedure SetIsLife(AValue: Byte);
+     procedure SetState(AValue: string);
+   public
+     ip: string;
+     property State: string read GetState write SetState;
+     property IsLife: Byte read GetIsLife write SetIsLife;
+     constructor Create(AOwner: TComponent);
+   end;
 
   { TDeviceList }
    TDeviceList = class(TObject)
@@ -52,22 +84,154 @@ type
     public
         function Add(ADevice : TDevice) : integer;
         function ToString: string; override;
-        function SearchByIp(AValue: string): TDevice;
+        function ToShortString: string;
+        function GetByIp(AValue: string): TDevice;
+        procedure MarkLife(AValue: Byte); overload;
+        procedure MarkLife(AIp: string; AValue: Byte); overload;
         function IsContainsByIp(AValue: string): Boolean;
         procedure SetNewState(AIp, AState: string);
         procedure Clear;
         property List: TDeviceArrayList read FDeviceArrayList;
         property Count: Integer read GetCount;
-        constructor Create;
     end;
 
-function DeviceToStr(ADevice: TDevice): string;
 function show_kb: string;
 function hide_kb: string;
 var
   FDeviceList, FNewDeviceList, FOldDeviceList: TDeviceList;
 
 implementation
+
+uses
+  uMain;
+
+{ TDevButtonController }
+
+function TDevButtonController.FindByIp(const ATextTag: string): Boolean;
+var
+  i: Integer;
+  bt: TDevButton;
+begin
+  Result := False;
+  for i := 0 to MainForm.pBtn.ControlCount - 1 do
+  begin
+    if not (MainForm.pBtn.Controls[i] is TDevButton) then
+       Continue;
+    bt := (MainForm.pBtn.Controls[i] as TDevButton);
+
+    if (SameText(bt.ip, ATextTag)) then
+      Result := True;
+  end;
+end;
+
+procedure TDevButtonController.Add(const ADevice: TDevice);
+var
+  bt: TDevButton;
+begin
+  bt := TDevButton.Create(MainForm.pBtn);
+  bt.OnMouseUp:= @OnBaseDevMouseUp;
+  bt.Height:= 50;
+  bt.Width:= 200;
+  bt.Top:= FlastTop + 10;
+  FlastTop := bt.Top + bt.Height;
+  bt.Left:= 10;
+  bt.BevelInner:= bvLowered;
+  bt.BevelOuter:= bvRaised;
+  bt.Parent := MainForm.pBtn;
+  bt.IsLife:= ADevice.IsLife;
+  bt.State:= ADevice.State;
+  bt.ip := ADevice.Ip;
+  bt.Caption:= ADevice.Ip;
+end;
+
+procedure TDevButtonController.Delete(const ATextTag: string);
+begin
+//
+end;
+
+procedure TDevButtonController.Refresh(const ADevice: TDevice);
+var
+  i: Integer;
+  bt: TDevButton;
+begin
+  for i := 0 to MainForm.pBtn.ControlCount - 1 do
+  begin
+    if not (MainForm.pBtn.Controls[i] is TDevButton) then
+       Continue;
+    bt := (MainForm.pBtn.Controls[i] as TDevButton);
+
+    if (SameText(bt.ip, ADevice.Ip)) then
+    begin
+      bt.IsLife:= ADevice.IsLife;
+      bt.State:= ADevice.State;
+      bt.ip := ADevice.Ip;
+      bt.Caption:= ADevice.Ip;
+    end;
+  end;
+end;
+
+procedure TDevButtonController.OnBaseDevMouseUp(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  bt: TDevButton;
+  outGet: string;
+begin
+  if not (Sender is TDevButton) then
+     Exit;
+  bt := (Sender as TDevButton);
+
+  if (bt.State = 'on') then
+    RunCommand('/curl -m 2 http://' + bt.ip + '/relay?turn=off', outGet)
+  else
+    RunCommand('/curl -m 2 http://' + bt.ip + '/relay?turn=on', outGet)
+end;
+
+constructor TDevButtonController.Create;
+begin
+  FlastTop := 0;
+end;
+
+{ TDevButton }
+
+function TDevButton.GetState: string;
+begin
+  result := FState;
+end;
+
+function TDevButton.GetIsLife: Byte;
+begin
+  result := FIsLife;
+end;
+
+procedure TDevButton.SetIsLife(AValue: Byte);
+begin
+  if (AValue = 0) then
+    self.Enabled:= False
+  else
+    self.Enabled:= True;
+  FIsLife := AValue;
+end;
+
+procedure TDevButton.SetState(AValue: string);
+begin
+  if (AValue = 'on') then
+    begin
+      self.Color:= clGreen;
+      self.Font.Color := clWhite;
+    end
+  else
+  begin
+    self.Color:= clWhite;
+    self.Font.Color := clBlack;
+  end;
+  FState := AValue;
+end;
+
+constructor TDevButton.Create(AOwner: TComponent);
+begin
+  Inherited Create(AOwner);
+  self.Color:= clWhite;
+end;
 
 { TDeviceList }
 
@@ -84,6 +248,8 @@ begin
   SetLength(FDeviceArrayList, c + 1);
   FDeviceArrayList[c] := ADevice;
   Result := c;
+
+
 end;
 
 function TDeviceList.ToString: string;
@@ -103,6 +269,7 @@ begin
       s.Add('GUID: ' + P.GUID);
       s.Add('DeviceIndex: ' + P.DeviceIndex);
       s.Add('isnewdevice: ' + P.isnewdevice + '}');
+      s.Add('IsLife: ' + P.IsLife.ToString + '}');
       s.Add('------------------------------------');
     end;
     Result := s.Text;
@@ -111,13 +278,53 @@ begin
   end;
 end;
 
-function TDeviceList.SearchByIp(AValue: string): TDevice;
+function TDeviceList.ToShortString: string;
+var
+  s: TStringList;
+  P : TDevice;
+begin
+  s := TStringList.Create;
+  try
+    s.Add('Devices count: ' + self.Count.ToString);
+    for P in FDeviceArrayList do
+    begin
+      s.Add('ip: ' + P.Ip);
+      s.Add('State: ' + P.State);
+      s.Add('Name: ' + P.Name);
+      s.Add('isnewdevice: ' + P.isnewdevice + '}');
+      s.Add('IsLife: ' + P.IsLife.ToString + '}');
+      s.Add('------------------------------------');
+    end;
+    Result := s.Text;
+  finally
+    s.Free;
+  end;
+end;
+
+function TDeviceList.GetByIp(AValue: string): TDevice;
 var
   elem: TDevice;
 begin
   for elem in FDeviceArrayList do
       if SameText(elem.Ip, AValue) then
          Exit(elem);
+end;
+
+procedure TDeviceList.MarkLife(AValue: Byte);
+var
+  i: Integer;
+begin
+  for i := 0 to Count - 1 do
+      FDeviceArrayList[i].IsLife := AValue;
+end;
+
+procedure TDeviceList.MarkLife(AIp: string; AValue: Byte);
+var
+  i: Integer;
+begin
+  for i := 0 to Count - 1 do
+      if SameText(FDeviceArrayList[i].Ip, AIp) then
+         FDeviceArrayList[i].IsLife:= AValue;
 end;
 
 function TDeviceList.IsContainsByIp(AValue: string): Boolean;
@@ -144,31 +351,6 @@ end;
 procedure TDeviceList.Clear;
 begin
   SetLength(FDeviceArrayList, 0);
-end;
-
-constructor TDeviceList.Create;
-begin
-
-end;
-
-function DeviceToStr(ADevice: TDevice): string;
-var
-  s: TStringList;
-begin
-  s := TStringList.Create;
-  try
-    s.Add('{ ip: ' + ADevice.Ip);
-    s.Add('DeviceClass: ' + ADevice.DeviceClass);
-    s.Add('State: ' + ADevice.State);
-    s.Add('Name: ' + ADevice.Name);
-    s.Add('GUID: ' + ADevice.GUID);
-    s.Add('DeviceIndex: ' + ADevice.DeviceIndex);
-    s.Add('isnewdevice: ' + ADevice.isnewdevice + '}');
-    s.Add('------------------------------------');
-    Result := s.Text;
-  finally
-    s.Free;
-  end;
 end;
 
 function show_kb: string;

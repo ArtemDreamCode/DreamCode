@@ -10,15 +10,15 @@ object Form1: TForm1
   Font.Height = -13
   Font.Name = 'Inter V'
   OnCreate = FormCreate
-  LCLVersion = '2.0.6.0'
+  LCLVersion = '2.2.2.0'
   object pgc: TPageControl
     Left = 0
     Height = 581
     Top = 0
     Width = 957
-    ActivePage = tsDebug
+    ActivePage = tsSett
     Align = alClient
-    TabIndex = 4
+    TabIndex = 1
     TabOrder = 0
     OnChange = pgcChange
     object tsMain: TTabSheet
@@ -82,7 +82,7 @@ object Form1: TForm1
         end
         object lb_date: TLabel
           Left = 16
-          Height = 36
+          Height = 38
           Top = 48
           Width = 82
           Caption = 'date'
@@ -201,7 +201,7 @@ object Form1: TForm1
           end
           object lb_cnt_sett: TLabel
             Left = 151
-            Height = 61
+            Height = 63
             Top = 8
             Width = 37
             Align = alCustom
@@ -218,7 +218,7 @@ object Form1: TForm1
         end
         object lb_time: TLabel
           Left = 16
-          Height = 36
+          Height = 38
           Top = 80
           Width = 81
           Caption = 'time'
@@ -299,67 +299,6 @@ object Form1: TForm1
           TabOrder = 2
           OnMouseDown = Panel31MouseDown
         end
-        object pTabNew: TPanel
-          Left = 72
-          Height = 84
-          Top = 18
-          Width = 390
-          Align = alLeft
-          BevelOuter = bvNone
-          Caption = ' Новые устройства'
-          ClientHeight = 84
-          ClientWidth = 390
-          Font.Height = -29
-          Font.Name = 'Veles'
-          ParentFont = False
-          TabOrder = 3
-          Wordwrap = True
-          OnMouseUp = pTabNewMouseUp
-          object pShNew: TShape
-            Left = 0
-            Height = 84
-            Top = 0
-            Width = 390
-            Align = alClient
-            Brush.Style = bsClear
-            Pen.Color = 15516693
-            Pen.Style = psPattern
-            OnMouseUp = pTabNewMouseUp
-            Shape = stRoundRect
-          end
-        end
-        object pTabOld: TPanel
-          Left = 472
-          Height = 84
-          Top = 18
-          Width = 390
-          Align = alLeft
-          BevelOuter = bvNone
-          Caption = 'Подключенные устройства'
-          ClientHeight = 84
-          ClientWidth = 390
-          Color = clWhite
-          Font.Height = -24
-          Font.Name = 'Veles'
-          ParentColor = False
-          ParentFont = False
-          TabOrder = 4
-          Wordwrap = True
-          OnClick = pTabOldClick
-          OnMouseUp = pTabOldMouseUp
-          object pShOld: TShape
-            Left = 0
-            Height = 84
-            Top = 0
-            Width = 390
-            Align = alClient
-            Brush.Style = bsClear
-            Pen.Color = 15516693
-            Pen.Style = psPattern
-            OnMouseUp = pTabOldMouseUp
-            Shape = stRoundRect
-          end
-        end
         object Panel33: TPanel
           Left = 0
           Height = 18
@@ -367,7 +306,7 @@ object Form1: TForm1
           Width = 947
           Align = alTop
           BevelOuter = bvNone
-          TabOrder = 5
+          TabOrder = 3
         end
         object Panel34: TPanel
           Left = 0
@@ -376,168 +315,35 @@ object Form1: TForm1
           Width = 947
           Align = alBottom
           BevelOuter = bvNone
-          TabOrder = 6
+          TabOrder = 4
         end
         object Panel48: TPanel
-          Left = 462
+          Left = 72
           Height = 84
           Top = 18
           Width = 10
           Align = alLeft
           BevelOuter = bvNone
-          TabOrder = 7
+          TabOrder = 5
         end
       end
-      object pgc_dev: TPageControl
+      object pBtn: TPanel
         Left = 0
         Height = 430
         Top = 120
         Width = 947
-        ActivePage = ts_old
         Align = alClient
-        TabIndex = 0
+        ClientHeight = 430
+        ClientWidth = 947
         TabOrder = 1
-        OnChange = pgc_devChange
-        object ts_old: TTabSheet
-          Caption = 'ts_old'
-          ClientHeight = 426
-          ClientWidth = 943
-          object lv_old: TListView
-            Left = 80
-            Height = 367
-            Top = 32
-            Width = 777
-            Align = alClient
-            BorderStyle = bsNone
-            Columns = <            
-              item
-                Caption = 'num'
-              end            
-              item
-                Caption = 'img'
-              end            
-              item
-                Caption = 'name'
-                Width = 450
-              end            
-              item
-                Caption = 'ip'
-                Width = 230
-              end            
-              item
-                Caption = 'state'
-                Visible = False
-              end            
-              item
-                Caption = 'isnewdevice'
-                Visible = False
-              end>
-            Font.Height = -35
-            Font.Name = 'Veles'
-            ParentFont = False
-            ReadOnly = True
-            RowSelect = True
-            ScrollBars = ssNone
-            TabOrder = 0
-            OnCustomDrawItem = lv_oldCustomDrawItem
-            OnMouseDown = lv_oldMouseDown
-            OnMouseMove = lv_oldMouseMove
-            OnMouseUp = lv_oldMouseUp
-          end
-          object Panel28: TPanel
-            Left = 857
-            Height = 367
-            Top = 32
-            Width = 80
-            Align = alRight
-            BevelOuter = bvNone
-            TabOrder = 1
-          end
-          object Panel29: TPanel
-            Left = 0
-            Height = 367
-            Top = 32
-            Width = 80
-            Align = alLeft
-            BevelOuter = bvNone
-            TabOrder = 2
-          end
-          object Panel32: TPanel
-            Left = 0
-            Height = 32
-            Top = 0
-            Width = 937
-            Align = alTop
-            BevelOuter = bvNone
-            TabOrder = 3
-          end
-        end
-        object ts_new: TTabSheet
-          Caption = 'ts_new'
-          ClientHeight = 426
-          ClientWidth = 943
-          object Panel37: TPanel
-            Left = 0
-            Height = 342
-            Top = 32
-            Width = 80
-            Align = alLeft
-            BevelOuter = bvNone
-            TabOrder = 0
-            OnClick = Panel37Click
-          end
-          object Panel41: TPanel
-            Left = 0
-            Height = 32
-            Top = 0
-            Width = 940
-            Align = alTop
-            BevelOuter = bvNone
-            TabOrder = 1
-          end
-          object Panel42: TPanel
-            Left = 860
-            Height = 342
-            Top = 32
-            Width = 80
-            Align = alRight
-            BevelOuter = bvNone
-            TabOrder = 2
-          end
-          object lv_new: TListView
-            Left = 80
-            Height = 342
-            Top = 32
-            Width = 780
-            Align = alClient
-            BorderStyle = bsNone
-            Columns = <            
-              item
-                Caption = 'num'
-              end            
-              item
-                Caption = 'img'
-              end            
-              item
-                Caption = 'name'
-                Width = 450
-              end            
-              item
-                Caption = 'ip'
-                Width = 640
-              end            
-              item
-                Caption = 'state'
-                Visible = False
-              end>
-            Font.Height = -35
-            Font.Name = 'Veles'
-            ParentFont = False
-            ReadOnly = True
-            RowSelect = True
-            ScrollBars = ssNone
-            TabOrder = 3
-          end
+        object Panel6: TPanel
+          Left = 194
+          Height = 50
+          Top = 100
+          Width = 170
+          BevelInner = bvLowered
+          Caption = 'Panel6'
+          TabOrder = 0
         end
       end
     end
@@ -741,7 +547,7 @@ object Form1: TForm1
       ClientWidth = 947
       object Label1: TLabel
         Left = 200
-        Height = 15
+        Height = 17
         Top = 48
         Width = 68
         Caption = 'pinged list'
@@ -753,7 +559,7 @@ object Form1: TForm1
         Top = 136
         Width = 592
         Color = clBlack
-        Font.Color = clTeal
+        Font.Color = clInactiveCaptionText
         Font.Height = -11
         Font.Name = 'System-ui'
         ParentFont = False
@@ -762,7 +568,7 @@ object Form1: TForm1
       end
       object Label2: TLabel
         Left = 608
-        Height = 15
+        Height = 17
         Top = 48
         Width = 67
         Caption = 'device list'
@@ -770,7 +576,7 @@ object Form1: TForm1
       end
       object Label3: TLabel
         Left = 24
-        Height = 15
+        Height = 17
         Top = 48
         Width = 72
         Caption = 'all proc log'
@@ -830,34 +636,12 @@ object Form1: TForm1
           BevelOuter = bvNone
           TabOrder = 3
         end
-        object Button1: TButton
-          Left = 32
-          Height = 25
-          Top = 104
-          Width = 75
-          Caption = 'Button1'
-          OnClick = Button1Click
-          TabOrder = 4
-        end
       end
     end
   end
-  object m_dev: TMemo
-    Left = 16
-    Height = 376
-    Top = 168
-    Width = 312
-    Color = clBlack
-    Font.Color = clTeal
-    Font.Height = -11
-    Font.Name = 'System-ui'
-    ParentFont = False
-    ScrollBars = ssBoth
-    TabOrder = 1
-  end
   object tm_time: TTimer
     OnTimer = tm_timeTimer
-    left = 880
-    top = 160
+    Left = 880
+    Top = 160
   end
 end

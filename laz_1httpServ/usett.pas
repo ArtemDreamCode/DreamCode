@@ -136,61 +136,8 @@ end;
 
 procedure TfrSett.shResetMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
-var
-   fip, addr, outGet: string;
-   p: TDevice;
 begin
-  if not Assigned(flv.Selected) then
-  begin
-    ModalResult:= mrCancel;
-    Exit;
-  end;
 
-  p.Ip:= flv.Selected.SubItems[2];
-  p.State:=flv.Selected.SubItems[3];
-  p.Name:=flv.Selected.SubItems[1];
-  p.IsNewDevice:= flv.Selected.SubItems[4];
-  if Assigned(MainForm.lv_New) then
-  begin
-    MainForm.lv_New.BeginUpdate;
-    try
-      with MainForm.lv_New.Items.Add do
-        begin
-           Caption:= MainForm.lv_New.Items.Count.ToString + '.';
-           if SameText(p.State, 'off') then
-             SubItems.Add('⚫')
-           else
-             SubItems.Add('🔥');
-           SubItems.Add(p.Name);
-           SubItems.Add(p.Ip);
-           SubItems.Add(p.State);
-           SubItems.Add('new');
-        end;
-    finally
-      MainForm.lv_New.EndUpdate;
-    end;
-  end;
-
-   try
-    fip := flv.Selected.SubItems[2];
-    flv.BeginUpdate;
-    try
-       flv.Selected.Delete;
-    finally
-      flv.EndUpdate;
-    end;
-
-    MainForm.pTabOld.Enabled:= flv.Items.Count  > 0;
-    MainForm.pTabNew.Enabled:= MainForm.lv_New.Items.Count  > 0;
-
-     if not MainForm.pTabOld.Enabled then
-       MainForm.OnCustomTabLinkClickNew;
-
-    addr := 'http://' + fip + c_reset;
-    RunCommand('/curl -m 2 ' + addr, outGet);
-  finally
-    ModalResult:= mrOk;
-  end;
 end;
 
 procedure TfrSett.shSwitchMouseUp(Sender: TObject; Button: TMouseButton;
@@ -233,86 +180,8 @@ begin
 end;
 
 procedure TfrSett.ChangeName;
-var
-   fip, addr, outGet: string;
-   p: TDevice;
 begin
-  if not Assigned(flv.Selected) then
-  begin
-    ModalResult:= mrCancel;
-    Exit;
-  end;
 
-  if Length(edName.Text) = 0 then
-  begin
-    ModalResult:= mrCancel;
-    Exit;
-  end;
-
-  p.Ip:= flv.Selected.SubItems[2];
-  p.State:=flv.Selected.SubItems[3];
-  p.Name:=flv.Selected.SubItems[1];
-  p.IsNewDevice:= flv.Selected.SubItems[4];
-
-  if p.IsNewDevice = 'old' then
-  begin
-      fip := flv.Selected.SubItems[2];
-      flv.BeginUpdate;
-      try
-        flv.Selected.SubItems[1] := edName.Text;
-      finally
-        flv.EndUpdate;
-      end;
-      addr := 'http://' + fip + c_change_name + edName.Text;
-      RunCommand('/curl -m 2 ' + addr, outGet);
-      ModalResult:= mrOk;
-      Exit;
-  end
-  else
-  begin
-     if Assigned(MainForm.lv_Old) then
-       begin
-         MainForm.lv_Old.BeginUpdate;
-         try
-           with MainForm.lv_Old.Items.Add do
-             begin
-                Caption:= MainForm.lv_Old.Items.Count.ToString + '.';
-                if SameText(p.State, 'off') then
-                  SubItems.Add('⚫')
-                else
-                  SubItems.Add('🔥');
-                SubItems.Add(edName.Text);
-                SubItems.Add(p.Ip);
-                SubItems.Add(p.State);
-                SubItems.Add('old');
-             end;
-         finally
-           MainForm.lv_Old.EndUpdate;
-         end;
-       end;
-
-      try
-        fip := flv.Selected.SubItems[2];
-        flv.BeginUpdate;
-        try
-           flv.Selected.Delete;
-        finally
-          flv.EndUpdate;
-        end;
-
-        MainForm.pTabNew.Enabled:= flv.Items.Count  > 0;
-        MainForm.pTabOld.Enabled:= MainForm.lv_Old.Items.Count  > 0;
-        if not MainForm.pTabNew.Enabled then
-          MainForm.OnCustomTabLinkClickOLd;
-
-        addr := 'http://' + fip + c_change_name + edName.Text;
-        RunCommand('/curl -m 2 ' + addr, outGet);
-
-      finally
-        ModalResult:= mrOk;
-      end;
-
-  end;
 end;
 
 end.
