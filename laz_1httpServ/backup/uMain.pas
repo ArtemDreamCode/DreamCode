@@ -6,19 +6,53 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
-  ComCtrls, EditBtn, uCore, uTypes, Types, uSett, sqlite3conn, sqldb, fpjson,
-  process, fphttpserver;
+  ComCtrls, EditBtn, Buttons, uCore, uTypes, Types, uSett, sqlite3conn, sqldb,
+  fpjson, process, fphttpserver;
 
   { TForm1 }
 type
   TForm1 = class(TForm)
+    book: TPage;
+    btnBackward: TSpeedButton;
+    btnBook: TSpeedButton;
+    btnDashboard: TSpeedButton;
+    btnExit: TSpeedButton;
+    btnForward: TSpeedButton;
+    btnMusic: TSpeedButton;
+    btnPause: TSpeedButton;
+    btnPlay: TSpeedButton;
+    btnSettings: TSpeedButton;
+    btnStop: TSpeedButton;
+    btnVideo: TSpeedButton;
+    dashboard: TPage;
+    edtSearch: TEdit;
+    Image1: TImage;
+    Image2: TImage;
+    Image3: TImage;
+    Image4: TImage;
     img_state: TImage;
     Label1: TLabel;
+    Label10: TLabel;
     Label2: TLabel;
     Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
+    lblAppInfo: TLabel;
+    lblBook: TLabel;
+    lblDashboard: TLabel;
+    lblMusic: TLabel;
+    lblSettings: TLabel;
+    lblUserName: TLabel;
+    lblVideo: TLabel;
     lb_cnt_sett: TLabel;
     lb_num_sett: TLabel;
     MainHomePanel: TPanel;
+    music: TPage;
+    nbkPages: TNotebook;
     PageControl2: TPageControl;
     Panel1: TPanel;
     Panel2: TPanel;
@@ -45,18 +79,25 @@ type
     Panel47: TPanel;
     Panel48: TPanel;
     Panel5: TPanel;
-    Panel50: TPanel;
-    Panel51: TPanel;
-    Panel52: TPanel;
-    Panel53: TPanel;
     Panel6: TPanel;
+    Panel7: TPanel;
+    Panel8: TPanel;
+    Panel9: TPanel;
     pBtn: TPanel;
-    pEdit: TPanel;
     pEdit1: TPanel;
+    pnlMain: TPanel;
+    pnlNav: TPanel;
+    pnlNavButtons: TPanel;
+    pnlUser: TPanel;
+    settings: TPage;
     Shape3: TShape;
     Shape4: TShape;
+    shapeSearchField: TShape;
     sh_home: TShape;
     sh_sett: TShape;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
@@ -70,6 +111,7 @@ type
    lb_time: TLabel;
     tsMain:TTabSheet;
     tsToDo: TTabSheet;
+    video: TPage;
     procedure Button1Click(Sender: TObject);
     procedure FServerRequest(Sender: TObject;
       var ARequest: TFPHTTPConnectionRequest;
@@ -344,7 +386,7 @@ end;
 procedure TForm1.sh_settMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  pgc.ActivePage := tsSett;
+  pgc.ActivePage := tsToDo;
 end;
 
 procedure TForm1.ShowTime;

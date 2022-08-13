@@ -1,0 +1,28 @@
+1. Установка Авалонии для студии
+	https://marketplace.visualstudio.com/items?itemName=AvaloniaTeam.AvaloniaVS
+2. Создание нового проекта avalonia шаблон mvvm
+3. Добавление пакетов: 
+ 3.1 "проект" -> "управление пакетами nuget"
+ 3.2 "обзор" -. установка следущих пакетов: 
+	а) avalonia.desktop
+	б) avalonia.diagnostic
+	в) avalonia.markup.xaml.loader
+	г) avalonia.reactiveUI
+	д) avalonia.skia
+	е) avalonia.linuxFramebuffer
+	ж) xamlNameReferenceGenerator
+	з) Neumorphism.Avalonia
+
+запуск на расбери: 
+1. установить ubuntu server 32bit for amd
+2. sudo apt update
+3. sudo apt upgrade
+4. sudo apt install libfontconfig1
+5. sudo apt-get install libinput-tools
+
+6. sudo ufw allow 7890/tcp      //открытие порта
+7. sudo ufw enable
+8. sudo apt install nmap
+9. crontab -e 
+	* * * * * /home/pi/dev/dev.sh
+

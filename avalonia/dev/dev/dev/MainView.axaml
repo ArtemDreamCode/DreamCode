@@ -1,0 +1,56 @@
+<UserControl  xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:dev.ViewModels"
+        xmlns:m="clr-namespace:dev.Models;assembly=dev"
+        xmlns:valueConverter="clr-namespace:dev.Models;assembly=dev"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+        x:Class="dev.MainView">
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+  <StackPanel Spacing="30">
+    <TextBlock FontSize="40" Text="Welcome to Avalonia" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="0.9*"></RowDefinition>
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="0.5*"></ColumnDefinition>
+        <ColumnDefinition Width="0.5*"></ColumnDefinition>
+      </Grid.ColumnDefinitions>
+
+      <TextBox FontSize="40" HorizontalAlignment="Center" Height="900" Width="800" Grid.Row="0" Grid.Column="1" Text="{Binding log_data}" AcceptsReturn="True" TextWrapping="Wrap" />
+
+
+      <ItemsControl  Grid.Row="0" Grid.Column="0"  Items="{Binding Devices}">
+        <ItemsControl.ItemTemplate  >
+          <DataTemplate>
+            <ToggleButton IsChecked="{Binding state, Converter={valueConverter:isPressedConverter}, Mode=OneWay}"
+                          Margin="20" Width="400" Height="180"
+                    Command="{Binding $parent[ItemsControl].DataContext.ChangeDeviceState}"
+                    CommandParameter="{Binding .}">
+              <StackPanel>
+                <TextBlock FontSize="40" Text="{Binding name}"/>
+                <StackPanel Orientation="Vertical">
+                  <TextBlock FontSize="28" Text="{Binding ip}"/>
+                  <TextBlock FontSize="28" Text="{Binding state}"/>
+
+                </StackPanel>
+              </StackPanel>
+            </ToggleButton>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <UniformGrid VerticalAlignment="Center" HorizontalAlignment="Right"  Columns="1" Rows="4"/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+
+      </ItemsControl>
+    </Grid>
+  </StackPanel>
+</UserControl >
