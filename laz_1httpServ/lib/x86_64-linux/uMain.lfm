@@ -16,9 +16,9 @@ object Form1: TForm1
     Height = 581
     Top = 0
     Width = 957
-    ActivePage = tsMain
+    ActivePage = tsToDo
     Align = alClient
-    TabIndex = 0
+    TabIndex = 3
     TabOrder = 0
     OnChange = pgcChange
     object tsMain: TTabSheet

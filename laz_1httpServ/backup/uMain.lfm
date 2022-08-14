@@ -193,7 +193,6 @@ object Form1: TForm1
             Width = 188
             Align = alClient
             Brush.Style = bsClear
-            Enabled = False
             Pen.Color = 15516693
             Pen.Style = psPattern
             OnMouseUp = sh_settMouseUp
